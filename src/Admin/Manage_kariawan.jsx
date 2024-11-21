@@ -35,7 +35,7 @@ const ManageKaryawan = () => {
             </li>
             <li onClick={() => navigate("/Stockgudangadmin")} className="p-3 hover:bg-blue-600 rounded-md">Stock Gudang</li>
             <li onClick={() => navigate("/Returadmin")} className="p-3 hover:bg-blue-600 rounded-md">Retur Barang</li>
-            <li className="p-3 hover:bg-blue-600 rounded-md">List Barang</li>
+            <li onClick={() => navigate("/List_barang_admin")} className="p-3 hover:bg-blue-600 rounded-md">List Barang</li>
           </ul>
           <button
             className="mt-10 bg-pink-500 p-3 rounded-md w-full text-white font-semibold"

@@ -47,7 +47,7 @@ const Stockgudang = () => {
             >
               Retur Barang
             </li>
-            <li className="p-3 hover:bg-blue-600 rounded-md cursor-pointer">
+            <li className="p-3 hover:bg-blue-600 rounded-md cursor-pointer" onClick={() => navigate("/List_barang_admin")}>
               List Barang
             </li>
           </ul>

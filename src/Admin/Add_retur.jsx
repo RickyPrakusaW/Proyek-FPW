@@ -1,6 +1,7 @@
 import React from "react";
-
+import { useNavigate } from "react-router-dom";
 function AddRetur() {
+  const navigate = useNavigate();
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-700">
       <div className="bg-white w-full max-w-lg p-8 rounded-lg shadow-lg">
@@ -63,7 +64,8 @@ function AddRetur() {
           <div className="flex justify-between mt-6">
             <button
               type="button"
-              className="px-6 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 focus:outline-none"
+              className="px-6 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 focus:outline-none" 
+              onClick={() => navigate("/Returadmin")}
             >
               Kembali
             </button>

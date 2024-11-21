@@ -20,36 +20,31 @@ const ReturAdmin = () => {
               alt="Admin Avatar"
               className="rounded-full w-12 h-12"
             />
-            <h2 className="text-xl font-semibold">Admin</h2>
+            <h2 className="text-xl font-semibold">Kepala Gudang</h2>
           </div>
           <ul className="space-y-4">
             <li
-              className="p-3 hover:bg-blue-600 rounded-md cursor-pointer"
-              onClick={() => navigate("/Homeadmin")}
+              className="p-3 hover:bg-blue-600 rounded-md"
+              onClick={() => navigate("/Homekepalagudang")}
             >
               Dashboard
             </li>
             <li
+            onClick={() => navigate("/Stockgudangkepalagudang")}
               className="p-3 hover:bg-blue-600 rounded-md cursor-pointer"
-              onClick={() => navigate("/Managekaryawan")}
-            >
-              Manage Karyawan
-            </li>
-            <li
-              className="p-3 hover:bg-blue-600 rounded-md cursor-pointer"
-              onClick={() => navigate("/Stockgudangadmin")}
+                
             >
               Stock Gudang
             </li>
-            <li className="bg-blue-600 p-3 rounded-md cursor-pointer">
-              Retur Barang
-            </li>
-            <li
-              className="p-3 hover:bg-blue-600 rounded-md cursor-pointer"
-              onClick={() => navigate("/List_barang_admin")}
-            >
-              List Barang
-            </li>
+            <li 
+            onClick={() => navigate("/Tambahbarangmasuukkepalagudang")} 
+            className="p-3 hover:bg-blue-600 rounded-md">Tambah Barang Masuk</li>
+            <li 
+            // onClick={() => navigate("/Returkepalagudang")} 
+            className="p-3 hover:bg-blue-600 rounded-md">Barang Keluar</li>
+            <li 
+            onClick={() => navigate("/Returkepalagudang")} 
+            className="bg-blue-600 p-3 rounded-md cursor-pointer">Retur Barang</li>
           </ul>
           <button
             className="mt-10 bg-pink-500 p-3 rounded-md w-full text-white font-semibold"

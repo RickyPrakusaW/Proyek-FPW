@@ -90,6 +90,24 @@ const Login = () => {
             >
               Login
             </button>
+            <br />
+            <button
+              type="submit"
+              className="bg-green-500 text-white py-2 font-semibold hover:bg-green-600"
+              style={{ borderRadius: "12px" }}
+              onClick={() => navigate("/Homekepalagudang")}
+            >
+              Login kepala gudang example
+            </button>
+            <br />
+            <button
+              type="submit"
+              className="bg-green-500 text-white py-2 font-semibold hover:bg-green-600"
+              style={{ borderRadius: "12px" }}
+              onClick={() => navigate("/Profile")}
+            >
+              Login kariawan example
+            </button>
           </form>
         </div>
         <div className="w-1/2 pl-8">
