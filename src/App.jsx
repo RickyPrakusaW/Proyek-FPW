@@ -24,7 +24,7 @@ import List_barang_kariawan from "./Kariawan/List_barang_kariawan"
 import Keranjang from "./Kariawan/Keranjang"
 import Checkout from "./Kariawan/Checkout"
 import Pembayaran from "./Kariawan/Pembayaran";
-import Retur from "./Kariawan/Retur"
+// import Retur from "./Kariawan/Retur"
 function App() {
   return (
     <Router>
@@ -53,7 +53,7 @@ function App() {
         <Route path="/Keranjang" element={<Keranjang />} />
         <Route path="/Checkout" element={<Checkout />} />
         <Route path="/Pembayaran" element={<Pembayaran />} />
-        <Route path="/Retur" element={<Retur />} />
+        {/* <Route path="/Retur" element={<Retur />} /> */}
 
       </Routes>
     </Router>
