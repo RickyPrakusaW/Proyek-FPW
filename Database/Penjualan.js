@@ -1,38 +1,38 @@
 const mongoose = require('mongoose');
 
 const penjualanSchema = new mongoose.Schema({
-  Id_penjualan: {
+  idPenjualan: { 
     type: String,
     required: true,
     unique: true
   },
-  Id_barang: {
-    type: mongoose.Schema.Types.Number, 
-    ref: 'Product',
+  idBarang: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Barang',
     required: true
   },
-  Nama_barang: {
+  namaBarang: { 
     type: String,
     required: true
   },
-  Total_barang: {
+  totalBarang: { 
     type: Number,
     required: true
   },
-  Total_harga: {
+  totalHarga: { 
     type: Number,
     required: true
   },
-  Tanggal_pembelian: {
+  tanggalPembelian: {
     type: Date,
     required: true
   },
-  Id_karyawan: {
-    type: mongoose.Schema.Types.Number,
-    ref: 'Admin',
+  idKaryawan: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Karyawan', 
     required: true
   },
-  Nama_customer: {
+  namaCustomer: {
     type: String,
     required: true
   }

@@ -1,53 +1,62 @@
 const mongoose = require('mongoose');
 
 const adminSchema = new mongoose.Schema({
-  Id_admin: {
+  idAdmin: {
     type: Number,
     required: true,
     unique: true
   },
-  Email: {
+  email: {
     type: String,
     required: true
   },
-  Password: {
+  password: {
     type: String,
     required: true
   },
-  Id_karyawan: {
-    type: String,
+  idKaryawan: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Karyawan',
     required: true
   },
-  Id_kepala_gudang: {
-    type: String,
+  idKepalaGudang: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'KepalaGudang',
     required: true
   },
-  Id_product: {
-    type: Number,
+  idProduct: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product',
     required: true
   },
-  Id_stock: {
-    type: Number,
+  idStock: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Stock',
     required: true
   },
-  Id_penjualan: {
-    type: String,
+  idPenjualan: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Penjualan',
     required: true
   },
-  Id_barang_masuk: {
-    type: Number,
+  idBarangMasuk: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'BarangMasuk', 
     required: true
   },
-  Id_barang_keluar: {
-    type: String,
+  idBarangKeluar: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'BarangKeluar',
     required: true
   },
-  Id_retur_gudang: {
-    type: String,
+  idReturGudang: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ReturGudang',
     required: true
   },
-  Id_retur_admin: {
-    type: String,
+  idReturAdmin: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ReturAdmin',
     required: true
   }
 });

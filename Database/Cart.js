@@ -1,33 +1,34 @@
 const mongoose = require('mongoose');
 
 const cartSchema = new mongoose.Schema({
-  Id_cart: {
+  idCart: { 
     type: String,
     required: true,
   },
-  Id_barang: {
-    type: Number,
+  idBarang: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Barang',
     required: true,
   },
-  Nama_barang: {
+  namaBarang: { 
     type: String,
     required: true,
   },
-  Total_product: {
+  totalProduct: { 
     type: Number,
     required: true,
     min: 0,
   },
-  Harga: {
+  harga: { 
     type: Number,
     required: true,
     min: 0,
   },
-  Photo: {
+  photo: { 
     type: String,
     required: false,
   },
-  Total_belanja: {
+  totalBelanja: {
     type: Number,
     required: true,
     min: 0,
