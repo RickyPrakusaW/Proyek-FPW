@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
 
-const HomeAdmin = () => {
+const Penjualan = () => {
   const navigate = useNavigate();
   const { isDarkMode, toggleTheme } = useTheme();
 
@@ -19,17 +19,35 @@ const HomeAdmin = () => {
     ? "bg-blue-600 hover:bg-blue-500"
     : "bg-blue-400 hover:bg-blue-300";
 
-    const handleNavigation = () => {
-      navigate("/Penjualan");
-    };
-    const handleBarang_keluar = () => {
-      navigate("/Barang_keluar");
-    };
+  const dummyData = [
+    { id: 1, name: "Produk A", qty: 10, price: 20000, total: 200000 },
+    { id: 2, name: "Produk B", qty: 5, price: 50000, total: 250000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
+  ];
+  const handleBarang_keluar = () => {
+    navigate("/Barang_keluar");
+  };
+
   return (
     <div className={`min-h-screen flex ${themeClasses}`}>
       {/* Sidebar */}
       <div
-        className={`${
+        className={`fixed ${
           isSidebarOpen ? "w-64" : "w-16"
         } h-screen ${sidebarClasses} p-5 transition-all duration-300`}
       >
@@ -144,13 +162,16 @@ const HomeAdmin = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-5 space-y-5">
+      <div className={`flex-1 p-5 space-y-5 ${isSidebarOpen ? "ml-64" : "ml-16"}`}>
+        {/* Statistik Utama */}
         <div className="grid grid-cols-3 gap-5">
-          <div className={`${buttonClasses} p-5 rounded-md text-center cursor-pointer`}
-        onClick={handleNavigation}>
-        <h3 className="text-xl font-semibold">Penjualan Hari Ini</h3>
-        <p className="text-2xl font-bold">Rp. 1.000.000</p>
-      </div>
+          <div
+            className={`${buttonClasses} p-5 rounded-md text-center cursor-pointer`}
+            onClick={() => navigate("/Penjualan")}
+          >
+            <h3 className="text-xl font-semibold">Penjualan Hari Ini</h3>
+            <p className="text-2xl font-bold">Rp. 1.000.000</p>
+          </div>
 
           <div className={`${buttonClasses} p-5 rounded-md text-center`} onClick={handleBarang_keluar}>
             <h3 className="text-xl font-semibold">Total Barang Keluar</h3>
@@ -162,15 +183,32 @@ const HomeAdmin = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-5">
-          <div className={`${sidebarClasses} p-5 rounded-md`}>
-            <h3 className="text-xl font-semibold mb-3">Penjualan Bulanan</h3>
-            <div className="relative w-full h-48 bg-blue-200 rounded-md"></div>
-          </div>
-
-          <div className={`${sidebarClasses} p-5 rounded-md`}>
-            <h3 className="text-xl font-semibold mb-3">Stock Tipe Barang</h3>
-            <div className="relative w-full h-48 bg-blue-200 rounded-md"></div>
+        {/* Data Dummy Penjualan */}
+        <div className={`${sidebarClasses} p-5 rounded-md`}>
+          <h3 className="text-xl font-semibold mb-5">Data Penjualan</h3>
+          <div className="overflow-auto">
+            <table className="table-auto w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b">
+                  <th className="p-3">No</th>
+                  <th className="p-3">Nama Barang</th>
+                  <th className="p-3">Jumlah</th>
+                  <th className="p-3">Harga Satuan</th>
+                  <th className="p-3">Total Harga</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dummyData.map((item, index) => (
+                  <tr key={item.id} className="border-b">
+                    <td className="p-3">{index + 1}</td>
+                    <td className="p-3">{item.name}</td>
+                    <td className="p-3">{item.qty}</td>
+                    <td className="p-3">Rp. {item.price.toLocaleString()}</td>
+                    <td className="p-3">Rp. {item.total.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -178,4 +216,4 @@ const HomeAdmin = () => {
   );
 };
 
-export default HomeAdmin;
+export default Penjualan;

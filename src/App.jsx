@@ -11,6 +11,8 @@ import Retur_admin from "./Admin/Retur_admin"
 import Add_retur from "./Admin/Add_retur"
 import List_barang_admin from "./Admin/List_barang_admin"
 import Tambah_barang_admin from "./Admin/Tambah_barang_admin"
+import Penjualan from "./Admin/Penjualan"
+import Barang_keluar from "./Admin/Barang_keluar"
 
 //punya kepala gudang semua
 import Home_kepala_gudang from "./Kepala_Gudang/Home_kepalagudang"
@@ -41,6 +43,8 @@ function App() {
         <Route path="/Addretur" element={<Add_retur />} />
         <Route path="/List_barang_admin" element={<List_barang_admin />} />
         <Route path="/Tambah_barang_admin" element={<Tambah_barang_admin />} />
+        <Route path="/Penjualan" element={<Penjualan />} />
+        <Route path="/Barang_keluar" element={<Barang_keluar />} />
 
         {/* punya kepala gudang semua */}
         <Route path="/Homekepalagudang" element={<Home_kepala_gudang />} />
