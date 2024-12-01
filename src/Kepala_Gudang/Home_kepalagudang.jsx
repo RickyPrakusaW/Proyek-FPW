@@ -3,6 +3,12 @@ import { useNavigate } from "react-router-dom";
 
 const Homekepalagudang = () => {
   const navigate = useNavigate();
+  const handleClick = () => {
+    navigate("/Total_barang");
+  };
+  const handleClickk = () => {
+    navigate("/Total_barangKeluar");
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-900 text-white">
@@ -39,7 +45,7 @@ const Homekepalagudang = () => {
             onClick={() => navigate("/Tambahbarangmasuukkepalagudang")} 
             className="p-3 hover:bg-blue-600 rounded-md">Tambah Barang Masuk</li>
             <li 
-            // onClick={() => navigate("/Returkepalagudang")} 
+            onClick={() => navigate("/Total_barangKeluar")} 
             className="p-3 hover:bg-blue-600 rounded-md">Barang Keluar</li>
             <li 
             onClick={() => navigate("/Returkepalagudang")} 
@@ -55,14 +61,21 @@ const Homekepalagudang = () => {
 
         <div className="flex-1 p-5 space-y-5">
           <div className="grid grid-cols-3 gap-5">
-            <div className="bg-blue-600 p-5 rounded-md text-center">
-              <h3 className="text-xl font-semibold">Total Barang Masuk</h3>
-              <p className="text-2xl font-bold">Rp. 1.000.000</p>
-            </div>
-            <div className="bg-blue-600 p-5 rounded-md text-center">
-              <h3 className="text-xl font-semibold">Total Barang Keluar</h3>
-              <p className="text-2xl font-bold">1000</p>
-            </div>
+          <div
+      className="bg-blue-600 p-5 rounded-md text-center cursor-pointer"
+      onClick={handleClick}
+    >
+      <h3 className="text-xl font-semibold">Total Barang Masuk</h3>
+      <p className="text-2xl font-bold">1000 Karung</p>
+    </div>
+    <div
+      className="bg-blue-600 p-5 rounded-md text-center cursor-pointer"
+      onClick={handleClickk}
+    >
+      <h3 className="text-xl font-semibold">Total Barang Keluar</h3>
+      <p className="text-2xl font-bold">1000 Karung</p>
+    </div>
+            
             <div className="bg-blue-600 p-5 rounded-md text-center">
               <h3 className="text-xl font-semibold">Total Barang</h3>
               <p className="text-2xl font-bold">0 Barang</p>

@@ -19,6 +19,9 @@ import Home_kepala_gudang from "./Kepala_Gudang/Home_kepalagudang"
 import Stock_gudang_kepala_gudang from "./Kepala_Gudang/Stock_gudang_kepalagudang"
 import Tambah_barangmasuuk_kepalagudang from "./Kepala_Gudang/Tambah_barangmasuk_kepalagudang"
 import Retur_kepalagudang from "./Kepala_Gudang/Retur_kepalagudang"
+import Total_barang from "./Kepala_Gudang/Total_barangMasuk"
+import Total_barangKeluar from "./Kepala_Gudang/Total_barangKeluar"
+
 
 //punya kariawan
 import Profile from "./Kariawan/Profile"
@@ -51,6 +54,8 @@ function App() {
         <Route path="/Stockgudangkepalagudang" element={<Stock_gudang_kepala_gudang />} />
         <Route path="/Tambahbarangmasuukkepalagudang" element={<Tambah_barangmasuuk_kepalagudang />} />
         <Route path="/Returkepalagudang" element={<Retur_kepalagudang />} />
+        <Route path="/Total_barang" element={<Total_barang />} />
+        <Route path="/Total_barangKeluar" element={<Total_barangKeluar />} />
 
         {/* punya kariawan */}
         <Route path="/Profile" element={<Profile />} />
