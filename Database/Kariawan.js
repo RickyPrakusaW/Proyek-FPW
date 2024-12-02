@@ -6,21 +6,38 @@ const KaryawanSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  first_name: {
+  nama_lengkap: {
     type: String,
     required: true,
   },
-  last_name: {
+  tempat_lahir: {
     type: String,
     required: true,
   },
-  email: {
+  tanggal_lahir: {
+    type: Date,
+    required: true,
+  },
+  jenis_kelamin: {
+    type: String,
+    enum: ['Pria', 'Perempuan'],
+    required: true,
+  },
+  golongan_darah: {
+    type: String,
+    enum: ['A', 'B', 'AB', 'O'],
+    required: false,
+  },
+  alamat: {
     type: String,
     required: true,
-    unique: true,
-    match: [/.+\@.+\..+/, 'Invalid email format'],
   },
-  password: {
+  no_telepon: {
+    type: String,
+    required: true,
+    match: [/^\d+$/, 'Nomor telepon harus berupa angka'],
+  },
+  agama: {
     type: String,
     required: true,
   },
