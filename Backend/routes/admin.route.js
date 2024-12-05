@@ -2,6 +2,10 @@ const express = require('express')
 const router = express()
 
 const Karyawan = require("../models/Kariawan")
+const StockGudang = require("../models/Stock_gudang")
+const BarangRetur = require("../models/Retur_admin")
+const Product = require("../models/Product")
+
 
 router.post("/addKaryawan", async (req, res) => {
     const {
@@ -48,5 +52,23 @@ router.post("/addKaryawan", async (req, res) => {
         res.status(500).json({ error: "Terjadi kesalahan pada server" });
     }
 });
+router.get("/fetchKaryawan", async (req, res) => {
+    const fetchKaryawan = await Karyawan.find();
+    return res.status(200).json(fetchKaryawan)
+})
 
+router.get("/fetchStockGudang", async (req, res) => {
+    const fetchStockGudang = await StockGudang.find();
+    return res.status(200).json(fetchStockGudang)
+})
+
+router.get("/fetchBarangRetur", async (req, res) => {
+    const fetchBarangRetur = await BarangRetur.find();
+    return res.status(200).json(fetchBarangRetur)
+})
+
+router.get("fetchProduct", async (req, res) => {
+    const fetchProduct = await Product.find();
+    return res.status(200).json(fetchProduct)
+})
 module.exports= router;

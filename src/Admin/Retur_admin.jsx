@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SideBar from "./component/SideBar";
 import { useTheme } from "../ThemeContext";
+import axios from "axios"; // Pastikan axios diimpor
 
 const ReturAdmin = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
+  const [barangReturs, setBarangReturs] = useState([]); // Perbaikan di sini
   const [searchQuery, setSearchQuery] = useState("");
 
   const themeClasses = isDarkMode
@@ -17,6 +19,16 @@ const ReturAdmin = () => {
   const tableRowClasses = isDarkMode
     ? "bg-gray-700 hover:bg-blue-700"
     : "bg-gray-100 hover:bg-blue-100";
+
+  useEffect(() => {
+    axios.get("http://localhost:3000/admin/fetchBarangRetur")
+      .then((response) => {
+        setBarangReturs(response.data);
+      })
+      .catch((error) => {
+        console.error("There was an error fetching the return data!", error);
+      });
+  }, []);
 
   return (
     <div className={`flex min-h-screen ${themeClasses}`}>
@@ -49,25 +61,35 @@ const ReturAdmin = () => {
             </tr>
           </thead>
           <tbody>
-            {[...Array(6)].map((_, index) => (
-              <tr key={index} className={`${tableRowClasses}`}>
-                <td className="p-3 border">
-                  {index + 1 < 10 ? `0${index + 1}` : index + 1}
-                </td>
-                <td className="p-3 border">00{index + 1}</td>
-                <td className="p-3 border">Contoh</td>
-                <td className="p-3 border">0</td>
-                <td className="p-3 border">
-                  <div className="flex justify-center">
-                    <img
-                      src="https://via.placeholder.com/40"
-                      alt="Barang"
-                      className="w-10 h-10"
-                    />
-                  </div>
+            {barangReturs.length > 0 ? (
+              barangReturs
+                .filter((barang) =>
+                  barang.namaBarang.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+                .map((barang, index) => (
+                  <tr key={barang.idBarang} className={`${tableRowClasses}`}>
+                    <td className="p-3 border">{index + 1}</td>
+                    <td className="p-3 border">{barang.idBarang}</td>
+                    <td className="p-3 border">{barang.namaBarang}</td>
+                    <td className="p-3 border">{barang.jumlah}</td>
+                    <td className="p-3 border">
+                      <div className="flex justify-center">
+                        <img
+                          src={barang.fotoBarang || "https://via.placeholder.com/40"}
+                          alt={barang.namaBarang}
+                          className="w-10 h-10"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="p-3 text-center text-gray-500">
+                  Tidak ada data retur barang.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

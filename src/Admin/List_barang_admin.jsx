@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SideBar from "./component/SideBar"; 
 import { useTheme } from "../ThemeContext"; 
+import axios from "axios"; // Pastikan axios diimpor
 
 const List_barang_admin = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
+  const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   const themeClasses = isDarkMode
@@ -17,6 +19,20 @@ const List_barang_admin = () => {
   const tableRowClasses = isDarkMode
     ? "bg-gray-700 hover:bg-blue-700"
     : "bg-gray-100 hover:bg-blue-100";
+
+  useEffect(() => {
+    axios.get("http://localhost:3000/admin/fetchProduct")
+      .then((response) => {
+        setProducts(response.data); // Data dari API disimpan di state products
+      })
+      .catch((error) => {
+        console.error("There was an error fetching the product data!", error);
+      });
+  }, []);
+
+  const filteredProducts = products.filter(product =>
+    product.namaBarang.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className={`flex min-h-screen ${themeClasses}`}>
@@ -57,30 +73,38 @@ const List_barang_admin = () => {
             </tr>
           </thead>
           <tbody>
-            {[...Array(8)].map((_, index) => (
-              <tr key={index} className={`${tableRowClasses}`}>
-                <td className="p-3 border">00{index + 1}</td>
-                <td className="p-3 border">Barang {index + 1}</td>
-                <td className="p-3 border">0</td>
-                <td className="p-3 border">11 November 2024</td>
-                <td className="p-3 border">
-                  <div className="flex justify-center space-x-2">
-                    <button
-                      className="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600"
-                      onClick={() => navigate(`/Ubah_barang/${index + 1}`)}
-                    >
-                      Ubah
-                    </button>
-                    <button
-                      className="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600"
-                      onClick={() => console.log(`Hapus Barang ${index + 1}`)}
-                    >
-                      Hapus
-                    </button>
-                  </div>
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((product, index) => (
+                <tr key={product.idBarang} className={`${tableRowClasses}`}>
+                  <td className="p-3 border">{product.idBarang}</td>
+                  <td className="p-3 border">{product.namaBarang}</td>
+                  <td className="p-3 border">{product.stock}</td>
+                  <td className="p-3 border">{product.tanggalMasuk}</td>
+                  <td className="p-3 border">
+                    <div className="flex justify-center space-x-2">
+                      <button
+                        className="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600"
+                        onClick={() => navigate(`/Ubah_barang/${product.idBarang}`)}
+                      >
+                        Ubah
+                      </button>
+                      <button
+                        className="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600"
+                        onClick={() => console.log(`Hapus Barang ${product.idBarang}`)}
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="p-3 text-center text-gray-500">
+                  Tidak ada data barang yang ditemukan.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
