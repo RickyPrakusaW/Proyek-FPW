@@ -8,6 +8,10 @@ import HomeKepalaGudang from "./Kepala_Gudang/Home_kepalagudang";
 import HomeKaryawan from "./Kariawan/Profile"
 import AddKaryawan from "./Admin/Tambah_kariawan"
 import AdminPage from "./AdminPage"
+import ManageKaryawan from "./Admin/Manage_kariawan"
+import StockGudang from "./Admin/Stock_gudang"
+import ReturAdmin from "./Admin/Retur_admin"
+import ListBarang from "./Admin/List_barang_admin"
 import { ThemeProvider } from "./ThemeContext"; // Import ThemeProvider
 import "./index.css"; // Untuk memuat Tailwind CSS
 
@@ -28,6 +32,22 @@ const router = createBrowserRouter([
         path: "addKaryawan",
         element: <AddKaryawan/>
       },
+      {
+        path: "manageKaryawan",
+        element: <ManageKaryawan/>
+      },
+      {
+        path: "stockGudang",
+        element: <StockGudang/>
+      },
+      {
+        path: "returBarang",
+        element: <ReturAdmin/>
+      },
+      {
+        path: "listBarang",
+        element: <ListBarang/>
+      }
     ]
   },
   {
