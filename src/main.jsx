@@ -7,6 +7,7 @@ import HomeAdmin from "./Admin/Home_admin"
 import HomeKepalaGudang from "./Kepala_Gudang/Home_kepalagudang";
 import HomeKaryawan from "./Kariawan/Profile"
 import AddKaryawan from "./Admin/Tambah_kariawan"
+import AdminPage from "./AdminPage"
 import { ThemeProvider } from "./ThemeContext"; // Import ThemeProvider
 import "./index.css"; // Untuk memuat Tailwind CSS
 
@@ -17,7 +18,17 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <HomeAdmin />
+    element: <AdminPage />,
+    children: [
+      {
+        path: "",
+        element: <HomeAdmin />,
+      },
+      {
+        path: "addKaryawan",
+        element: <AddKaryawan/>
+      },
+    ]
   },
   {
     path: "/kepalagudang",
@@ -26,10 +37,6 @@ const router = createBrowserRouter([
   {
     path: "/karyawan",
     element: <HomeKaryawan/>
-  },
-  {
-    path: "/addKaryawan",
-    element: <AddKaryawan/>
   }
 ]);
 

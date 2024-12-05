@@ -65,7 +65,7 @@ const TambahKaryawan = () => {
             className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer ${
               isSidebarOpen ? "bg-blue-600" : ""
             }`}
-            onClick={() => navigate("/admin")}
+            // onClick={() => navigate("/")}
           >
             <span>🏠</span>
             {isSidebarOpen && <span>Dashboard</span>}
@@ -74,28 +74,28 @@ const TambahKaryawan = () => {
             className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer ${
               isSidebarOpen ? "bg-blue-600" : ""
             }`}
-            onClick={() => navigate("/")}
+            // onClick={() => navigate("/")}
           >
             <span>👥</span>
             {isSidebarOpen && <span>Manage Karyawan</span>}
           </li>
           <li
             className="flex items-center space-x-3 p-3 rounded-md cursor-pointer hover:bg-blue-600"
-            onClick={() => navigate("/")}
+            // onClick={() => navigate("/")}
           >
             <span>📦</span>
             {isSidebarOpen && <span>Stock Gudang</span>}
           </li>
           <li
             className="flex items-center space-x-3 p-3 rounded-md cursor-pointer hover:bg-blue-600"
-            onClick={() => navigate("/")}
+            // onClick={() => navigate("/")}
           >
             <span>↩️</span>
             {isSidebarOpen && <span>Retur Barang</span>}
           </li>
           <li
             className="flex items-center space-x-3 p-3 rounded-md cursor-pointer hover:bg-blue-600"
-            onClick={() => navigate("/")}
+            // onClick={() => navigate("/")}
           >
             <span>📋</span>
             {isSidebarOpen && <span>List Barang</span>}
@@ -105,7 +105,7 @@ const TambahKaryawan = () => {
         {/* Logout Button */}
         <button
           className="mt-10 bg-pink-500 p-3 rounded-md w-full text-white font-semibold hover:bg-pink-400"
-          onClick={() => navigate("/")}
+          // onClick={() => navigate("/")}
         >
           {isSidebarOpen ? "Keluar" : "🚪"}
         </button>

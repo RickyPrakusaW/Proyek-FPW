@@ -99,7 +99,7 @@ const HomeAdmin = () => {
             <ul className="ml-6 space-y-2">
               <li
                 className="p-2 hover:bg-gray-300 rounded-md cursor-pointer"
-                onClick={() => navigate("/addKaryawan")}
+                onClick={() => navigate("addKaryawan")}
               >
                 Tambah Karyawan
               </li>
