@@ -83,7 +83,7 @@ const HomeAdmin = () => {
         <ul className="space-y-4">
           <li
             className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer ${buttonClasses}`}
-            onClick={() => navigate("/Homeadmin")}
+            onClick={() => navigate("/admin")}
           >
             <span>🏠</span>
             {isSidebarOpen && <span>Dashboard</span>}
@@ -99,7 +99,7 @@ const HomeAdmin = () => {
             <ul className="ml-6 space-y-2">
               <li
                 className="p-2 hover:bg-gray-300 rounded-md cursor-pointer"
-                onClick={() => navigate("/Tambahkariawan")}
+                onClick={() => navigate("/addKaryawan")}
               >
                 Tambah Karyawan
               </li>

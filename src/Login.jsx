@@ -49,14 +49,24 @@
 import React from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate untuk navigasi
 import logo from "./assets/logo.jpg";
+import { useForm } from "react-hook-form";
 
 const Login = () => {
   const navigate = useNavigate(); // Inisialisasi useNavigate
+  const { register, handleSubmit, reset } = useForm();
 
-  const handleLogin = (e) => {
-    e.preventDefault(); // Mencegah reload halaman setelah submit
+  const handleLogin = (data) => {
+    // e.preventDefault(); // Mencegah reload halaman setelah submit
     // Logika validasi autentikasi bisa ditambahkan di sini
-    navigate("/homeadmin"); // Navigasi ke halaman HomeAdmin
+    if(data.username == "admin" && data.password == "admin"){
+      navigate("/admin"); // Navigasi ke halaman HomeAdmin
+    }
+    else if(data.username == "thio" && data.password == "thio"){
+      navigate("/kepalagudang")
+    }
+    else{
+      alert("Username / Password salah!")
+    }
   };
 
   return (
@@ -70,15 +80,17 @@ const Login = () => {
       >
         <div className="w-1/2 pr-8">
           <h2 className="text-5xl font-bold text-center mb-4">LOGIN</h2>
-          <form className="flex flex-col" onSubmit={handleLogin}>
+          <form className="flex flex-col" onSubmit={handleSubmit(handleLogin)}>
             <input
-              type="email"
+            type="text"
+              {...register('username', {required: true})}
               placeholder="Enter User Email"
               className="p-2 mb-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               style={{ borderRadius: "12px" }}
             />
             <input
               type="password"
+              {...register('password', {required: true})}
               placeholder="Password"
               className="p-2 mb-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               style={{ borderRadius: "12px" }}
@@ -104,7 +116,7 @@ const Login = () => {
               type="submit"
               className="bg-green-500 text-white py-2 font-semibold hover:bg-green-600"
               style={{ borderRadius: "12px" }}
-              onClick={() => navigate("/Profile")}
+              onClick={() => navigate("/karyawan")}
             >
               Login kariawan example
             </button>
