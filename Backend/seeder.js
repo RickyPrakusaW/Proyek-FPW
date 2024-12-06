@@ -1,25 +1,26 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const api = require('./routes/index')
+const mongoose = require('mongoose')
+const express = require("express")
+const api = require("./routes/index")
+const cors = require("cors")
 
 // Inisialisasi aplikasi Express
 const app = express();
 
 // Middleware
-app.use(cors()); // Mengizinkan koneksi dari frontend (React)
-app.use(express.json()); // Parsing JSON request body
-app.use(express.urlencoded({ extended: true }))
-
-app.use('/api', api)
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+const port = 3000
+app.use('/api', api);
 
 // Koneksi ke MongoDB
-mongoose.connect('mongodb://localhost:27017/Proyek_Fpw', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
-
-// Jalankan server
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(port, async () => {
+  try{
+      await mongoose.connect('mongodb://127.0.0.1:27017/Proyek_Fpw')
+      console.log('Database connected')
+  }
+  catch(e){
+      console.log('Error database connection \n', e)
+  }
+  console.log(`listening on port ${port}!`)
+})

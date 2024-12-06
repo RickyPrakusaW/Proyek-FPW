@@ -45,7 +45,7 @@ const List_barang_admin = () => {
           <div className="flex items-center space-x-4">
             <button
               className={`bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded`}
-              onClick={() => navigate("/Tambah_barang_admin")}
+              onClick={() => navigate("/admin/tambahBarang")}
             >
               + Tambah Barang
             </button>

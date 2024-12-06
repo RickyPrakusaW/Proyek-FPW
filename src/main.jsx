@@ -12,6 +12,7 @@ import ManageKaryawan from "./Admin/Manage_kariawan"
 import StockGudang from "./Admin/Stock_gudang"
 import ReturAdmin from "./Admin/Retur_admin"
 import ListBarang from "./Admin/List_barang_admin"
+import TambahBarang from "./Admin/Tambah_barang_admin"
 import { ThemeProvider } from "./ThemeContext"; // Import ThemeProvider
 import "./index.css"; // Untuk memuat Tailwind CSS
 
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: "listBarang",
         element: <ListBarang/>
+      },
+      {
+        path: "tambahBarang",
+        element: <TambahBarang/>
       }
     ]
   },

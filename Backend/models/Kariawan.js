@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const KaryawanSchema = new mongoose.Schema({
+const KaryawanSchema = mongoose.Schema({
   id_karyawan: {
     type: String,
     required: true,
@@ -44,6 +44,10 @@ const KaryawanSchema = new mongoose.Schema({
   ktp: {
     type: String,
     required: true,
+  },
+  foto_ktp: { // Menambahkan field untuk foto KTP
+    type: String,
+    required: false,
   },
   status: {
     type: Boolean,

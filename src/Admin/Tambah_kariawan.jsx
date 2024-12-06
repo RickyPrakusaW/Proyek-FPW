@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
@@ -19,7 +19,26 @@ const TambahKaryawan = () => {
 
   const handleAddKaryawan = async (data) => {
     try {
-      const response = await axios.post("http://localhost:3000/admin/addKaryawan", data);
+      // Prepare form data for file upload
+      const formData = new FormData();
+      formData.append("id_karyawan", data.id_karyawan);
+      formData.append("nama_lengkap", data.nama_lengkap);
+      formData.append("tempat_lahir", data.tempat_lahir);
+      formData.append("tanggal_lahir", data.tanggal_lahir);
+      formData.append("jenis_kelamin", data.jenis_kelamin); // Corrected to match backend field
+      formData.append("golongan_darah", data.golongan_darah);
+      formData.append("alamat", data.alamat);
+      formData.append("no_telepon", data.no_telepon);
+      formData.append("agama", data.agama);
+      formData.append("ktp", data.ktp[0]); // KTP is the file input, it's an array of files
+
+      const response = await axios.post("http://localhost:3000/api/admin/addKaryawan", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // Navigate to admin page after successful addition
       navigate("/admin");
     } catch (error) {
       if (error.response) {
@@ -48,53 +67,56 @@ const TambahKaryawan = () => {
                 type="text"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
                 placeholder="Masukkan ID Karyawan"
-                {...register("id_karyawan")}
+                {...register("id_karyawan", { required: "ID Karyawan wajib diisi" })}
               />
+              {errors.id_karyawan && <span className="text-red-500">{errors.id_karyawan.message}</span>}
 
               <label className="block font-semibold mb-1 mt-4">Nama Lengkap</label>
               <input
                 type="text"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
                 placeholder="Masukkan Nama Lengkap"
-                {...register("nama_lengkap")}
+                {...register("nama_lengkap", { required: "Nama Lengkap wajib diisi" })}
               />
+              {errors.nama_lengkap && <span className="text-red-500">{errors.nama_lengkap.message}</span>}
 
               <label className="block font-semibold mb-1 mt-4">Tempat Lahir</label>
               <input
                 type="text"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
                 placeholder="Masukkan Tempat Lahir"
-                {...register("tempat_lahir")}
+                {...register("tempat_lahir", { required: "Tempat Lahir wajib diisi" })}
               />
+              {errors.tempat_lahir && <span className="text-red-500">{errors.tempat_lahir.message}</span>}
 
               <label className="block font-semibold mb-1 mt-4">Tanggal Lahir</label>
               <input
                 type="date"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
-                {...register("tanggal_lahir")}
+                {...register("tanggal_lahir", { required: "Tanggal Lahir wajib diisi" })}
               />
+              {errors.tanggal_lahir && <span className="text-red-500">{errors.tanggal_lahir.message}</span>}
 
               <label className="block font-semibold mb-1 mt-4">Jenis Kelamin</label>
               <div className="flex items-center space-x-4">
                 <label>
                   <input
                     type="radio"
-                    name="gender"
-                    className="mr-2"
-                    {...register("jenis_kelamin")}
+                    value="Pria"
+                    {...register("jenis_kelamin", { required: "Jenis Kelamin wajib diisi" })}
                   />
                   Pria
                 </label>
                 <label>
                   <input
                     type="radio"
-                    name="gender"
-                    className="mr-2"
-                    {...register("jenis_kelamin")}
+                    value="Perempuan"
+                    {...register("jenis_kelamin", { required: "Jenis Kelamin wajib diisi" })}
                   />
                   Perempuan
                 </label>
               </div>
+              {errors.jenis_kelamin && <span className="text-red-500">{errors.jenis_kelamin.message}</span>}
             </div>
 
             {/* Right Column */}
@@ -104,39 +126,45 @@ const TambahKaryawan = () => {
                 type="text"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
                 placeholder="Masukkan Golongan Darah"
-                {...register("golongan_darah")}
+                {...register("golongan_darah", { required: "Golongan Darah wajib diisi" })}
               />
+              {errors.golongan_darah && <span className="text-red-500">{errors.golongan_darah.message}</span>}
 
               <label className="block font-semibold mb-1 mt-4">Alamat</label>
               <input
                 type="text"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
                 placeholder="Masukkan Alamat"
-                {...register("alamat")}
+                {...register("alamat", { required: "Alamat wajib diisi" })}
               />
+              {errors.alamat && <span className="text-red-500">{errors.alamat.message}</span>}
 
-              <label className="block font-semibold mb-1 mt-4">No Telephone</label>
+              <label className="block font-semibold mb-1 mt-4">No Telepon</label>
               <input
                 type="text"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
                 placeholder="Masukkan No Telepon"
-                {...register("no_telepon")}
+                {...register("no_telepon", { required: "No Telepon wajib diisi" })}
               />
+              {errors.no_telepon && <span className="text-red-500">{errors.no_telepon.message}</span>}
 
               <label className="block font-semibold mb-1 mt-4">Agama</label>
               <input
                 type="text"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
                 placeholder="Masukkan Agama"
-                {...register("agama")}
+                {...register("agama", { required: "Agama wajib diisi" })}
               />
+              {errors.agama && <span className="text-red-500">{errors.agama.message}</span>}
 
               <label className="block font-semibold mb-1 mt-4">KTP</label>
               <input
                 type="file"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
-                {...register("ktp")}
+                {...register("ktp", { required: "KTP wajib diupload", validate: (fileList) => fileList.length > 0 || "File KTP wajib diupload" })}
+                accept=".jpg, .jpeg, .png"
               />
+              {errors.ktp && <span className="text-red-500">{errors.ktp.message}</span>}
             </div>
           </div>
 
