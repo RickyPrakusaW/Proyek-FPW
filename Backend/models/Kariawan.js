@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
+// Schema Karyawan
 const KaryawanSchema = mongoose.Schema({
-  id_karyawan: {
+  id_karyawan: { // ID auto-generate (contoh: K001, K002)
     type: String,
     required: true,
     unique: true,
@@ -41,11 +43,7 @@ const KaryawanSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  ktp: {
-    type: String,
-    required: true,
-  },
-  foto_ktp: { // Menambahkan field untuk foto KTP
+  foto_ktp: { // Nama file foto KTP
     type: String,
     required: false,
   },
@@ -54,7 +52,31 @@ const KaryawanSchema = mongoose.Schema({
     required: true,
     default: true,
   },
+  password: { // Password baru
+    type: String,
+    required: true,
+  },
 });
+
+// Hash password sebelum disimpan ke database
+KaryawanSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    return next(); // Skip hashing jika password tidak diubah
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(10); // Generate salt untuk hash
+    this.password = await bcrypt.hash(this.password, salt); // Hash password
+    next();
+  } catch (error) {
+    next(error); // Jika ada error, lanjutkan ke next dengan error
+  }
+});
+
+// Method untuk memverifikasi password yang dimasukkan dengan password di database
+KaryawanSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 
 const Karyawan = mongoose.model('Karyawan', KaryawanSchema);
 

@@ -13,6 +13,9 @@ import StockGudang from "./Admin/Stock_gudang"
 import ReturAdmin from "./Admin/Retur_admin"
 import ListBarang from "./Admin/List_barang_admin"
 import TambahBarang from "./Admin/Tambah_barang_admin"
+
+//kepala gudang 
+
 import { ThemeProvider } from "./ThemeContext"; // Import ThemeProvider
 import "./index.css"; // Untuk memuat Tailwind CSS
 
@@ -57,7 +60,16 @@ const router = createBrowserRouter([
   },
   {
     path: "/kepalagudang",
-    element: <HomeKepalaGudang />
+    element: <HomeKepalaGudang />,
+    children: [
+      {
+        // path: "Stock",
+        // element: <StockGudangs/>
+      },
+      {
+
+      }
+    ]
   },
   {
     path: "/karyawan",

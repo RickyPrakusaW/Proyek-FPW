@@ -19,27 +19,28 @@ const TambahKaryawan = () => {
 
   const handleAddKaryawan = async (data) => {
     try {
-      // Prepare form data for file upload
+      // Siapkan formData untuk mengirim file dan data lainnya
       const formData = new FormData();
-      formData.append("id_karyawan", data.id_karyawan);
       formData.append("nama_lengkap", data.nama_lengkap);
       formData.append("tempat_lahir", data.tempat_lahir);
       formData.append("tanggal_lahir", data.tanggal_lahir);
-      formData.append("jenis_kelamin", data.jenis_kelamin); // Corrected to match backend field
+      formData.append("jenis_kelamin", data.jenis_kelamin);
       formData.append("golongan_darah", data.golongan_darah);
       formData.append("alamat", data.alamat);
       formData.append("no_telepon", data.no_telepon);
       formData.append("agama", data.agama);
-      formData.append("ktp", data.ktp[0]); // KTP is the file input, it's an array of files
+      formData.append("foto_ktp", data.ktp[0]); // Ganti 'ktp' dengan 'foto_ktp'
+      formData.append("password", data.password); // Menambahkan password ke formData
 
+      // Kirim data ke backend menggunakan axios
       const response = await axios.post("http://localhost:3000/api/admin/addKaryawan", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
-      // Navigate to admin page after successful addition
-      navigate("/admin");
+      alert("Karyawan berhasil ditambahkan!");
+      navigate("/admin"); // Navigasi kembali ke halaman admin setelah berhasil
     } catch (error) {
       if (error.response) {
         alert(`Error: ${error.response.data.error}`);
@@ -60,18 +61,9 @@ const TambahKaryawan = () => {
           onSubmit={handleSubmit(handleAddKaryawan)}
         >
           <div className="grid grid-cols-2 gap-4">
-            {/* Left Column */}
+            {/* Kolom Kiri */}
             <div>
-              <label className="block font-semibold mb-1">ID Karyawan</label>
-              <input
-                type="text"
-                className={`w-full p-2 border rounded-md ${inputClasses}`}
-                placeholder="Masukkan ID Karyawan"
-                {...register("id_karyawan", { required: "ID Karyawan wajib diisi" })}
-              />
-              {errors.id_karyawan && <span className="text-red-500">{errors.id_karyawan.message}</span>}
-
-              <label className="block font-semibold mb-1 mt-4">Nama Lengkap</label>
+              <label className="block font-semibold mb-1">Nama Lengkap</label>
               <input
                 type="text"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
@@ -119,7 +111,7 @@ const TambahKaryawan = () => {
               {errors.jenis_kelamin && <span className="text-red-500">{errors.jenis_kelamin.message}</span>}
             </div>
 
-            {/* Right Column */}
+            {/* Kolom Kanan */}
             <div>
               <label className="block font-semibold mb-1">Golongan Darah</label>
               <input
@@ -157,18 +149,28 @@ const TambahKaryawan = () => {
               />
               {errors.agama && <span className="text-red-500">{errors.agama.message}</span>}
 
-              <label className="block font-semibold mb-1 mt-4">KTP</label>
+              <label className="block font-semibold mb-1 mt-4">Upload KTP</label>
               <input
                 type="file"
+                name="foto_ktp"  // Ganti 'ktp' dengan 'foto_ktp'
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
-                {...register("ktp", { required: "KTP wajib diupload", validate: (fileList) => fileList.length > 0 || "File KTP wajib diupload" })}
-                accept=".jpg, .jpeg, .png"
+                accept=".jpg,.jpeg,.png"
+                {...register("ktp", { required: "KTP wajib diupload" })}
               />
               {errors.ktp && <span className="text-red-500">{errors.ktp.message}</span>}
+
+              <label className="block font-semibold mb-1 mt-4">Password</label>
+              <input
+                type="password"
+                className={`w-full p-2 border rounded-md ${inputClasses}`}
+                placeholder="Masukkan Password"
+                {...register("password", { required: "Password wajib diisi" })}
+              />
+              {errors.password && <span className="text-red-500">{errors.password.message}</span>}
             </div>
           </div>
 
-          <div className="flex justify-end space-x-4">
+          <div className="flex justify-end space-x-4 mt-5">
             <button
               type="button"
               className="bg-pink-500 px-5 py-2 rounded-md text-white font-semibold"

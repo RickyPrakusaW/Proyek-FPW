@@ -21,17 +21,19 @@ const List_barang_admin = () => {
     : "bg-gray-100 hover:bg-blue-100";
 
   useEffect(() => {
-    axios.get("http://localhost:3000/admin/fetchProduct")
+    // Pastikan menggunakan endpoint yang benar
+    axios.get("http://localhost:3000/api/admin/getProduct")
       .then((response) => {
-        setProducts(response.data); // Data dari API disimpan di state products
+        setProducts(response.data.data); // Data dari API disimpan di state products
       })
       .catch((error) => {
         console.error("There was an error fetching the product data!", error);
       });
   }, []);
 
+  // Memastikan namaBarang ada sebelum melakukan .toLowerCase()
   const filteredProducts = products.filter(product =>
-    product.namaBarang.toLowerCase().includes(searchQuery.toLowerCase())
+    product.Nama_product && product.Nama_product.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -54,59 +56,37 @@ const List_barang_admin = () => {
               placeholder="Cari"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`border border-gray-300 py-2 px-4 rounded ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
+              className={`border border-gray-300 py-2 px-4 rounded ${isDarkMode ? "text-white" : "text-gray-900"}`}
             />
           </div>
         </div>
 
-        {/* Table Section */}
-        <table className="w-full text-center border-collapse">
-          <thead>
-            <tr className={`${tableHeaderClasses}`}>
-              <th className="p-3 border">ID</th>
-              <th className="p-3 border">Nama</th>
-              <th className="p-3 border">Stock</th>
-              <th className="p-3 border">Tanggal Masuk</th>
-              <th className="p-3 border">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product, index) => (
-                <tr key={product.idBarang} className={`${tableRowClasses}`}>
-                  <td className="p-3 border">{product.idBarang}</td>
-                  <td className="p-3 border">{product.namaBarang}</td>
-                  <td className="p-3 border">{product.stock}</td>
-                  <td className="p-3 border">{product.tanggalMasuk}</td>
-                  <td className="p-3 border">
-                    <div className="flex justify-center space-x-2">
-                      <button
-                        className="bg-green-500 text-white py-1 px-4 rounded hover:bg-green-600"
-                        onClick={() => navigate(`/Ubah_barang/${product.idBarang}`)}
-                      >
-                        Ubah
-                      </button>
-                      <button
-                        className="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-600"
-                        onClick={() => console.log(`Hapus Barang ${product.idBarang}`)}
-                      >
-                        Hapus
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="p-3 text-center text-gray-500">
-                  Tidak ada data barang yang ditemukan.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        {/* Card Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <div key={product.Id_product} className="border rounded-md p-4 shadow-lg">
+                <img
+                  src={`http://localhost:3000/uploads/product/${product.Photo_product}`}
+                  alt={product.Nama_product}
+                  className="w-full h-64 object-cover mb-4"
+                />
+                <h3 className="text-xl font-semibold">{product.Nama_product}</h3>
+                <p className="text-gray-500">Harga: Rp {product.Harga}</p>
+                <p className="text-gray-500">Stock: {product.Stock_barang}</p>
+                <p className="text-gray-500">Tanggal Masuk: {product.Tanggal_masuk}</p>
+                <button
+                  className="bg-blue-500 text-white py-2 px-4 rounded mt-4 w-full"
+                  onClick={() => navigate(`/admin/detailBarang/${product.Id_product}`)}
+                >
+                  Detail
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500">Tidak ada barang yang ditemukan.</p>
+          )}
+        </div>
       </div>
     </div>
   );

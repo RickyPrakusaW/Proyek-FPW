@@ -1,28 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
-import { useForm } from "react-hook-form";
-import SideBar from "./component/SideBar";
 import axios from "axios";
+import SideBar from "./component/SideBar";
 
 const ManageKaryawan = () => {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm();
-  const [karyawans, setKaryawans] = useState([]); // Perbaiki penggunaan useState
+  const [karyawans, setKaryawans] = useState([]);
   const { isDarkMode } = useTheme();
 
-  const themeClasses = isDarkMode
-    ? "bg-gray-900 text-white"
-    : "bg-white text-gray-900";
-  const inputClasses = isDarkMode
-    ? "bg-gray-800 text-white border-gray-700"
-    : "bg-white text-gray-900 border-gray-300";
+  const themeClasses = isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900";
+  const tableClasses = isDarkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900";
   const isLightMode = !isDarkMode;
 
   useEffect(() => {
-    axios.get("http://localhost:3000/admin/fetchKaryawan")
+    // Mengambil data karyawan dari backend
+    axios.get("http://localhost:3000/api/admin/getKaryawan")
       .then((response) => {
-        setKaryawans(response.data);
+        setKaryawans(response.data.data); // Menyimpan data karyawan dalam state
       })
       .catch((error) => {
         console.error("There was an error fetching the karyawan data!", error);
@@ -32,8 +27,7 @@ const ManageKaryawan = () => {
   return (
     <div className={`flex min-h-screen ${themeClasses}`}>
       <SideBar />
-      {/* Main Content */}
-      <div className="flex-1 p-5">
+      <div className="flex-1 p-8">
         {/* Header Content */}
         <div className="flex justify-between items-center mb-5">
           <h2 className="text-2xl font-bold">Daftar Karyawan</h2>
@@ -44,44 +38,45 @@ const ManageKaryawan = () => {
             >
               + Tambah Karyawan
             </button>
-            <span className="ml-5 text-lg">Total Karyawan: {karyawans.length}</span> {/* Menampilkan total karyawan */}
+            <span className="ml-5 text-lg">Total Karyawan: {karyawans.length}</span>
           </div>
         </div>
 
         {/* Table */}
-        <div
-          className={`p-5 rounded-md ${isLightMode ? "bg-gray-200" : "bg-gray-800"}`}
-        >
-          <table className="w-full text-center border-collapse">
+        <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+          <table className="min-w-full table-auto">
             <thead>
-              <tr
-                className={`${isLightMode ? "bg-blue-400" : "bg-blue-600"} text-white`}
-              >
-                <th className="p-3 border">ID</th>
-                <th className="p-3 border">Email</th>
-                <th className="p-3 border">Status</th>
-                <th className="p-3 border">Action</th>
+              <tr className={`text-white ${isLightMode ? "bg-blue-400" : "bg-blue-600"}`}>
+                <th className="p-4 border">ID</th>
+                <th className="p-4 border">Nama Lengkap</th>
+                <th className="p-4 border">Tempat Lahir</th>
+                <th className="p-4 border">Tanggal Lahir</th>
+                <th className="p-4 border">Jenis Kelamin</th>
+                <th className="p-4 border">Golongan Darah</th>
+                <th className="p-4 border">No Telepon</th>
+                <th className="p-4 border">Status</th>
+                <th className="p-4 border">Action</th>
               </tr>
             </thead>
             <tbody>
               {karyawans.length > 0 ? (
                 karyawans.map((karyawan, index) => (
                   <tr
-                    key={karyawan.id}
-                    className={`${
-                      isLightMode
-                        ? index % 2 === 0
-                          ? "bg-gray-100"
-                          : "bg-gray-50"
-                        : index % 2 === 0
-                        ? "bg-gray-700"
-                        : "bg-gray-600"
-                    }`}
+                    key={karyawan.id_karyawan}
+                    className={`${isLightMode ? (index % 2 === 0 ? "bg-gray-50" : "bg-gray-100") : (index % 2 === 0 ? "bg-gray-700" : "bg-gray-600")}`}
                   >
-                    <td className="p-3 border">{karyawan.id}</td>
-                    <td className="p-3 border">{karyawan.email}</td>
+                    <td className="p-3 border">{karyawan.id_karyawan}</td>
+                    <td className="p-3 border">{karyawan.nama_lengkap}</td>
+                    <td className="p-3 border">{karyawan.tempat_lahir}</td>
+                    <td className="p-3 border">{karyawan.tanggal_lahir}</td>
+                    <td className="p-3 border">{karyawan.jenis_kelamin}</td>
+                    <td className="p-3 border">{karyawan.golongan_darah}</td>
+                    <td className="p-3 border">{karyawan.no_telepon}</td>
                     <td className="p-3 border">{karyawan.status}</td>
                     <td className="p-3 border">
+                      <button className="bg-blue-500 px-3 py-1 rounded-md mr-2 text-white font-semibold">
+                        Detail
+                      </button>
                       {karyawan.status === "Bekerja" ? (
                         <button className="bg-pink-500 px-3 py-1 rounded-md mr-2 text-white font-semibold">
                           Pecat
@@ -99,7 +94,7 @@ const ManageKaryawan = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="p-3 text-center text-gray-500">
+                  <td colSpan="9" className="p-3 text-center text-gray-500">
                     Tidak ada karyawan yang ditemukan.
                   </td>
                 </tr>

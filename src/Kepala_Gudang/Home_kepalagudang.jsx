@@ -35,7 +35,7 @@ const Homekepalagudang = () => {
               Dashboard
             </li>
             <li
-            onClick={() => navigate("/Stockgudangkepalagudang")}
+            onClick={() => navigate("/StockGudangs")}
               className="p-3 hover:bg-blue-600 rounded-md cursor-pointer"
                 
             >
