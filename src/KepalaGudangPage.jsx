@@ -1,9 +1,9 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import SideBar from './Admin/component/SideBar';
+import SideBar from './Kepala_Gudang/component/SideBar';
 import { useTheme } from './ThemeContext';
 
-const AdminPage = () => {
+const KepalaGudangPage = () => {
   const { isDarkMode } = useTheme();
   const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
@@ -22,4 +22,4 @@ const AdminPage = () => {
   );
 };
 
-export default AdminPage;
+export default KepalaGudangPage;

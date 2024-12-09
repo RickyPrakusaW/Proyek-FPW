@@ -113,7 +113,7 @@
 
     return (
       <div className={`flex min-h-screen ${themeClasses}`}>
-        <SideBar />
+        {/* <SideBar /> */}
         <div className="flex-1 p-5 space-y-5">
           {/* Kartu Statistik */}
           <div className="grid grid-cols-3 gap-5">

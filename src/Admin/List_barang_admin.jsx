@@ -38,7 +38,7 @@ const List_barang_admin = () => {
 
   return (
     <div className={`flex min-h-screen ${themeClasses}`}>
-      <SideBar />
+      {/* <SideBar /> */}
       {/* Main Content */}
       <div className="flex-1 p-5">
         {/* Header Section */}

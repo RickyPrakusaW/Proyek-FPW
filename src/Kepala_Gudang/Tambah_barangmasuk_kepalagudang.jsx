@@ -1,123 +1,89 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useTheme } from "./../ThemeContext";
 
-const Tambah_barangmasuk_kepalagudang = () => {
-  const navigate = useNavigate();
+const TambahBarangMasukKepalaGudang = () => {
+  const { isDarkMode } = useTheme();
+
+  const themeClasses = isDarkMode
+    ? "bg-gray-900 text-white"
+    : "bg-white text-gray-900";
+  const inputClasses = isDarkMode
+    ? "w-full border border-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    : "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500";
+  const buttonBackClasses = isDarkMode
+    ? "bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600"
+    : "bg-pink-300 text-black px-4 py-2 rounded hover:bg-pink-400";
+  const buttonSaveClasses = isDarkMode
+    ? "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+    : "bg-green-300 text-black px-4 py-2 rounded hover:bg-green-400";
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900 text-white">
-      {/* Header */}
-      <div className="flex justify-between items-center p-5 bg-gray-800">
-        <h1 className="text-xl font-bold">Lihat Stock (Kepala_Gudang)</h1>
-      </div>
-
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <div className="w-1/4 bg-gray-800 p-5">
-          <div className="flex items-center space-x-3 mb-10">
-            <img
-              src="https://via.placeholder.com/50"
-              alt="Admin Avatar"
-              className="rounded-full w-12 h-12"
-            />
-            <h2 className="text-xl font-semibold">Kepala Gudang</h2>
-          </div>
-          <ul className="space-y-4">
-            <li
-              className="p-3 hover:bg-blue-600 rounded-md"
-              onClick={() => navigate("/Homekepalagudang")}
-            >
-              Dashboard
-            </li>
-            <li
-            onClick={() => navigate("/Stockgudangkepalagudang")}
-              className="p-3 hover:bg-blue-600 rounded-md"
-                
-            >
-              Stock Gudang
-            </li>
-            <li 
-            onClick={() => navigate("/Tambahbarangmasuukkepalagudang")} 
-            className="bg-blue-600 p-3 rounded-md cursor-pointer">Tambah Barang Masuk</li>
-            <li 
-            // onClick={() => navigate("/Returkepalagudang")} 
-            className="p-3 hover:bg-blue-600 rounded-md">Barang Keluar</li>
-            <li 
-            onClick={() => navigate("/Returkepalagudang")} 
-            className="p-3 hover:bg-blue-600 rounded-md">Retur Barang</li>
-          </ul>
-          <button
-            className="mt-10 bg-pink-500 p-3 rounded-md w-full text-white font-semibold"
-            onClick={() => navigate("/")}
-          >
-            Keluar
-          </button>
-        </div>
-
-        {/* Main Content */}
-         <div className="w-4/5 p-5">
+    <div className={`min-h-screen flex flex-col ${themeClasses}`}>
+      {/* Main Content */}
+      <div className="w-4/5 p-5 mx-auto">
         {/* Form Title */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Tambah Barang Masuk</h1>
+          <h1 className="text-2xl font-bold">Tambah Barang Masuk</h1>
         </div>
 
         {/* Form */}
-        <form className="bg-white shadow-lg rounded-lg p-6">
+        <form className={`shadow-lg rounded-lg p-6 ${isDarkMode ? "bg-gray-800" : "bg-gray-100"}`}>
           <div className="space-y-4">
             {/* ID Barang */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">ID Barang</label>
+              <label className="block font-medium mb-1">ID Barang</label>
               <input
                 type="text"
                 placeholder="ID Barang"
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClasses}
               />
             </div>
             {/* Nama Barang */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Nama Barang</label>
+              <label className="block font-medium mb-1">Nama Barang</label>
               <input
                 type="text"
                 placeholder="Nama Barang"
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClasses}
               />
             </div>
             {/* Jumlah Barang */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Jumlah Barang</label>
+              <label className="block font-medium mb-1">Jumlah Barang</label>
               <input
                 type="number"
                 placeholder="Jumlah Barang"
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClasses}
               />
             </div>
             {/* Tipe Barang */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Tipe Barang</label>
+              <label className="block font-medium mb-1">Tipe Barang</label>
               <input
                 type="text"
                 placeholder="Tipe Barang"
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClasses}
               />
             </div>
             {/* Tanggal Masuk */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Tanggal Masuk</label>
+              <label className="block font-medium mb-1">Tanggal Masuk</label>
               <input
                 type="date"
-                placeholder="Tanggal Masuk"
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputClasses}
               />
             </div>
             {/* Foto Barang */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Foto Barang</label>
+              <label className="block font-medium mb-1">Foto Barang</label>
               <div className="flex items-center">
                 <input
                   type="file"
-                  className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`border rounded px-3 py-2 ${isDarkMode ? "border-gray-700" : "border-gray-300"}`}
                 />
-                <span className="ml-4 text-gray-500">Tidak Ada File yang Dipilih</span>
+                <span className={`ml-4 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                  Tidak Ada File yang Dipilih
+                </span>
               </div>
             </div>
           </div>
@@ -126,24 +92,21 @@ const Tambah_barangmasuk_kepalagudang = () => {
           <div className="flex justify-end space-x-4 mt-6">
             <button
               type="button"
-              className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600"
+              className={buttonBackClasses}
             >
               Kembali
             </button>
             <button
               type="submit"
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              className={buttonSaveClasses}
             >
               Simpan
             </button>
           </div>
         </form>
-      </div> 
       </div>
     </div>
   );
 };
 
-export default Tambah_barangmasuk_kepalagudang;
-
-
+export default TambahBarangMasukKepalaGudang;

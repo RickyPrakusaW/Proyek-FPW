@@ -26,7 +26,7 @@ const ManageKaryawan = () => {
 
   return (
     <div className={`flex min-h-screen ${themeClasses}`}>
-      <SideBar />
+      {/* <SideBar /> */}
       <div className="flex-1 p-8">
         {/* Header Content */}
         <div className="flex justify-between items-center mb-5">

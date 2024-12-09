@@ -8,11 +8,18 @@ import HomeKepalaGudang from "./Kepala_Gudang/Home_kepalagudang";
 import HomeKaryawan from "./Kariawan/Profile"
 import AddKaryawan from "./Admin/Tambah_kariawan"
 import AdminPage from "./AdminPage"
+import KepalaGudangPage from "./KepalaGudangPage"
 import ManageKaryawan from "./Admin/Manage_kariawan"
 import StockGudang from "./Admin/Stock_gudang"
 import ReturAdmin from "./Admin/Retur_admin"
 import ListBarang from "./Admin/List_barang_admin"
 import TambahBarang from "./Admin/Tambah_barang_admin"
+import StockGudang2 from './Kepala_Gudang/Stock_gudang_kepalagudang'
+import TambahBarangMasuk from './Kepala_Gudang/Tambah_barangmasuk_kepalagudang'
+import TambahBarangKeluar from './Kepala_Gudang/Tambah_barangkeluar_kepalagudang'
+import ReturKepalaGudang from './Kepala_Gudang/Retur_kepalagudang'
+import TotalBarang from './Kepala_Gudang/Total_barangMasuk'
+import TotalBarangKeluar from './Kepala_Gudang/Total_barangKeluar'
 
 //kepala gudang 
 
@@ -54,20 +61,41 @@ const router = createBrowserRouter([
       },
       {
         path: "tambahBarang",
-        element: <TambahBarang/>
+        element: <TambahBarang/>,
       }
     ]
   },
   {
     path: "/kepalagudang",
-    element: <HomeKepalaGudang />,
+    element: <KepalaGudangPage />,
     children: [
       {
-        // path: "Stock",
-        // element: <StockGudangs/>
+        path: "",
+        element: <HomeKepalaGudang/>
       },
       {
-
+        path: "stockGudang",
+        element: <StockGudang2/>
+      },
+      {
+        path: "addBarangMasuk",
+        element: <TambahBarangMasuk/>
+      },
+      {
+        path: "addBarangKeluar",
+        element: <TambahBarangKeluar/>
+      },
+      {
+        path: "returBarang",
+        element: <ReturKepalaGudang/>
+      },
+      {
+        path: "totalBarang",
+        element: <TotalBarang/>,
+      },
+      {
+        path: "totalBarangKeluar",
+        element: <TotalBarangKeluar/>,
       }
     ]
   },

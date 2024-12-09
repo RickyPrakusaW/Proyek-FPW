@@ -53,7 +53,7 @@ const TambahKaryawan = () => {
 
   return (
     <div className={`flex min-h-screen ${themeClasses}`}>
-      <SideBar />
+      {/* <SideBar /> */}
       <div className="flex-1 p-10">
         <h2 className="text-2xl font-bold mb-5">Tambah Karyawan</h2>
         <form
