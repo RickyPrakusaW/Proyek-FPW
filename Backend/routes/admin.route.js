@@ -206,5 +206,14 @@ router.post('/addRetur', uploadRetur, async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+router.get('/getRetur', async (req, res) => {
+  try {
+    const returs = await ReturAdmin.find(); // Mengambil semua data retur dari database
+    res.status(200).json({ message: 'Data retur berhasil diambil', data: returs });
+  } catch (error) {
+    console.error('Error saat mengambil data retur:', error);
+    res.status(500).json({ error: 'Terjadi kesalahan pada server' });
+  }
+});
 
 module.exports = router;

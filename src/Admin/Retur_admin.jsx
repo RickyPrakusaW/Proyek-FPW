@@ -7,7 +7,7 @@ import axios from "axios"; // Pastikan axios diimpor
 const ReturAdmin = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
-  const [barangReturs, setBarangReturs] = useState([]); // Perbaikan di sini
+  const [barangReturs, setBarangReturs] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   const themeClasses = isDarkMode
@@ -20,10 +20,13 @@ const ReturAdmin = () => {
     ? "bg-gray-700 hover:bg-blue-700"
     : "bg-gray-100 hover:bg-blue-100";
 
+  // Ambil data dari backend saat komponen dimuat
   useEffect(() => {
-    axios.get("http://localhost:3000/admin/fetchBarangRetur")
+    axios
+      .get("http://localhost:3000/api/admin/getRetur") // Pastikan URL benar
       .then((response) => {
-        setBarangReturs(response.data);
+        // Mengakses data dari response.data.data
+        setBarangReturs(response.data.data);
       })
       .catch((error) => {
         console.error("There was an error fetching the return data!", error);
@@ -64,19 +67,23 @@ const ReturAdmin = () => {
             {barangReturs.length > 0 ? (
               barangReturs
                 .filter((barang) =>
-                  barang.namaBarang.toLowerCase().includes(searchQuery.toLowerCase())
+                  barang.Nama_barang.toLowerCase().includes(searchQuery.toLowerCase())
                 )
                 .map((barang, index) => (
-                  <tr key={barang.idBarang} className={`${tableRowClasses}`}>
+                  <tr key={barang._id} className={`${tableRowClasses}`}>
                     <td className="p-3 border">{index + 1}</td>
-                    <td className="p-3 border">{barang.idBarang}</td>
-                    <td className="p-3 border">{barang.namaBarang}</td>
-                    <td className="p-3 border">{barang.jumlah}</td>
+                    <td className="p-3 border">{barang.Id_barang}</td>
+                    <td className="p-3 border">{barang.Nama_barang}</td>
+                    <td className="p-3 border">{barang.Jumlah_barang}</td>
                     <td className="p-3 border">
                       <div className="flex justify-center">
                         <img
-                          src={barang.fotoBarang || "https://via.placeholder.com/40"}
-                          alt={barang.namaBarang}
+                          src={
+                            barang.Photo_product
+                              ? `http://localhost:3000/uploads/${barang.Photo_product}`
+                              : "https://via.placeholder.com/40"
+                          }
+                          alt={barang.Nama_barang}
                           className="w-10 h-10"
                         />
                       </div>
