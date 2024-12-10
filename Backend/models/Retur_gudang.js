@@ -1,13 +1,17 @@
 const mongoose = require('mongoose');
 
+// Import model StockGudang untuk referensi
+const StockGudang = require('./Stock_gudang');
+
 const returGudangSchema = new mongoose.Schema({
   idReturGudang: { 
     type: String,
     required: true
   },
+  // Mengubah referensi ke StockGudang dan menggunakan id_stock sebagai referensi
   idBarang: { 
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Barang', 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'StockGudang',  // Menunjuk ke StockGudang
     required: true
   },
   namaBarang: { 
@@ -26,11 +30,6 @@ const returGudangSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  idKepalaGudang: { 
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'KepalaGudang', 
-    required: true
-  }
 });
 
 const ReturGudang = mongoose.model('ReturGudang', returGudangSchema);

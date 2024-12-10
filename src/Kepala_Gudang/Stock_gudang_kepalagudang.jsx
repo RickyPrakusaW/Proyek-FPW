@@ -1,70 +1,63 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "./../ThemeContext";
+import axios from "axios";
 
 const Stockgudang = () => {
   const { isDarkMode } = useTheme();
+  const [stocks, setStocks] = useState([]);
 
   const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
     : "bg-white text-gray-900";
-  const tableHeaderClasses = isDarkMode
-    ? "bg-blue-600 text-white"
-    : "bg-blue-300 text-black";
-  const rowOddClasses = isDarkMode ? "bg-gray-700" : "bg-gray-200";
-  const rowEvenClasses = isDarkMode ? "bg-gray-800" : "bg-gray-300";
+  const cardClasses = isDarkMode
+    ? "bg-gray-800 text-white shadow-lg"
+    : "bg-white text-gray-900 shadow-md";
   const inputClasses = isDarkMode
     ? "p-2 rounded-md border border-gray-700 text-black focus:outline-none"
     : "p-2 rounded-md border border-gray-300 text-black focus:outline-none";
 
+  // Fetch data from backend
+  useEffect(() => {
+    const fetchStockData = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/admin/getStock");
+        setStocks(response.data.data); // Assuming `data` is the key for the stock array
+      } catch (error) {
+        console.error("Error fetching stock data:", error);
+      }
+    };
+    fetchStockData();
+  }, []);
+
   return (
     <div className={`min-h-screen flex flex-col ${themeClasses}`}>
-      {/* Main Content */}
-      <div className="flex-1 p-5 rounded-md">
-        <div className="flex justify-between items-center mb-5">
-          <h1 className="text-2xl font-bold">Stock Di Gudang</h1>
-          <input
-            type="text"
-            placeholder="Search"
-            className={inputClasses}
-          />
-        </div>
+      {/* Header */}
+      <div className="flex justify-between items-center p-5">
+        <h1 className="text-2xl font-bold">Stock Di Gudang</h1>
+        <input type="text" placeholder="Search" className={inputClasses} />
+      </div>
 
-        {/* Tabel */}
-        <table className="w-full text-center border-collapse">
-          <thead>
-            <tr className={tableHeaderClasses}>
-              <th className="p-3 border">ID</th>
-              <th className="p-3 border">Nama</th>
-              <th className="p-3 border">Jumlah</th>
-              <th className="p-3 border">Tanggal Masuk</th>
-              <th className="p-3 border">Tanggal Keluar</th>
-              <th className="p-3 border">Tipe Barang</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[...Array(8)].map((_, index) => (
-              <tr
-                key={index}
-                className={`${
-                  index % 2 === 0 ? rowEvenClasses : rowOddClasses
-                } hover:bg-blue-700`}
-              >
-                <td className="p-3 border">00{index + 1}</td>
-                <td className="p-3 border">Example</td>
-                <td className="p-3 border">0</td>
-                <td className="p-3 border">11 November 2024</td>
-                <td className="p-3 border">11 November 2024</td>
-                <td className="p-3 border">
-                  {index % 3 === 0
-                    ? "Tas Sekolah"
-                    : index % 3 === 1
-                    ? "Tas Anak"
-                    : "Tas Canvas"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Cards Container */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 p-5">
+        {stocks.map((stock, index) => (
+          <div
+            key={index}
+            className={`rounded-lg overflow-hidden flex flex-col items-center p-5 ${cardClasses}`}
+          >
+            {/* Image */}
+            <img
+              src={`http://localhost:3000/api/admin/uploads/stock/${stock.photo_barang}`}
+              alt={stock.nama_barang}
+              className="w-full h-48 object-cover rounded-md mb-4"
+            />
+            {/* Nama Barang */}
+            <h2 className="text-lg font-bold mb-2">{stock.nama_barang}</h2>
+            {/* Stock Barang */}
+            <p className="text-sm text-gray-500">
+              Jumlah: <span className="font-semibold">{stock.total_barang}</span>
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );
