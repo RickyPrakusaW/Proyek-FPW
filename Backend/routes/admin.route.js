@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const Admin = require('../models/Admin');
 const Karyawan = require('../models/Kariawan');
 const Product = require('../models/Product');
 const Stock = require('../models/Stock_gudang');
@@ -59,6 +60,94 @@ const uploadReturGudang = multer({
   storage: createStorage('uploads/retur_gudang'), // Direktori penyimpanan file
   fileFilter, // Filter file untuk memvalidasi jenis file
 }).single('photo_product');
+
+
+//login
+const initializeAdmin = async () => {
+  try {
+    const existingAdmin = await Admin.findOne({ Email: 'admin' });
+    if (!existingAdmin) {
+      const hashedPassword = await bcrypt.hash('admin', 10);
+      const newAdmin = new Admin({
+        Id_admin: 1,
+        Email: 'admin',
+        Password: hashedPassword,
+        Id_karyawan: 'default_karyawan',
+        Id_kepala_gudang: 'default_kepala_gudang',
+        Id_product: 0,
+        Id_stock: 0,
+        Id_penjualan: 'default_penjualan',
+        Id_barang_masuk: 0,
+        Id_barang_keluar: 'default_barang_keluar',
+        Id_retur_gudang: 'default_retur_gudang',
+        Id_retur_admin: 'default_retur_admin',
+      });
+      await newAdmin.save();
+      console.log('Default admin created');
+    } else {
+      console.log('Admin already exists');
+    }
+  } catch (error) {
+    console.error('Error initializing admin:', error);
+  }
+};
+
+initializeAdmin();
+
+// Login Route
+router  .post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const admin = await Admin.findOne({ Email: email });
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, admin.Password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    res.status(200).json({ message: 'Welcome Admin' });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+router.put('/update', async (req, res) => {
+  const { oldEmail, oldPassword, newEmail, newPassword } = req.body;
+
+  try {
+    // Cari admin berdasarkan email lama
+    const admin = await Admin.findOne({ Email: oldEmail });
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+
+    // Verifikasi password lama
+    const isPasswordValid = await bcrypt.compare(oldPassword, admin.Password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid old credentials' });
+    }
+
+    // Hash password baru jika diberikan
+    const hashedPassword = newPassword ? await bcrypt.hash(newPassword, 10) : admin.Password;
+
+    // Update email dan/atau password
+    admin.Email = newEmail || admin.Email;
+    admin.Password = hashedPassword;
+
+    // Simpan perubahan ke database
+    await admin.save();
+
+    res.status(200).json({ message: 'Admin updated successfully' });
+  } catch (error) {
+    console.error('Error during update:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 
 
 // Route untuk menambahkan Karyawan
@@ -300,7 +389,23 @@ router.post('/barangKeluar', async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+router.get('/barangKeluar', async (req, res) => {
+  try {
+    // Ambil semua data barang keluar dari database
+    const allBarangKeluar = await Stock.find();
 
+    // Jika tidak ada data
+    if (allBarangKeluar.length === 0) {
+      return res.status(404).json({ message: 'Belum ada barang keluar yang tercatat.' });
+    }
+
+    // Kirimkan data barang keluar
+    res.status(200).json({ message: 'Data barang keluar berhasil diambil', data: allBarangKeluar });
+  } catch (error) {
+    console.error('Error saat mengambil data barang keluar:', error);
+    res.status(500).json({ error: 'Terjadi kesalahan pada server' });
+  }
+});
 // Route untuk mendapatkan semua data Stock
 router.get('/getStock', async (req, res) => {
   try {
