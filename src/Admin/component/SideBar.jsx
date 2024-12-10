@@ -27,7 +27,7 @@ function SideBar() {
         } h-screen ${sidebarClasses} p-5 transition-all duration-300`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between" onClick={() => navigate('/admin/profileAdmin')}>
           {isSidebarOpen && (
             <div className="flex items-center space-x-3">
               <img

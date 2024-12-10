@@ -1,9 +1,10 @@
 import React from "react";
 import { useTheme } from "./../ThemeContext";
+import { useNavigate } from "react-router-dom";
 
 const ReturAdmin = () => {
   const { isDarkMode } = useTheme();
-
+  const navigate = useNavigate();
   const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
     : "bg-white text-gray-900";
@@ -28,7 +29,7 @@ const ReturAdmin = () => {
           <h1 className="text-2xl font-bold">Retur Barang</h1>
           <button
             className={buttonAddClasses}
-            onClick={() => navigate("/Addretur")}
+            onClick={() => navigate("/kepalagudang/addBarangRetur")}
           >
             + Barang
           </button>

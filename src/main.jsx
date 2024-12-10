@@ -20,6 +20,11 @@ import TambahBarangKeluar from './Kepala_Gudang/Tambah_barangkeluar_kepalagudang
 import ReturKepalaGudang from './Kepala_Gudang/Retur_kepalagudang'
 import TotalBarang from './Kepala_Gudang/Total_barangMasuk'
 import TotalBarangKeluar from './Kepala_Gudang/Total_barangKeluar'
+import PenjualanToday from './Admin/Penjualan'
+import ProfileAdmin from "./Admin/ProfileAdmin";
+import TotalBarangKeluar2 from "./Admin/TotalBarangKeluar";
+import DetailBarang from './Admin/DetailBarang'
+import AddBarangRetur from "./Kepala_Gudang/AddBarangRetur";
 
 //kepala gudang 
 
@@ -33,11 +38,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <AdminPage />,
+    element: <AdminPage/>,
     children: [
       {
         path: "",
-        element: <HomeAdmin />,
+        element: <HomeAdmin/>,
       },
       {
         path: "addKaryawan",
@@ -62,6 +67,22 @@ const router = createBrowserRouter([
       {
         path: "tambahBarang",
         element: <TambahBarang/>,
+      },
+      {
+        path: "penjualanToday",
+        element: <PenjualanToday/>
+      },
+      {
+        path: "profileAdmin",
+        element: <ProfileAdmin/>
+      },
+      {
+        path: "totalBarangKeluar",
+        element: <TotalBarangKeluar2/>
+      },
+      {
+        path: "detailBarang",
+        element: <DetailBarang/>
       }
     ]
   },
@@ -96,6 +117,10 @@ const router = createBrowserRouter([
       {
         path: "totalBarangKeluar",
         element: <TotalBarangKeluar/>,
+      },
+      {
+        path: "addBarangRetur",
+        element: <AddBarangRetur/>
       }
     ]
   },

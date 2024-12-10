@@ -2,6 +2,7 @@
   import { useTheme } from "../ThemeContext";
   import SideBar from "./component/SideBar";
   import { Bar, Pie } from "react-chartjs-2";
+  import { useNavigate } from "react-router-dom";
   import axios from "axios"; // Import Axios
   import {
     Chart as ChartJS,
@@ -20,6 +21,7 @@
     const { isDarkMode } = useTheme();
     const [totalProducts, setTotalProducts] = useState(0); // State untuk jumlah barang
     const [productTypes, setProductTypes] = useState({}); // State untuk tipe barang
+    const navigate = useNavigate();
 
     const themeClasses = isDarkMode
       ? "bg-gray-900 text-white"
@@ -117,11 +119,11 @@
         <div className="flex-1 p-5 space-y-5">
           {/* Kartu Statistik */}
           <div className="grid grid-cols-3 gap-5">
-            <div className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}>
+            <div className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`} onClick={() => navigate('/admin/penjualanToday')}>
               <h3 className="text-xl font-semibold">Penjualan Hari Ini</h3>
               <p className="text-2xl font-bold">Rp. 1.000.000</p>
             </div>
-            <div className={`${cardClasses} p-5 rounded-md text-center`}>
+            <div className={`${cardClasses} p-5 rounded-md text-center`} onClick={() => navigate('/admin/totalBarangKeluar')}>
               <h3 className="text-xl font-semibold">Total Barang Keluar</h3>
               <p className="text-2xl font-bold">1000</p>
             </div>
