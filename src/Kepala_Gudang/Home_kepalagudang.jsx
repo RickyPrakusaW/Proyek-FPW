@@ -87,7 +87,7 @@ const Homekepalagudang = () => {
                   onClick={() => navigate("/kepalaGudang/totalBarang")}
                 >
                   <h3 className="text-xl font-semibold">Total Barang Masuk</h3>
-                  <p className="text-2xl font-bold">{barangData.length} Karung</p>
+                  <p className="text-2xl font-bold">{barangData.length} Item</p>
                 </div>
 
                 <div

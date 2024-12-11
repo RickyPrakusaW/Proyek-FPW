@@ -22,6 +22,7 @@ const TambahKaryawan = () => {
       // Siapkan formData untuk mengirim file dan data lainnya
       const formData = new FormData();
       formData.append("nama_lengkap", data.nama_lengkap);
+      formData.append("email", data.email); // Tambahkan email
       formData.append("tempat_lahir", data.tempat_lahir);
       formData.append("tanggal_lahir", data.tanggal_lahir);
       formData.append("jenis_kelamin", data.jenis_kelamin);
@@ -29,8 +30,8 @@ const TambahKaryawan = () => {
       formData.append("alamat", data.alamat);
       formData.append("no_telepon", data.no_telepon);
       formData.append("agama", data.agama);
-      formData.append("foto_ktp", data.ktp[0]); // Ganti 'ktp' dengan 'foto_ktp'
-      formData.append("password", data.password); // Menambahkan password ke formData
+      formData.append("foto_ktp", data.ktp[0]);
+      formData.append("password", data.password);
 
       // Kirim data ke backend menggunakan axios
       const response = await axios.post("http://localhost:3000/api/admin/addKaryawan", formData, {
@@ -71,6 +72,21 @@ const TambahKaryawan = () => {
                 {...register("nama_lengkap", { required: "Nama Lengkap wajib diisi" })}
               />
               {errors.nama_lengkap && <span className="text-red-500">{errors.nama_lengkap.message}</span>}
+
+              <label className="block font-semibold mb-1 mt-4">Email</label>
+              <input
+                type="email"
+                className={`w-full p-2 border rounded-md ${inputClasses}`}
+                placeholder="Masukkan Email"
+                {...register("email", {
+                  required: "Email wajib diisi",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Format email tidak valid",
+                  },
+                })}
+              />
+              {errors.email && <span className="text-red-500">{errors.email.message}</span>}
 
               <label className="block font-semibold mb-1 mt-4">Tempat Lahir</label>
               <input
@@ -152,7 +168,7 @@ const TambahKaryawan = () => {
               <label className="block font-semibold mb-1 mt-4">Upload KTP</label>
               <input
                 type="file"
-                name="foto_ktp"  // Ganti 'ktp' dengan 'foto_ktp'
+                name="foto_ktp"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
                 accept=".jpg,.jpeg,.png"
                 {...register("ktp", { required: "KTP wajib diupload" })}

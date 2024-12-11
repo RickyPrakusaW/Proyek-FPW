@@ -95,26 +95,45 @@ const initializeAdmin = async () => {
 initializeAdmin();
 
 // Login Route
-router  .post('/login', async (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Cek apakah email ada di koleksi Admin
     const admin = await Admin.findOne({ Email: email });
-    if (!admin) {
-      return res.status(404).json({ message: 'Admin not found' });
+    if (admin) {
+      const isPasswordValid = await bcrypt.compare(password, admin.Password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+      return res.status(200).json({ message: 'Selamat datang Admin' });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, admin.Password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+    // Jika bukan admin, cek di koleksi Karyawan
+    const karyawan = await Karyawan.findOne({ email: email });
+    if (karyawan) {
+      // Pastikan akun karyawan aktif
+      if (!karyawan.status) {
+        return res.status(401).json({ message: 'Akun Anda telah dinonaktifkan' });
+      }
+      
+
+      const isPasswordValid = await bcrypt.compare(password, karyawan.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      return res.status(200).json({ message: `Halo, ${karyawan.nama_lengkap}!` });
     }
 
-    res.status(200).json({ message: 'Welcome Admin' });
+    // Jika email tidak ditemukan di kedua koleksi
+    res.status(404).json({ message: 'User not found' });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 router.put('/update', async (req, res) => {
   const { oldEmail, oldPassword, newEmail, newPassword } = req.body;
 
@@ -162,7 +181,8 @@ router.post('/addKaryawan', uploadKaryawan, async (req, res) => {
       alamat,
       no_telepon,
       agama,
-      password, // Menambahkan field password
+      email, // Tambahkan email
+      password, // Password
     } = req.body;
 
     const foto_ktp = req.file?.filename;
@@ -176,10 +196,22 @@ router.post('/addKaryawan', uploadKaryawan, async (req, res) => {
       !alamat ||
       !no_telepon ||
       !agama ||
-      !foto_ktp ||
-      !password // Pastikan password juga diisi
+      !email || // Validasi email
+      !password // Validasi password
     ) {
       return res.status(400).json({ error: 'Semua field wajib diisi!' });
+    }
+
+    // Validasi format email
+    const emailRegex = /.+@.+\..+/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Format email tidak valid!' });
+    }
+
+    // Periksa apakah email sudah terdaftar
+    const existingEmail = await Karyawan.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ error: 'Email sudah digunakan!' });
     }
 
     // Hash password sebelum menyimpan ke database
@@ -199,6 +231,7 @@ router.post('/addKaryawan', uploadKaryawan, async (req, res) => {
       alamat,
       no_telepon,
       agama,
+      email, // Simpan email
       foto_ktp,
       password: hashedPassword, // Simpan password yang sudah di-hash
     });
@@ -210,6 +243,7 @@ router.post('/addKaryawan', uploadKaryawan, async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+
 router.get('/getKaryawan', async (req, res) => {
   try {
     // Ambil semua karyawan kecuali password

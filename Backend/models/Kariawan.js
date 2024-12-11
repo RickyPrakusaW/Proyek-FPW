@@ -39,6 +39,12 @@ const KaryawanSchema = mongoose.Schema({
     required: true,
     match: [/^\d+$/, 'Nomor telepon harus berupa angka'],
   },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    match: [/.+@.+\..+/, 'Format email tidak valid'],
+  },
   agama: {
     type: String,
     required: true,
