@@ -33,7 +33,12 @@ const penjualanSchema = new mongoose.Schema({
     required: true
   },
   namaCustomer: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'customer'
+  },
+  status: {
+    type: Boolean,
     required: true
   }
 });

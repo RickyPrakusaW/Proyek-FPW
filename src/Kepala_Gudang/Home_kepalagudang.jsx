@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bar } from "react-chartjs-2"; // Import Bar chart from react-chartjs-2
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
+import { Bar, Pie } from "react-chartjs-2"; // Import Pie chart from react-chartjs-2
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import { useTheme } from "./../ThemeContext";
 
 // Register chart.js components
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const Homekepalagudang = () => {
   const navigate = useNavigate();
@@ -37,14 +46,41 @@ const Homekepalagudang = () => {
     fetchStockData();
   }, []);
 
-  // Prepare chart data
-  const chartData = {
+  // Prepare Bar Chart data
+  const barChartData = {
     labels: barangData.map((barang) => barang.nama), // Get the product names
     datasets: [
       {
         label: "Total Barang Masuk",
         data: barangData.map((barang) => barang.total_barang), // Get the stock quantity
         backgroundColor: "#4CAF50", // Set the color of the bars
+      },
+    ],
+  };
+
+  // Prepare Pie Chart data
+  const pieChartData = {
+    labels: barangData.map((barang) => barang.nama),
+    datasets: [
+      {
+        label: "Total Barang",
+        data: barangData.map((barang) => barang.total_barang),
+        backgroundColor: [
+          "#FF6384",
+          "#36A2EB",
+          "#FFCE56",
+          "#4BC0C0",
+          "#9966FF",
+          "#FF9F40",
+        ],
+        hoverBackgroundColor: [
+          "#FF6384",
+          "#36A2EB",
+          "#FFCE56",
+          "#4BC0C0",
+          "#9966FF",
+          "#FF9F40",
+        ],
       },
     ],
   };
@@ -106,11 +142,20 @@ const Homekepalagudang = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-5">
+              <div className="grid grid-cols-2 gap-5">
+                {/* Bar Chart */}
                 <div className={`p-5 rounded-md ${themeClasses}`}>
                   <h3 className="text-xl font-semibold mb-3">Diagram Total Barang Masuk</h3>
                   <div className="w-full h-80">
-                    <Bar data={chartData} options={chartOptions} />
+                    <Bar data={barChartData} options={chartOptions} />
+                  </div>
+                </div>
+
+                {/* Pie Chart */}
+                <div className={`p-5 rounded-md ${themeClasses}`}>
+                  <h3 className="text-xl font-semibold mb-3">Distribusi Total Barang</h3>
+                  <div className="w-full h-80">
+                    <Pie data={pieChartData} />
                   </div>
                 </div>
               </div>
