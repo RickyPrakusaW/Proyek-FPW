@@ -1,45 +1,38 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-function Keranjang() {
-    const navigate = useNavigate();
-  return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className="w-1/4 bg-white shadow-md p-5 flex flex-col items-center">
-        {/* Profile Picture */}
-        <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
-          <img
-            src="https://via.placeholder.com/100"
-            alt="Profile"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        {/* Name */}
-        <h2 className="text-xl font-bold text-blue-600">Tiok</h2>
-        {/* Menu */}
-        <div className="mt-8 space-y-4 w-full">
-          <button className="w-full text-left text-gray-600 hover:text-blue-600"  onClick={() => navigate("/Listbarangkariawan")}>
-            List Barang
-          </button>
-          <button className="w-full text-left text-gray-600 hover:text-blue-600" onClick={() => navigate("/Keranjang")}>
-            Keranjang
-          </button>
-          <button className="w-full text-left text-gray-600 hover:text-blue-600" onClick={() => navigate("/Retur")}>
-            Cek Stok Gudang
-          </button>
-        </div>
-        {/* Logout Button */}
-        <button className="mt-auto px-4 py-2 bg-pink-500 text-white rounded-lg shadow hover:bg-pink-600">
-          Keluar
-        </button>
-      </div>
+import { useTheme } from "../ThemeContext"; // Import ThemeContext
 
+function Keranjang() {
+  const navigate = useNavigate();
+  const { isDarkMode } = useTheme(); // Gunakan ThemeContext
+
+  const themeClasses = isDarkMode
+    ? "bg-gray-900 text-white"
+    : "bg-gray-100 text-gray-900";
+  const sidebarClasses = isDarkMode
+    ? "bg-gray-800 text-white"
+    : "bg-white text-gray-900";
+  const buttonClasses = isDarkMode
+    ? "text-gray-400 hover:text-blue-300"
+    : "text-gray-600 hover:text-blue-600";
+  const tableHeaderClasses = isDarkMode
+    ? "bg-gray-700 text-white"
+    : "bg-blue-500 text-white";
+  const tableRowClasses = isDarkMode
+    ? "bg-gray-800 hover:bg-gray-700"
+    : "bg-blue-100 hover:bg-blue-200";
+  const cardClasses = isDarkMode
+    ? "bg-gray-800 text-white"
+    : "bg-white text-gray-900";
+
+  return (
+    <div className={`flex h-screen ${themeClasses}`}>
       {/* Main Content */}
-      <main className="flex-1 p-6 bg-gray-50">
-        <div className="p-4 bg-white shadow-md rounded-lg">
+      <main className={`flex-1 p-6 ${themeClasses}`}>
+        <div className={`p-4 shadow-md rounded-lg ${cardClasses}`}>
           <h1 className="text-2xl font-bold">Keranjang</h1>
           <table className="w-full mt-4 text-center border-collapse">
-            <thead className="bg-blue-500 text-white">
+            <thead className={tableHeaderClasses}>
               <tr>
                 <th className="px-4 py-2 border">No</th>
                 <th className="px-4 py-2 border">ID Barang</th>
@@ -51,7 +44,7 @@ function Keranjang() {
             </thead>
             <tbody>
               {[1, 2, 3, 4, 5, 6].map((item, index) => (
-                <tr key={index} className="bg-blue-100 hover:bg-blue-200">
+                <tr key={index} className={tableRowClasses}>
                   <td className="px-4 py-2 border">{index + 1}</td>
                   <td className="px-4 py-2 border">00{index + 1}</td>
                   <td className="px-4 py-2 border">Example</td>
@@ -70,7 +63,12 @@ function Keranjang() {
           </table>
           <div className="mt-4 flex justify-between items-center">
             <h2 className="text-lg font-bold">Total Penjualan: Rp. 0</h2>
-            <button className="px-4 py-2 bg-green-500 text-white rounded-lg" onClick={() => navigate("/Checkout")} >Proses</button>
+            <button
+              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+              onClick={() => navigate("/karyawan/checkOut")}
+            >
+              Proses
+            </button>
           </div>
         </div>
       </main>

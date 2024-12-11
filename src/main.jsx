@@ -25,11 +25,16 @@ import ProfileAdmin from "./Admin/ProfileAdmin";
 import TotalBarangKeluar2 from "./Admin/TotalBarangKeluar";
 import DetailBarang from './Admin/DetailBarang'
 import AddBarangRetur from "./Kepala_Gudang/AddBarangRetur";
+import KaryawanPage from "./KaryawanPage"
+import List_barang_kariawan from "./Kariawan/List_barang_kariawan";
+import CekStockGudang from "./Kariawan/CekStockGudang";
 
 //kepala gudang 
 
 import { ThemeProvider } from "./ThemeContext"; // Import ThemeProvider
 import "./index.css"; // Untuk memuat Tailwind CSS
+import Keranjang from "./Kariawan/Keranjang";
+import Checkout from "./Kariawan/Checkout";
 
 const router = createBrowserRouter([
   {
@@ -126,7 +131,29 @@ const router = createBrowserRouter([
   },
   {
     path: "/karyawan",
-    element: <HomeKaryawan/>
+    element: <KaryawanPage/>,
+    children: [
+      {
+        path: "",
+        element: <HomeKaryawan/>
+      },
+      {
+        path: "listBarang",
+        element: <List_barang_kariawan/>
+      },
+      {
+        path: "keranjang",
+        element: <Keranjang/>
+      },
+      {
+        path: "cekStockGudang",
+        element: <CekStockGudang/>
+      },
+      {
+        path: "checkOut",
+        element: <Checkout/>
+      }
+    ]
   }
 ]);
 
