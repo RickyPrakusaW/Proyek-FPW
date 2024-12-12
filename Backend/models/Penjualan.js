@@ -27,11 +27,6 @@ const penjualanSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  idKaryawan: { 
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Karyawan', 
-    required: true
-  },
   namaCustomer: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

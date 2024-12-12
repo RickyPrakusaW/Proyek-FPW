@@ -20,7 +20,7 @@ const router = express.Router();
 const createStorage = (destinationPath) =>
   multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, destinationPath);
+      cb(null, destinationPath);z
     },
     filename: function (req, file, cb) {
       cb(null, Date.now() + path.extname(file.originalname));
@@ -709,65 +709,65 @@ router.post('/addCustomer', async (req, res) => {
   }
 });
 //penjualan
-// app.post('/penjualan', async (req, res) => {
-//   try {
-//     const penjualan = new Penjualan(req.body);
-//     const savedPenjualan = await penjualan.save();
-//     res.status(201).json(savedPenjualan);
-//   } catch (error) {
-//     res.status(400).json({ message: error.message });
-//   }
-// });
+router.post('/penjualan', async (req, res) => {
+  try {
+    const penjualan = new Penjualan(req.body);
+    const savedPenjualan = await penjualan.save();
+    res.status(201).json(savedPenjualan);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
 
-// // Get all penjualan
-// app.get('/penjualan', async (req, res) => {
-//   try {
-//     const penjualanList = await Penjualan.find()
-//       .populate('idBarang')
-//       .populate('idKaryawan')
-//       .populate('namaCustomer');
-//     res.json(penjualanList);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// });
+// Get all penjualan
+router.get('/penjualan', async (req, res) => {
+  try {
+    const penjualanList = await Penjualan.find()
+      .populate('idBarang')
+      .populate('idKaryawan')
+      .populate('namaCustomer');
+    res.json(penjualanList);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
-// // Get a single penjualan by ID
-// app.get('/penjualan/:id', async (req, res) => {
-//   try {
-//     const penjualan = await Penjualan.findById(req.params.id)
-//       .populate('idBarang')
-//       .populate('idKaryawan')
-//       .populate('namaCustomer');
-//     if (!penjualan) return res.status(404).json({ message: 'Penjualan not found' });
-//     res.json(penjualan);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// });
+// Get a single penjualan by ID
+router.get('/penjualan/:id', async (req, res) => {
+  try {
+    const penjualan = await Penjualan.findById(req.params.id)
+      .populate('idBarang')
+      .populate('idKaryawan')
+      .populate('namaCustomer');
+    if (!penjualan) return res.status(404).json({ message: 'Penjualan not found' });
+    res.json(penjualan);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
-// // Update a penjualan by ID
-// app.put('/penjualan/:id', async (req, res) => {
-//   try {
-//     const updatedPenjualan = await Penjualan.findByIdAndUpdate(req.params.id, req.body, {
-//       new: true,
-//       runValidators: true
-//     });
-//     if (!updatedPenjualan) return res.status(404).json({ message: 'Penjualan not found' });
-//     res.json(updatedPenjualan);
-//   } catch (error) {
-//     res.status(400).json({ message: error.message });
-//   }
-// });
+// Update a penjualan by ID
+router.put('/penjualan/:id', async (req, res) => {
+  try {
+    const updatedPenjualan = await Penjualan.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    });
+    if (!updatedPenjualan) return res.status(404).json({ message: 'Penjualan not found' });
+    res.json(updatedPenjualan);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
 
-// // Delete a penjualan by ID
-// app.delete('/penjualan/:id', async (req, res) => {
-//   try {
-//     const deletedPenjualan = await Penjualan.findByIdAndDelete(req.params.id);
-//     if (!deletedPenjualan) return res.status(404).json({ message: 'Penjualan not found' });
-//     res.json({ message: 'Penjualan deleted successfully' });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// });
+// Delete a penjualan by ID
+router.delete('/penjualan/:id', async (req, res) => {
+  try {
+    const deletedPenjualan = await Penjualan.findByIdAndDelete(req.params.id);
+    if (!deletedPenjualan) return res.status(404).json({ message: 'Penjualan not found' });
+    res.json({ message: 'Penjualan deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 module.exports = router;

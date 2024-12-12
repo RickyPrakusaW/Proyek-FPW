@@ -42,7 +42,7 @@ function List_barang_kariawan() {
   // Add product to cart
   const addToCart = async (product) => {
     try {
-      const response = await fetch("http://localhost:3000/api/admin/updateCart", {
+      const response = await fetch("http://localhost:3000/api/admin/addToCart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
