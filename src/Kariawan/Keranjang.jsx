@@ -118,7 +118,7 @@ function Keranjang() {
                   {cartItems.map((item, index) => (
                     <tr key={item._id} className={tableRowClasses}>
                       <td className="px-4 py-2 border">{index + 1}</td>
-                      <td className="px-4 py-2 border">{item.idBarang}</td>
+                      <td className="px-4 py-2 border">{item.Id_product}</td>
                       <td className="px-4 py-2 border">{item.namaBarang}</td>
                       <td className="px-4 py-2 border">
                         <div className="flex items-center justify-center space-x-2">

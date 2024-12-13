@@ -63,21 +63,25 @@ function Checkout() {
         throw new Error("Gagal menambahkan pelanggan");
       }
 
-      // Kirim data pesanan (keranjang) ke backend jika perlu
-      const orderResponse = await fetch("http://localhost:3000/api/orders/addOrder", {
+      const customerData = await customerResponse.json();
+
+      // Kirim data penjualan ke backend
+      const orderResponse = await fetch("http://localhost:3000/api/admin/addPenjualan", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          customer: formData,
-          items: cartItems,
+          customerId: customerData.data._id, // ID pelanggan dari backend
+          cartItems, // Data keranjang
           total: totalBelanja,
+          status: true, // Contoh status penjualan
         }),
       });
-
+      const orderResponseData = await orderResponse.json();
+      console.log("Order Response:", orderResponseData);
       if (!orderResponse.ok) {
-        throw new Error("Gagal menyelesaikan pesanan");
+        throw new Error("Gagal menyelesaikan penjualan");
       }
 
       // Redirect ke halaman pembayaran
@@ -92,15 +96,15 @@ function Checkout() {
     <div className="flex h-screen bg-gray-100">
       <main className="flex-1 p-6 bg-gray-50">
         <div className="p-6 bg-white shadow-md rounded-lg">
-          <h1 className="text-2xl font-bold">Proses</h1>
+          <h1 className="text-3xl font-bold mb-6">Proses Checkout</h1>
 
           {loading && <p>Loading...</p>}
           {error && <p className="text-red-500">{error}</p>}
 
           {!loading && !error && (
-            <div className="grid grid-cols-3 gap-6 mt-6">
-              <div className="col-span-2">
-                <h2 className="mb-4 text-xl font-semibold">Informasi data pelanggan</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2">
+                <h2 className="mb-4 text-xl font-semibold">Informasi Data Pelanggan</h2>
                 <form className="space-y-4">
                   <div>
                     <label className="block text-gray-700">Nama Lengkap</label>
@@ -110,7 +114,7 @@ function Checkout() {
                       value={formData.Nama_lengkap}
                       onChange={handleChange}
                       placeholder="Nama Lengkap"
-                      className="w-full px-4 py-2 border rounded-md"
+                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
                     />
                   </div>
                   <div>
@@ -121,7 +125,7 @@ function Checkout() {
                       value={formData.No_telepone}
                       onChange={handleChange}
                       placeholder="Nomor Telepon"
-                      className="w-full px-4 py-2 border rounded-md"
+                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
                     />
                   </div>
                   <div>
@@ -131,7 +135,7 @@ function Checkout() {
                       value={formData.Alamat}
                       onChange={handleChange}
                       placeholder="Alamat"
-                      className="w-full px-4 py-2 border rounded-md"
+                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
                       rows="3"
                     ></textarea>
                   </div>
@@ -144,7 +148,7 @@ function Checkout() {
                         value={formData.Kota}
                         onChange={handleChange}
                         placeholder="Kota"
-                        className="w-full px-4 py-2 border rounded-md"
+                        className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
                       />
                     </div>
                     <div>
@@ -155,7 +159,7 @@ function Checkout() {
                         value={formData.Kodepos}
                         onChange={handleChange}
                         placeholder="Kode Pos"
-                        className="w-full px-4 py-2 border rounded-md"
+                        className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
                       />
                     </div>
                   </div>
@@ -167,7 +171,7 @@ function Checkout() {
                       value={formData.Negara}
                       onChange={handleChange}
                       placeholder="Negara"
-                      className="w-full px-4 py-2 border rounded-md"
+                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
                     />
                   </div>
                 </form>
@@ -198,7 +202,7 @@ function Checkout() {
 
           <div className="mt-6 text-right">
             <button
-              className="px-6 py-3 text-white bg-green-500 rounded-lg"
+              className="px-6 py-3 text-white bg-green-500 rounded-lg hover:bg-green-600"
               onClick={handleCheckout}
             >
               Pembayaran

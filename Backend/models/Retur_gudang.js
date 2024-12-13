@@ -1,34 +1,32 @@
+// models/ReturGudang.js
 const mongoose = require('mongoose');
-
-// Import model StockGudang untuk referensi
-const StockGudang = require('./Stock_gudang');
+const StockGudang = require('./Stock_gudang'); // pastikan pathnya benar
 
 const returGudangSchema = new mongoose.Schema({
-  idReturGudang: { 
+  idReturGudang: {
     type: String,
-    required: true
+    required: true,
   },
-  // Mengubah referensi ke StockGudang dan menggunakan id_stock sebagai referensi
-  idBarang: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'StockGudang',  // Menunjuk ke StockGudang
-    required: true
+  idBarang: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'StockGudang',  // Harus sesuai dengan nama model yang di-import
+    required: true,
   },
-  namaBarang: { 
+  namaBarang: {
     type: String,
-    required: true
+    required: true,
   },
-  jumlahBarang: { 
+  jumlahBarang: {
     type: Number,
-    required: true
+    required: true,
   },
   photoBarang: {
     type: String,
-    required: true
+    required: true,
   },
   tanggal: {
     type: Date,
-    required: true
+    required: true,
   },
 });
 

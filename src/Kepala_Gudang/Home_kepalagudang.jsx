@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bar, Pie } from "react-chartjs-2"; // Import Pie chart from react-chartjs-2
+import { Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -46,25 +46,41 @@ const Homekepalagudang = () => {
     fetchStockData();
   }, []);
 
-  // Prepare Bar Chart data
+  // Process data by date for Bar and Pie Charts
+  const processDataByDate = () => {
+    const groupedData = barangData.reduce((acc, barang) => {
+      const date = barang.tanggal_masuk;
+      acc[date] = (acc[date] || 0) + barang.total_barang;
+      return acc;
+    }, {});
+
+    const labels = Object.keys(groupedData);
+    const data = Object.values(groupedData);
+
+    return { labels, data };
+  };
+
+  const { labels, data } = processDataByDate();
+
+  // Bar Chart Data
   const barChartData = {
-    labels: barangData.map((barang) => barang.nama), // Get the product names
+    labels, // Tanggal sebagai label
     datasets: [
       {
         label: "Total Barang Masuk",
-        data: barangData.map((barang) => barang.total_barang), // Get the stock quantity
-        backgroundColor: "#4CAF50", // Set the color of the bars
+        data, // Total_barang per tanggal
+        backgroundColor: "#4CAF50",
       },
     ],
   };
 
-  // Prepare Pie Chart data
+  // Pie Chart Data
   const pieChartData = {
-    labels: barangData.map((barang) => barang.nama),
+    labels,
     datasets: [
       {
-        label: "Total Barang",
-        data: barangData.map((barang) => barang.total_barang),
+        label: "Distribusi Total Barang",
+        data,
         backgroundColor: [
           "#FF6384",
           "#36A2EB",
@@ -91,7 +107,7 @@ const Homekepalagudang = () => {
     plugins: {
       title: {
         display: true,
-        text: "Diagram Total Barang Masuk",
+        text: "Diagram Total Barang Berdasarkan Tanggal",
       },
       tooltip: {
         callbacks: {
@@ -137,7 +153,7 @@ const Homekepalagudang = () => {
                 <div className={`${cardClasses} p-5 rounded-md text-center`}>
                   <h3 className="text-xl font-semibold">Total Barang</h3>
                   <p className="text-2xl font-bold">
-                    {barangData.reduce((total, barang) => total + (barang.total_barang || 0), 0)} Barang
+                    {barangData.reduce((total, barang) => total + (barang.total_barang || 0), 0)} Karung
                   </p>
                 </div>
               </div>
@@ -145,7 +161,7 @@ const Homekepalagudang = () => {
               <div className="grid grid-cols-2 gap-5">
                 {/* Bar Chart */}
                 <div className={`p-5 rounded-md ${themeClasses}`}>
-                  <h3 className="text-xl font-semibold mb-3">Diagram Total Barang Masuk</h3>
+                  <h3 className="text-xl font-semibold mb-3">Diagram Total Barang Berdasarkan Tanggal</h3>
                   <div className="w-full h-80">
                     <Bar data={barChartData} options={chartOptions} />
                   </div>

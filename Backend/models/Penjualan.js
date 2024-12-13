@@ -29,11 +29,20 @@ const penjualanSchema = new mongoose.Schema({
   },
   namaCustomer: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: 'customer'
+    ref: 'Customer', // Menghubungkan ke model 'Customer'
+    required: true
   },
   status: {
     type: Boolean,
+    required: true
+  },
+  idCart: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Cart', // Menghubungkan ke model 'Cart'
+    required: true
+  },
+  Nama_lengkap: {
+    type: String,
     required: true
   }
 });

@@ -1,30 +1,30 @@
 const mongoose = require('mongoose');
 
 const cartSchema = new mongoose.Schema({
-  idCart: { 
+  idCart: {
     type: String,
     required: true,
   },
-  idBarang: { 
+  idBarang: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'product',
+    ref: "Product",  // Ganti "product" dengan "Product" sesuai dengan nama model
     required: true,
   },
-  namaBarang: { 
+  namaBarang: {
     type: String,
     required: true,
   },
-  totalProduct: { 
+  totalProduct: {
     type: Number,
     required: true,
     min: 0,
   },
-  harga: { 
+  harga: {
     type: Number,
     required: true,
     min: 0,
   },
-  photo: { 
+  photo: {
     type: String,
     required: false,
   },

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { useTheme } from "./../ThemeContext";
+import React, { useState, useEffect } from "react";
+import { useTheme } from "../ThemeContext"; 
 import axios from "axios";
 
-const Stockgudang = () => {
+const StockGudang = () => {
   const { isDarkMode } = useTheme();
   const [stocks, setStocks] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");  // State untuk query pencarian
 
   const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
@@ -29,24 +30,40 @@ const Stockgudang = () => {
     fetchStockData();
   }, []);
 
+  // Filtered stocks based on search query
+  const filteredStocks = stocks.filter((stock) =>
+    stock.nama_barang.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Handle change in search input
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
   return (
     <div className={`min-h-screen flex flex-col ${themeClasses}`}>
       {/* Header */}
       <div className="flex justify-between items-center p-5">
         <h1 className="text-2xl font-bold">Stock Di Gudang</h1>
-        <input type="text" placeholder="Search" className={inputClasses} />
+        <input
+          type="text"
+          placeholder="Search"
+          value={searchQuery}  // Bind value to searchQuery state
+          onChange={handleSearchChange}  // Update state when input changes
+          className={inputClasses}
+        />
       </div>
 
       {/* Cards Container */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 p-5">
-        {stocks.map((stock, index) => (
+        {filteredStocks.map((stock, index) => (
           <div
             key={index}
             className={`rounded-lg overflow-hidden flex flex-col items-center p-5 ${cardClasses}`}
           >
             {/* Image */}
             <img
-              src={`http://localhost:3000/api/admin/uploads/stock/${stock.photo_barang}`}
+              src={stock.photo_url}  // Gunakan URL gambar dari API response
               alt={stock.nama_barang}
               className="w-full h-48 object-cover rounded-md mb-4"
             />
@@ -63,4 +80,5 @@ const Stockgudang = () => {
   );
 };
 
-export default Stockgudang;
+export default StockGudang;
+  

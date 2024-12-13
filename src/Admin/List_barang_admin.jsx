@@ -22,7 +22,7 @@ const List_barang_admin = () => {
 
   useEffect(() => {
     // Pastikan menggunakan endpoint yang benar
-    axios.get("http://localhost:3000/api/admin/getProduct")
+    axios.get("http://localhost:3000/api/admin/products")
       .then((response) => {
         setProducts(response.data.data); // Data dari API disimpan di state products
       })
