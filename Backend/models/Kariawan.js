@@ -54,9 +54,10 @@ const KaryawanSchema = mongoose.Schema({
     required: false,
   },
   status: {
-    type: Boolean,
+    type: String,
+    enum: ['Aktif', 'Nonaktif'], // Nilai yang diperbolehkan
     required: true,
-    default: true,
+    default: 'Aktif',
   },
   password: { // Password baru
     type: String,

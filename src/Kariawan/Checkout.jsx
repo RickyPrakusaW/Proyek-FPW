@@ -73,16 +73,19 @@ function Checkout() {
         },
         body: JSON.stringify({
           customerId: customerData.data._id, // ID pelanggan dari backend
-          cartItems, // Data keranjang
-          total: totalBelanja,
+          cartId: cartItems.map(item => item._id), // Kirim ID cart item
+          total: totalBelanja, // Total belanja
           status: true, // Contoh status penjualan
         }),
       });
-      const orderResponseData = await orderResponse.json();
-      console.log("Order Response:", orderResponseData);
+      
+
       if (!orderResponse.ok) {
         throw new Error("Gagal menyelesaikan penjualan");
       }
+
+      const orderResponseData = await orderResponse.json();
+      console.log("Order Response:", orderResponseData);
 
       // Redirect ke halaman pembayaran
       navigate("/Pembayaran");

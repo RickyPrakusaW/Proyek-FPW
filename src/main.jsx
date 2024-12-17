@@ -24,6 +24,9 @@ import PenjualanToday from './Admin/Penjualan'
 import ProfileAdmin from "./Admin/ProfileAdmin";
 import TotalBarangKeluar2 from "./Admin/TotalBarangKeluar";
 import DetailBarang from './Admin/DetailBarang'
+import Customer from './Admin/Customer'
+import Detailkariawan from './Admin/Detail_kariawan'
+import Update_kariawan from './Admin/Update_kariawan'
 import AddBarangRetur from "./Kepala_Gudang/AddBarangRetur";
 import KaryawanPage from "./KaryawanPage"
 import List_barang_kariawan from "./Kariawan/List_barang_kariawan";
@@ -88,6 +91,18 @@ const router = createBrowserRouter([
       {
         path: "detailBarang",
         element: <DetailBarang/>
+      },
+      {
+        path: "customer",
+        element: <Customer/>
+      },
+      {
+        path: "update_kariawan",
+        element: <Update_kariawan/>
+      },
+      {
+        path: "detailkariawan",
+        element: <Detailkariawan/>
       }
     ]
   },

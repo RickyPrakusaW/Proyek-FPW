@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import SideBar from "./component/SideBar"; 
 import { useTheme } from "../ThemeContext"; 
-import axios from "axios"; // Pastikan axios diimpor
+import axios from "axios";
 
 const List_barang_admin = () => {
   const navigate = useNavigate();
@@ -13,40 +12,36 @@ const List_barang_admin = () => {
   const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
     : "bg-white text-gray-900";
-  const tableHeaderClasses = isDarkMode
-    ? "bg-blue-600 text-white"
-    : "bg-blue-300 text-gray-900";
   const tableRowClasses = isDarkMode
     ? "bg-gray-700 hover:bg-blue-700"
     : "bg-gray-100 hover:bg-blue-100";
 
   useEffect(() => {
-    // Pastikan menggunakan endpoint yang benar
     axios.get("http://localhost:3000/api/admin/products")
       .then((response) => {
-        setProducts(response.data.data); // Data dari API disimpan di state products
+        setProducts(response.data.data); // Asumsikan API mengembalikan { data: [...] }
       })
       .catch((error) => {
-        console.error("There was an error fetching the product data!", error);
+        console.error("Error fetching product data:", error);
       });
   }, []);
 
-  // Memastikan namaBarang ada sebelum melakukan .toLowerCase()
   const filteredProducts = products.filter(product =>
     product.Nama_product && product.Nama_product.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleDetail = (id) => {
+    navigate(`/admin/detailBarang/${id}`);
+  };
+
   return (
     <div className={`flex min-h-screen ${themeClasses}`}>
-      {/* <SideBar /> */}
-      {/* Main Content */}
       <div className="flex-1 p-5">
-        {/* Header Section */}
         <div className="flex justify-between items-center mb-5">
           <h1 className="text-2xl font-bold">List Barang</h1>
           <div className="flex items-center space-x-4">
             <button
-              className={`bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded`}
+              className="bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded text-white"
               onClick={() => navigate("/admin/tambahBarang")}
             >
               + Tambah Barang
@@ -56,12 +51,11 @@ const List_barang_admin = () => {
               placeholder="Cari"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`border border-gray-300 py-2 px-4 rounded ${isDarkMode ? "text-white" : "text-gray-900"}`}
+              className={`border py-2 px-4 rounded ${isDarkMode ? "text-white" : "text-gray-900"}`}
             />
           </div>
         </div>
 
-        {/* Card Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
@@ -77,7 +71,7 @@ const List_barang_admin = () => {
                 <p className="text-gray-500">Tanggal Masuk: {product.Tanggal_masuk}</p>
                 <button
                   className="bg-blue-500 text-white py-2 px-4 rounded mt-4 w-full"
-                  onClick={() => navigate(`/admin/detailBarang/${product.Id_product}`)}
+                  onClick={() => handleDetail(product.Id_product)}
                 >
                   Detail
                 </button>

@@ -14,78 +14,31 @@ import {
   Legend,
 } from "chart.js";
 
+// Registrasi komponen chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const HomeAdmin = () => {
   const { isDarkMode } = useTheme();
+
+  // State management
   const [totalProducts, setTotalProducts] = useState(0);
   const [productTypes, setProductTypes] = useState({});
   const [employeeDistribution, setEmployeeDistribution] = useState({});
+  const [customerDistributionByCity, setCustomerDistributionByCity] = useState({});
   const [totalEmployees, setTotalEmployees] = useState(0);
+  const [totalCustomers, setTotalCustomers] = useState(0);
+
   const navigate = useNavigate();
 
-  const themeClasses = isDarkMode
-    ? "bg-gray-900 text-white"
-    : "bg-white text-gray-900";
-  const cardClasses = isDarkMode
-    ? "bg-gray-800 text-white"
-    : "bg-blue-400 text-gray-900";
-  const chartClasses = isDarkMode
-    ? "bg-gray-700"
-    : "bg-blue-200";
-
-  const barChartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    datasets: [
-      {
-        label: "Penjualan Bulanan (Rp)",
-        data: [
-          1000000, 2000000, 1500000, 3000000, 2500000, 4000000, 3500000, 2000000,
-          3000000, 4500000, 5000000, 4000000,
-        ],
-        backgroundColor: isDarkMode
-          ? "rgba(54, 162, 235, 0.8)"
-          : "rgba(75, 192, 192, 0.8)",
-        borderColor: isDarkMode
-          ? "rgba(54, 162, 235, 1)"
-          : "rgba(75, 192, 192, 1)",
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const barChartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-        labels: {
-          color: isDarkMode ? "white" : "black",
-        },
-      },
-      title: {
-        display: true,
-        text: "Grafik Penjualan Bulanan",
-        color: isDarkMode ? "white" : "black",
-      },
-    },
-    scales: {
-      x: {
-        ticks: {
-          color: isDarkMode ? "white" : "black",
-        },
-      },
-      y: {
-        ticks: {
-          color: isDarkMode ? "white" : "black",
-        },
-      },
-    },
-  };
+  // Dynamic theme classes
+  const themeClasses = isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900";
+  const cardClasses = isDarkMode ? "bg-gray-800 text-white" : "bg-blue-400 text-gray-900";
+  const chartClasses = isDarkMode ? "bg-gray-700" : "bg-blue-200";
 
   useEffect(() => {
+    // Ambil data produk
     axios
-      .get("http://localhost:3000/api/admin/getProduct")
+      .get("http://localhost:3000/api/admin/products")
       .then((response) => {
         const products = response.data.data;
         setTotalProducts(products.length);
@@ -96,10 +49,9 @@ const HomeAdmin = () => {
         }, {});
         setProductTypes(typeCounts);
       })
-      .catch((error) => {
-        console.error("Error saat mengambil data produk:", error);
-      });
+      .catch((error) => console.error("Error mengambil data produk:", error));
 
+    // Ambil data karyawan
     axios
       .get("http://localhost:3000/api/admin/getKaryawan")
       .then((response) => {
@@ -107,30 +59,39 @@ const HomeAdmin = () => {
         setTotalEmployees(employees.length);
 
         const distribution = employees.reduce((acc, employee) => {
-          const category = employee.position || "Unspecified"; // Ganti sesuai field di model Anda
+          const category = employee.position || "Unspecified";
           acc[category] = (acc[category] || 0) + 1;
           return acc;
         }, {});
         setEmployeeDistribution(distribution);
       })
-      .catch((error) => {
-        console.error("Error saat mengambil data karyawan:", error);
-      });
+      .catch((error) => console.error("Error mengambil data karyawan:", error));
+
+    // Ambil data customer
+    axios
+      .get("http://localhost:3000/api/admin/getCustomers")
+      .then((response) => {
+        const customers = response.data.data;
+        setTotalCustomers(customers.length);
+
+        // Hitung distribusi customer berdasarkan kota
+        const cityCounts = customers.reduce((acc, customer) => {
+          const city = customer.Kota || "Tidak Diketahui";
+          acc[city] = (acc[city] || 0) + 1;
+          return acc;
+        }, {});
+        setCustomerDistributionByCity(cityCounts);
+      })
+      .catch((error) => console.error("Error mengambil data customer:", error));
   }, []);
 
+  // Data untuk chart
   const pieChartData = {
     labels: Object.keys(productTypes),
     datasets: [
       {
         data: Object.values(productTypes),
-        backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#9966FF",
-          "#FF9F40",
-        ],
+        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
         borderWidth: 1,
       },
     ],
@@ -141,14 +102,18 @@ const HomeAdmin = () => {
     datasets: [
       {
         data: Object.values(employeeDistribution),
-        backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#9966FF",
-          "#FF9F40",
-        ],
+        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const customerCityPieChartData = {
+    labels: Object.keys(customerDistributionByCity),
+    datasets: [
+      {
+        data: Object.values(customerDistributionByCity),
+        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
         borderWidth: 1,
       },
     ],
@@ -157,6 +122,7 @@ const HomeAdmin = () => {
   return (
     <div className={`flex min-h-screen ${themeClasses}`}>
       <div className="flex-1 p-5 space-y-5">
+        {/* Kartu Atas */}
         <div className="grid grid-cols-3 gap-5">
           <div
             className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
@@ -166,11 +132,11 @@ const HomeAdmin = () => {
             <p className="text-2xl font-bold">Rp. 1.000.000</p>
           </div>
           <div
-            className={`${cardClasses} p-5 rounded-md text-center`}
-            onClick={() => navigate("/admin/totalBarangKeluar")}
+            className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
+            onClick={() => navigate("/Admin/Customer")}
           >
-            <h3 className="text-xl font-semibold">Total Barang Keluar</h3>
-            <p className="text-2xl font-bold">1000</p>
+            <h3 className="text-xl font-semibold">Customer</h3>
+            <p className="text-2xl font-bold">{totalCustomers} Customer</p>
           </div>
           <div className={`${cardClasses} p-5 rounded-md text-center`}>
             <h3 className="text-xl font-semibold">Total Barang</h3>
@@ -178,39 +144,22 @@ const HomeAdmin = () => {
           </div>
         </div>
 
+        {/* Bagian Chart */}
         <div className="grid grid-cols-2 gap-5">
+          {/* Distribusi Karyawan */}
           <div className={`p-5 rounded-md ${chartClasses}`}>
-            <h3 className="text-xl font-semibold mb-3">Penjualan Bulanan</h3>
-            <Bar data={barChartData} options={barChartOptions} />
-          </div>
-          <div className={`p-5 rounded-md ${chartClasses}`}>
-            <h3 className="text-xl font-semibold mb-3">Distribusi Tipe Barang</h3>
-            <div className="w-72 h-72 mx-auto">
-              <Pie data={pieChartData} options={{ maintainAspectRatio: false }} />
-            </div>
-            <div className="mt-3 space-y-2">
-              {Object.keys(productTypes).map((type) => (
-                <p key={type} className="text-sm">
-                  <span className="font-bold">{type}:</span>{" "}
-                  {((productTypes[type] / totalProducts) * 100).toFixed(2)}%
-                </p>
-              ))}
+            <h3 className="text-xl font-semibold mb-3">Distribusi Karyawan</h3>
+            <div className="w-56 h-56 mx-auto">
+              <Pie data={employeePieChartData} options={{ maintainAspectRatio: false }} />
             </div>
           </div>
-        </div>
 
-        <div className={`p-5 rounded-md ${chartClasses}`}>
-          <h3 className="text-xl font-semibold mb-3">Distribusi Karyawan</h3>
-          <div className="w-72 h-72 mx-auto">
-            <Pie data={employeePieChartData} options={{ maintainAspectRatio: false }} />
-          </div>
-          <div className="mt-3 space-y-2">
-            {Object.keys(employeeDistribution).map((category) => (
-              <p key={category} className="text-sm">
-                <span className="font-bold">{category}:</span>{" "}
-                {((employeeDistribution[category] / totalEmployees) * 100).toFixed(2)}%
-              </p>
-            ))}
+          {/* Customer Berdasarkan Kota */}
+          <div className={`p-5 rounded-md ${chartClasses}`}>
+            <h3 className="text-xl font-semibold mb-3">Customer Berdasarkan Kota</h3>
+            <div className="w-56 h-56 mx-auto">
+              <Pie data={customerCityPieChartData} options={{ maintainAspectRatio: false }} />
+            </div>
           </div>
         </div>
       </div>

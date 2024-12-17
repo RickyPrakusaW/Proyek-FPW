@@ -1,12 +1,17 @@
 const mongoose = require('mongoose');
 
 const customerSchema = new mongoose.Schema({
+  Customer_id: { 
+    type: String, 
+    required: true, 
+    unique: true 
+  },
   Nama_lengkap: {
     type: String,
     required: true,
   },
   No_telepone: {
-    type: Number,
+    type: String,
     required: true,
   },
   Alamat: {
@@ -22,11 +27,12 @@ const customerSchema = new mongoose.Schema({
     required: true,
   },
   Kodepos: {
-    type: Number,
+    type: String,
     required: true,
   },
 });
 
 const Customer = mongoose.model('Customer', customerSchema);
+
 
 module.exports = Customer;

@@ -6,9 +6,9 @@ const penjualanSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  idBarang: { 
+  idCart: { 
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Barang',
+    ref: 'Cart',
     required: true
   },
   namaBarang: { 
@@ -27,8 +27,8 @@ const penjualanSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  namaCustomer: {
-    type: mongoose.Schema.Types.ObjectId,
+  Customer_id: { 
+    type: mongoose.Schema.Types.ObjectId, 
     ref: 'Customer', // Menghubungkan ke model 'Customer'
     required: true
   },
@@ -36,15 +36,6 @@ const penjualanSchema = new mongoose.Schema({
     type: Boolean,
     required: true
   },
-  idCart: { 
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Cart', // Menghubungkan ke model 'Cart'
-    required: true
-  },
-  Nama_lengkap: {
-    type: String,
-    required: true
-  }
 });
 
 module.exports = mongoose.model('Penjualan', penjualanSchema);

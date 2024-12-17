@@ -250,7 +250,111 @@ router.post('/addKaryawan', uploadKaryawan, async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+router.put('/updateKaryawan/:id', uploadKaryawan, async (req, res) => {
+  try {
+    const { id } = req.params; // Ambil id_karyawan dari parameter URL
+    const {
+      nama_lengkap,
+      tempat_lahir,
+      tanggal_lahir,
+      jenis_kelamin,
+      golongan_darah,
+      alamat,
+      no_telepon,
+      agama,
+      email, // Email baru (jika ada)
+      password, // Password baru (jika ada)
+    } = req.body;
 
+    const foto_ktp = req.file?.filename;
+
+    // Validasi input (opsional, hanya jika ada data yang diubah)
+    if (email) {
+      const emailRegex = /.+@.+\..+/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: 'Format email tidak valid!' });
+      }
+
+      // Periksa apakah email sudah digunakan oleh karyawan lain
+      const existingEmail = await Karyawan.findOne({ email, id_karyawan: { $ne: id } });
+      if (existingEmail) {
+        return res.status(400).json({ error: 'Email sudah digunakan oleh karyawan lain!' });
+      }
+    }
+
+    let hashedPassword;
+    if (password) {
+      // Hash password baru (jika diberikan)
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+
+    // Update karyawan di database
+    const updatedData = {
+      nama_lengkap,
+      tempat_lahir,
+      tanggal_lahir,
+      jenis_kelamin,
+      golongan_darah,
+      alamat,
+      no_telepon,
+      agama,
+      email,
+      password: hashedPassword,
+      foto_ktp,
+    };
+
+    // Hapus field yang undefined atau null
+    Object.keys(updatedData).forEach((key) => {
+      if (updatedData[key] === undefined || updatedData[key] === null) {
+        delete updatedData[key];
+      }
+    });
+
+    const updatedKaryawan = await Karyawan.findOneAndUpdate(
+      { id_karyawan: id },
+      updatedData,
+      { new: true }
+    );
+
+    if (!updatedKaryawan) {
+      return res.status(404).json({ error: 'Karyawan tidak ditemukan' });
+    }
+
+    res.status(200).json({ message: 'Karyawan berhasil diperbarui', data: updatedKaryawan });
+  } catch (error) {
+    console.error('Error saat memperbarui karyawan:', error);
+    res.status(500).json({ error: 'Terjadi kesalahan pada server' });
+  }
+});
+router.put('/updateStatusKaryawan/:id', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body; // Expects 'Aktif' or 'Nonaktif'
+
+  try {
+    // Validasi input
+    if (status !== 'Aktif' && status !== 'Nonaktif') {
+      return res.status(400).json({ message: 'Status harus berupa "Aktif" atau "Nonaktif".' });
+    }
+
+    // Cari karyawan berdasarkan ID
+    const karyawan = await Karyawan.findOne({ id_karyawan: id });
+    if (!karyawan) {
+      return res.status(404).json({ message: 'Karyawan tidak ditemukan.' });
+    }
+
+    // Update status karyawan
+    karyawan.status = status;
+    await karyawan.save();
+
+    return res.status(200).json({
+      message: `Status karyawan berhasil diubah menjadi ${status}.`,
+      karyawan,
+    });
+  } catch (error) {
+    console.error('Gagal mengupdate status karyawan:', error);
+    return res.status(500).json({ message: 'Terjadi kesalahan server.' });
+  }
+});
 router.get('/getKaryawan', async (req, res) => {
   try {
     // Ambil semua karyawan kecuali password
@@ -266,6 +370,25 @@ router.get('/getKaryawan', async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+// Ambil karyawan berdasarkan ID
+router.get('/getKaryawan/:id', async (req, res) => {
+  try {
+    const { id } = req.params; // Ambil id dari parameter URL
+    // Cari berdasarkan `id_karyawan` jika `id` bukan ObjectId
+    const karyawan = await Karyawan.findOne({ id_karyawan: id }).select('-password');
+
+    if (!karyawan) {
+      return res.status(404).json({ error: 'Karyawan tidak ditemukan' });
+    }
+
+    res.status(200).json({ message: 'Data karyawan ditemukan', data: karyawan });
+  } catch (error) {
+    console.error('Error saat mengambil data karyawan berdasarkan ID:', error);
+    res.status(500).json({ error: 'Terjadi kesalahan pada server' });
+  }
+});
+
+
 //update password
 router.post('/updatePassword', async (req, res) => {
   try {
@@ -362,6 +485,25 @@ router.get('/products', async (req, res) => {
     res.status(500).json({ message: 'Error fetching products', error });
   }
 });
+// Contoh Express.js Endpoint
+app.get("/products/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Cari produk berdasarkan ID
+    const product = await db.query("SELECT * FROM products WHERE id = ?", [id]);
+
+    if (product.length === 0) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json({ data: product[0] });
+  } catch (error) {
+    console.error("Error fetching product by ID:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 
 //get multer
@@ -384,15 +526,29 @@ router.get('/products/:folder/:imageName', (req, res) => {
 // Route untuk menambahkan retur barang
 router.post('/addRetur', uploadRetur, async (req, res) => {
   try {
-    const { Id_retur_admin, Id_barang, Nama_barang, Jumlah_barang, Tanggal } = req.body;
-    const Photo_product = req.file?.filename; // Ambil nama file foto produk
+    // Get the latest retur admin ID from the database
+    const lastRetur = await ReturAdmin.findOne().sort({ Id_retur_admin: -1 }).limit(1);
 
-    if (!Id_retur_admin || !Id_barang || !Nama_barang || !Jumlah_barang || !Tanggal || !Photo_product) {
+    // Generate the new Id_retur_admin
+    let newId = 'D002'; // Default starting ID
+    if (lastRetur) {
+      const lastId = lastRetur.Id_retur_admin;
+      const numericPart = parseInt(lastId.slice(1), 10);
+      const newNumericPart = numericPart + 1;
+      newId = `D${String(newNumericPart).padStart(3, '0')}`;
+    }
+
+    const { Id_barang, Nama_barang, Jumlah_barang, Tanggal } = req.body;
+    const Photo_product = req.file?.filename;  // Get the uploaded file's filename
+
+    // Ensure all fields are provided
+    if (!Id_barang || !Nama_barang || !Jumlah_barang || !Tanggal || !Photo_product) {
       return res.status(400).json({ error: 'Semua field wajib diisi!' });
     }
 
+    // Create a new retur entry
     const newRetur = new ReturAdmin({
-      Id_retur_admin,
+      Id_retur_admin: newId,
       Id_barang,
       Nama_barang,
       Jumlah_barang,
@@ -400,6 +556,7 @@ router.post('/addRetur', uploadRetur, async (req, res) => {
       Tanggal,
     });
 
+    // Save the new retur entry to the database
     const savedRetur = await newRetur.save();
     res.status(201).json({ message: 'Retur barang berhasil ditambahkan', data: savedRetur });
   } catch (error) {
@@ -407,6 +564,8 @@ router.post('/addRetur', uploadRetur, async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+
+
 router.get('/getRetur', async (req, res) => {
   try {
     const returs = await ReturAdmin.find(); // Mengambil semua data retur dari database
@@ -759,8 +918,28 @@ router.post('/addCustomer', async (req, res) => {
   }
 
   try {
+    // Cari Customer terakhir berdasarkan Customer_id yang terbesar
+    const lastCustomer = await Customer.findOne().sort({ Customer_id: -1 });
+    console.log("Last Customer:", lastCustomer); // Log last customer
+
+    let newCustomerId = 'Cus010'; // Default ID pertama
+
+    if (lastCustomer && lastCustomer.Customer_id) {
+      // Jika lastCustomer ada dan Customer_id ada, ambil angka ID terakhir dan increment
+      const lastIdNumber = parseInt(lastCustomer.Customer_id.substring(3)); // Ambil angka setelah 'Cus'
+      
+      if (isNaN(lastIdNumber)) {
+        // Jika ID tidak sesuai format, beri pesan error
+        return res.status(500).json({ error: 'Format ID Customer terakhir tidak valid' });
+      }
+      
+      const newIdNumber = lastIdNumber + 1; // Increment ID dengan 1
+      newCustomerId = `Cus${String(newIdNumber).padStart(3, '0')}`; // Format ID baru
+    }
+
     // Membuat instance pelanggan baru
     const newCustomer = new Customer({
+      Customer_id: newCustomerId,
       Nama_lengkap,
       No_telepone,
       Alamat,
@@ -769,21 +948,47 @@ router.post('/addCustomer', async (req, res) => {
       Kodepos,
     });
 
-    // Menyimpan pelanggan ke database
+    // Simpan customer baru ke database
     await newCustomer.save();
 
     res.status(201).json({
-      message: 'Pelanggan berhasil ditambahkan',
+      message: 'Customer berhasil ditambahkan',
       data: newCustomer,
     });
   } catch (error) {
-    console.error('Error saat menambahkan pelanggan:', error);
+    console.error('Error saat menambahkan customer:', error.message);
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+// GET /getCustomers - Mengambil semua data customer
+router.get('/getCustomers', async (req, res) => {
+  try {
+    // Ambil semua data customer dari database
+    const customers = await Customer.find();
+
+    // Periksa apakah data customer tersedia
+    if (customers.length === 0) {
+      return res.status(404).json({ message: 'Tidak ada data pelanggan yang ditemukan' });
+    }
+
+    // Kirim data pelanggan dalam respons JSON
+    res.status(200).json({
+      message: 'Data pelanggan berhasil diambil',
+      data: customers,
+    });
+  } catch (error) {
+    console.error('Error saat mengambil data customer:', error.message);
+    res.status(500).json({ error: 'Terjadi kesalahan pada server' });
+  }
+});
+
+
+
 //penjualan
 router.post('/addPenjualan', async (req, res) => {
   const { customerId, cartId, status } = req.body;
+
+  console.log('Received Data:', req.body); // Log data yang diterima
 
   // Validasi input
   if (!customerId || !cartId || typeof status !== 'boolean') {
@@ -798,26 +1003,26 @@ router.post('/addPenjualan', async (req, res) => {
     }
 
     // Ambil data keranjang
-    const cart = await Cart.findById(cartId).populate('items'); // Pastikan model Cart memiliki relasi items
-    if (!cart) {
-      return res.status(404).json({ error: 'Keranjang tidak ditemukan' });
+    const cart = await Cart.findById(cartId).populate('items');
+    if (!cart || !cart.items || cart.items.length === 0) {
+      return res.status(404).json({ error: 'Keranjang kosong atau tidak valid' });
     }
 
+    console.log('Cart Data:', cart);
+
     // Iterasi barang dalam keranjang dan buat data penjualan
-    const penjualanData = cart.items.map((item) => ({
-      idPenjualan: `PJ${Date.now()}`, // ID unik, bisa diubah sesuai kebutuhan
-      idBarang: item._id,
-      namaBarang: item.nama,
-      totalBarang: item.jumlah,
-      totalHarga: item.harga * item.jumlah,
-      tanggalPembelian: new Date(),
-      namaCustomer: customer._id,
-      status,
-      idCart: cart._id,
-      Nama_lengkap: customer.Nama_lengkap,
+    const penjualanData = cart.items.map((item, index) => ({
+      idPenjualan: `PJ${Date.now()}${index}`, // ID unik
+      idCart: cart._id, // Relasi ke keranjang
+      namaBarang: item.nama, // Nama barang
+      totalBarang: item.jumlah, // Jumlah barang
+      totalHarga: item.harga * item.jumlah, // Total harga
+      tanggalPembelian: new Date(), // Tanggal pembelian
+      Customer_id: customer._id, // Referensi ke Customer_id
+      status, // Status penjualan
     }));
 
-    // Simpan semua data penjualan ke database
+    // Simpan data penjualan ke database
     const penjualanRecords = await Penjualan.insertMany(penjualanData);
 
     res.status(201).json({
@@ -825,8 +1030,9 @@ router.post('/addPenjualan', async (req, res) => {
       data: penjualanRecords,
     });
   } catch (error) {
-    console.error('Error saat menyimpan penjualan:', error);
+    console.error('Error saat menyimpan penjualan:', error.message);  // Log pesan error di sini
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+
 module.exports = router;

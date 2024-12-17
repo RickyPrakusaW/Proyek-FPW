@@ -1,0 +1,114 @@
+/* Gaya dasar untuk seluruh halaman */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Container untuk formulir */
+  div {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 600px;
+    margin: 40px auto;
+  }
+  
+  /* Header */
+  h1 {
+    text-align: center;
+    color: #333333;
+    margin-bottom: 20px;
+  }
+  
+  /* Pesan sukses atau error */
+  p {
+    text-align: center;
+    font-size: 14px;
+    margin: 10px 0;
+  }
+  
+  p[style*="color: green"] {
+    color: green;
+  }
+  
+  p[style*="color: red"] {
+    color: red;
+  }
+  
+  /* Label untuk setiap input */
+  label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #555555;
+  }
+  
+  /* Input dan textarea */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="date"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #555555;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease-in-out;
+  }
+  
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="date"]:focus,
+  textarea:focus,
+  select:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  /* Tombol */
+  button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+    transition: background-color 0.3s ease-in-out;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    div {
+      padding: 15px;
+    }
+  
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="date"],
+    textarea,
+    select {
+      font-size: 13px;
+    }
+  
+    button {
+      width: 100%;
+      font-size: 14px;
+    }
+  }
+  
