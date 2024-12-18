@@ -26,6 +26,16 @@ const returAdminSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  Status: {
+    type: String,
+    required: true,
+    enum: [
+      'Barang diretur ke supplier',
+      'Barang dikembalikan dari supplier',
+      'Barang rusak',
+    ], // Nilai valid status
+    default: 'Barang rusak', // Nilai default
+  },
 });
 
 const ReturAdmin = mongoose.model('ReturAdmin', returAdminSchema);

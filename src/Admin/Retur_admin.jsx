@@ -8,12 +8,12 @@ const ReturAdmin = () => {
   const { isDarkMode } = useTheme();
   const [barangReturs, setBarangReturs] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showModal, setShowModal] = useState(false);  // State for showing the modal
+  const [showModal, setShowModal] = useState(false);
   const [newRetur, setNewRetur] = useState({
-    Id_barang: '',
-    Nama_barang: '',
-    Jumlah_barang: '',
-    Tanggal: '',
+    Id_barang: "",
+    Nama_barang: "",
+    Jumlah_barang: "",
+    Tanggal: "",
     Photo_product: null,
   });
 
@@ -27,19 +27,19 @@ const ReturAdmin = () => {
     ? "bg-gray-700 hover:bg-blue-700"
     : "bg-gray-100 hover:bg-blue-100";
 
-  // Fetch the return data
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/admin/getRetur")
-      .then((response) => {
-        setBarangReturs(response.data.data);
-      })
-      .catch((error) => {
-        console.error("There was an error fetching the return data!", error);
-      });
+    fetchReturs();
   }, []);
 
-  // Handle input changes in the form
+  const fetchReturs = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/api/admin/getRetur");
+      setBarangReturs(response.data.data);
+    } catch (error) {
+      console.error("Error fetching return data:", error);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewRetur({
@@ -48,7 +48,6 @@ const ReturAdmin = () => {
     });
   };
 
-  // Handle file input for the image
   const handleFileChange = (e) => {
     setNewRetur({
       ...newRetur,
@@ -56,7 +55,6 @@ const ReturAdmin = () => {
     });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -74,24 +72,38 @@ const ReturAdmin = () => {
         { headers: { "Content-Type": "multipart/form-data" } }
       );
       alert(response.data.message);
-      setShowModal(false);  // Close the modal
+      setShowModal(false);
       setNewRetur({
-        Id_barang: '',
-        Nama_barang: '',
-        Jumlah_barang: '',
-        Tanggal: '',
+        Id_barang: "",
+        Nama_barang: "",
+        Jumlah_barang: "",
+        Tanggal: "",
         Photo_product: null,
-      }); // Clear the form
+      });
+      fetchReturs();
     } catch (error) {
       console.error("Error adding return:", error);
       alert("Failed to add return!");
     }
   };
 
+  const updateStatus = async (id, status) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/api/admin/updateRetur/${id}`,
+        { Status: status }
+      );
+      alert(response.data.message);
+      fetchReturs();
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Failed to update status!");
+    }
+  };
+
   return (
     <div className={`flex min-h-screen ${themeClasses}`}>
       <div className="flex-1 p-5">
-        {/* Header */}
         <div className="flex justify-between items-center mb-5">
           <h1 className="text-2xl font-bold">Retur Barang</h1>
           <input
@@ -103,7 +115,6 @@ const ReturAdmin = () => {
               isDarkMode ? "border-gray-500 text-black" : "border-gray-700"
             } focus:outline-none`}
           />
-          {/* Add Retur Button */}
           <button
             onClick={() => setShowModal(true)}
             className="bg-green-500 px-5 py-2 rounded-md text-white font-semibold hover:bg-green-600"
@@ -112,7 +123,6 @@ const ReturAdmin = () => {
           </button>
         </div>
 
-        {/* Table */}
         <table className="w-full text-center border-collapse">
           <thead>
             <tr className={`${tableHeaderClasses}`}>
@@ -121,6 +131,8 @@ const ReturAdmin = () => {
               <th className="p-3 border">Nama Barang</th>
               <th className="p-3 border">Jumlah</th>
               <th className="p-3 border">Foto Barang</th>
+              <th className="p-3 border">Status</th>
+              <th className="p-3 border">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -148,11 +160,37 @@ const ReturAdmin = () => {
                         />
                       </div>
                     </td>
+                    <td className="p-3 border">{barang.Status}</td>
+                    <td className="p-3 border">
+                      {barang.Status === "Barang rusak" && (
+                        <button
+                          onClick={() =>
+                            updateStatus(barang.Id_retur_admin, "Barang diretur ke supplier")
+                          }
+                          className="bg-blue-500 px-2 py-1 text-white rounded-md hover:bg-blue-600"
+                        >
+                          Retur ke Supplier
+                        </button>
+                      )}
+                      {barang.Status === "Barang diretur ke supplier" && (
+                        <button
+                          onClick={() =>
+                            updateStatus(
+                              barang.Id_retur_admin,
+                              "Barang dikembalikan dari supplier"
+                            )
+                          }
+                          className="bg-yellow-500 px-2 py-1 text-white rounded-md hover:bg-yellow-600"
+                        >
+                          Kembali dari Supplier
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))
             ) : (
               <tr>
-                <td colSpan="5" className="p-3 text-center text-gray-500">
+                <td colSpan="7" className="p-3 text-center text-gray-500">
                   Tidak ada data retur barang.
                 </td>
               </tr>
@@ -160,24 +198,11 @@ const ReturAdmin = () => {
           </tbody>
         </table>
 
-        {/* Modal for adding return */}
         {showModal && (
           <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
             <div className="bg-white p-6 rounded-md shadow-lg w-96">
               <h3 className="text-2xl font-bold mb-4">Tambah Retur</h3>
               <form onSubmit={handleSubmit}>
-                {/* ID Retur Admin is automatically generated */}
-                {/* <div className="mb-4">
-                  <label className="block text-gray-700">ID Retur Admin</label>
-                  <input
-                    type="text"
-                    name="Id_retur_admin"
-                    value={newRetur.Id_retur_admin}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border rounded-md"
-                    disabled
-                  />
-                </div> */}
                 <div className="mb-4">
                   <label className="block text-gray-700">ID Barang</label>
                   <input

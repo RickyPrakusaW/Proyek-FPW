@@ -78,7 +78,7 @@ const Homekepalagudang = () => {
                   className={`p-5 rounded-md text-center ${sidebarClasses}`}
                 >
                   <img
-                    src={barang.foto || "https://via.placeholder.com/100"}
+                    src={barang.photo_url || "https://via.placeholder.com/100"}
                     alt={barang.nama}
                     className="w-20 h-20 mx-auto rounded-md mb-3"
                   />

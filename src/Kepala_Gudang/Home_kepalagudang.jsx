@@ -60,7 +60,22 @@ const Homekepalagudang = () => {
     return { labels, data };
   };
 
+  // Process data by type for Pie Chart
+  const processDataByType = () => {
+    const groupedData = barangData.reduce((acc, barang) => {
+      const type = barang.tipe_barang;
+      acc[type] = (acc[type] || 0) + barang.total_barang;
+      return acc;
+    }, {});
+
+    const labels = Object.keys(groupedData);
+    const data = Object.values(groupedData);
+
+    return { labels, data };
+  };
+
   const { labels, data } = processDataByDate();
+  const { labels: typeLabels, data: typeData } = processDataByType();
 
   // Bar Chart Data
   const barChartData = {
@@ -74,7 +89,7 @@ const Homekepalagudang = () => {
     ],
   };
 
-  // Pie Chart Data
+  // Pie Chart Data for Date Distribution
   const pieChartData = {
     labels,
     datasets: [
@@ -96,6 +111,33 @@ const Homekepalagudang = () => {
           "#4BC0C0",
           "#9966FF",
           "#FF9F40",
+        ],
+      },
+    ],
+  };
+
+  // Pie Chart Data for Type Distribution
+  const pieChartTypeData = {
+    labels: typeLabels,
+    datasets: [
+      {
+        label: "Distribusi Barang Berdasarkan Tipe",
+        data: typeData,
+        backgroundColor: [
+          "#FF9999",
+          "#66B2FF",
+          "#FFDB4D",
+          "#80E1A7",
+          "#C79EF4",
+          "#FFB266",
+        ],
+        hoverBackgroundColor: [
+          "#FF9999",
+          "#66B2FF",
+          "#FFDB4D",
+          "#80E1A7",
+          "#C79EF4",
+          "#FFB266",
         ],
       },
     ],
@@ -138,7 +180,7 @@ const Homekepalagudang = () => {
                   className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
                   onClick={() => navigate("/kepalaGudang/totalBarang")}
                 >
-                  <h3 className="text-xl font-semibold">Total Barang Masuk</h3>
+                  <h3 className="text-xl font-semibold">Total Barang </h3>
                   <p className="text-2xl font-bold">{barangData.length} Item</p>
                 </div>
 
@@ -167,12 +209,20 @@ const Homekepalagudang = () => {
                   </div>
                 </div>
 
-                {/* Pie Chart */}
+                {/* Pie Chart for Date Distribution */}
                 <div className={`p-5 rounded-md ${themeClasses}`}>
                   <h3 className="text-xl font-semibold mb-3">Distribusi Total Barang</h3>
                   <div className="w-full h-80">
                     <Pie data={pieChartData} />
                   </div>
+                </div>
+              </div>
+
+              {/* Additional Pie Chart for Type Distribution */}
+              <div className="p-5 rounded-md w-full">
+                <h3 className="text-xl font-semibold mb-3">Distribusi Barang Berdasarkan Tipe</h3>
+                <div className="w-full h-80">
+                  <Pie data={pieChartTypeData} />
                 </div>
               </div>
             </>

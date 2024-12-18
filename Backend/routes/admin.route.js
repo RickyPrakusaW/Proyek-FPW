@@ -53,9 +53,8 @@ const uploadProduct = multer({
 }).single('photo_product'); // Pastikan field di frontend menggunakan 'photo_product'
 
 const uploadRetur = multer({
-  storage: createStorage('uploads/retur'),
-  fileFilter,
-}).single('photo_product'); // Pastikan field di frontend menggunakan 'photo_product'
+  storage: createStorage('./uploads'),
+}).single('Photo_product'); 
 
 const uploadStock = multer({
   storage: createStorage('uploads/stock'),
@@ -524,29 +523,36 @@ router.get('/products/:folder/:imageName', (req, res) => {
 });
 
 // Route untuk menambahkan retur barang
-router.post('/addRetur', uploadRetur, async (req, res) => {
+router.post("/addRetur", uploadRetur, async (req, res) => {
   try {
-    // Get the latest retur admin ID from the database
-    const lastRetur = await ReturAdmin.findOne().sort({ Id_retur_admin: -1 }).limit(1);
+    // Log file and body data for debugging
+    console.log("File diterima:", req.file);
+    console.log("Data body:", req.body);
 
-    // Generate the new Id_retur_admin
-    let newId = 'D002'; // Default starting ID
-    if (lastRetur) {
-      const lastId = lastRetur.Id_retur_admin;
-      const numericPart = parseInt(lastId.slice(1), 10);
-      const newNumericPart = numericPart + 1;
-      newId = `D${String(newNumericPart).padStart(3, '0')}`;
-    }
+    // Fetch the last entry to calculate the new ID
+    const lastRetur = await ReturAdmin.findOne().sort({ Id_retur_admin: -1 });
+    const newId = lastRetur
+      ? `D${String(parseInt(lastRetur.Id_retur_admin.slice(1)) + 1).padStart(3, "0")}`
+      : "D001";
 
-    const { Id_barang, Nama_barang, Jumlah_barang, Tanggal } = req.body;
-    const Photo_product = req.file?.filename;  // Get the uploaded file's filename
+    // Destructure and validate required fields
+    const { Id_barang, Nama_barang, Jumlah_barang, Tanggal, Status } = req.body;
+    const Photo_product = req.file?.filename;
 
-    // Ensure all fields are provided
     if (!Id_barang || !Nama_barang || !Jumlah_barang || !Tanggal || !Photo_product) {
-      return res.status(400).json({ error: 'Semua field wajib diisi!' });
+      return res.status(400).json({ error: "Semua field wajib diisi!" });
     }
 
-    // Create a new retur entry
+    // Validate numeric and date fields
+    if (isNaN(Jumlah_barang) || Jumlah_barang <= 0) {
+      return res.status(400).json({ error: "Jumlah barang harus berupa angka positif." });
+    }
+
+    if (isNaN(Date.parse(Tanggal))) {
+      return res.status(400).json({ error: "Tanggal tidak valid." });
+    }
+
+    // Create a new ReturAdmin entry
     const newRetur = new ReturAdmin({
       Id_retur_admin: newId,
       Id_barang,
@@ -554,18 +560,27 @@ router.post('/addRetur', uploadRetur, async (req, res) => {
       Jumlah_barang,
       Photo_product,
       Tanggal,
+      Status: Status || "Barang rusak",
     });
 
-    // Save the new retur entry to the database
+    // Save the new entry to the database
     const savedRetur = await newRetur.save();
-    res.status(201).json({ message: 'Retur barang berhasil ditambahkan', data: savedRetur });
+
+    // Respond with success message
+    res.status(201).json({
+      message: "Retur barang berhasil ditambahkan",
+      data: savedRetur,
+    });
   } catch (error) {
-    console.error('Error saat menambahkan retur barang:', error);
-    res.status(500).json({ error: 'Terjadi kesalahan pada server' });
+    console.error("Error saat menambahkan retur barang:", error);
+
+    // Improved error response for debugging
+    res.status(500).json({
+      error: "Terjadi kesalahan pada server",
+      details: error.message,
+    });
   }
 });
-
-
 router.get('/getRetur', async (req, res) => {
   try {
     const returs = await ReturAdmin.find(); // Mengambil semua data retur dari database
@@ -576,6 +591,52 @@ router.get('/getRetur', async (req, res) => {
   }
 });
 
+router.put("/updateRetur/:id", async (req, res) => {
+  try {
+    const { id } = req.params; // ID retur dari parameter URL
+    const { Status } = req.body; // Status baru dari body request
+
+    // Validasi input
+    if (!Status) {
+      return res.status(400).json({ error: "Status wajib diisi!" });
+    }
+
+    // Validasi nilai status
+    const validStatuses = [
+      "Barang diretur ke supplier",
+      "Barang dikembalikan dari supplier",
+      "Barang rusak",
+    ];
+    if (!validStatuses.includes(Status)) {
+      return res.status(400).json({ error: "Status tidak valid!" });
+    }
+
+    // Cari retur berdasarkan ID dan update status
+    const updatedRetur = await ReturAdmin.findOneAndUpdate(
+      { Id_retur_admin: id }, // Filter by Id_retur_admin
+      { $set: { Status } },   // Update the status
+      { new: true }           // Return the updated document
+    );
+
+    if (!updatedRetur) {
+      return res.status(404).json({ error: "Data retur tidak ditemukan!" });
+    }
+
+    // Kirim respon sukses
+    res.status(200).json({
+      message: "Status retur berhasil diperbarui",
+      data: updatedRetur,
+    });
+  } catch (error) {
+    console.error("Error saat memperbarui status retur:", error);
+
+    // Respon kesalahan
+    res.status(500).json({
+      error: "Terjadi kesalahan pada server",
+      details: error.message,
+    });
+  }
+});
 
 
 //kepala gudang
@@ -649,16 +710,14 @@ router.post('/barangKeluar', async (req, res) => {
 });
 router.get('/barangKeluar', async (req, res) => {
   try {
-    // Ambil semua data barang keluar dari database
-    const allBarangKeluar = await Stock.find();
+    // Mengambil semua data barang keluar dari database
+    const barangKeluar = await Stock.find({ tanggal_keluar: { $exists: true } });
 
-    // Jika tidak ada data
-    if (allBarangKeluar.length === 0) {
-      return res.status(404).json({ message: 'Belum ada barang keluar yang tercatat.' });
+    if (barangKeluar.length === 0) {
+      return res.status(404).json({ message: 'Tidak ada data barang keluar ditemukan' });
     }
 
-    // Kirimkan data barang keluar
-    res.status(200).json({ message: 'Data barang keluar berhasil diambil', data: allBarangKeluar });
+    res.status(200).json({ message: 'Data barang keluar berhasil diambil', data: barangKeluar });
   } catch (error) {
     console.error('Error saat mengambil data barang keluar:', error);
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
@@ -751,15 +810,17 @@ router.delete('/deleteStock/:id', async (req, res) => {
 });
 
 //retur kepala gudang 
-router.post('/addReturGudang', async (req, res) => {
+router.post('/addReturGudang', uploadReturGudang, async (req, res) => {
   try {
-    const { idBarang, namaBarang, jumlahBarang, photoBarang, tanggal } = req.body;
+    const { idBarang, namaBarang, jumlahBarang, tanggal } = req.body;
+    const photoBarang = req.file ? req.file.path : ''; // Get the uploaded photo path
 
-    // Validasi data yang masuk
+    // Validate data
     if (!idBarang || !namaBarang || !jumlahBarang || !photoBarang || !tanggal) {
       return res.status(400).json({ error: 'Semua data wajib diisi' });
     }
 
+    // Validate the ID of the barang
     if (!mongoose.Types.ObjectId.isValid(idBarang)) {
       return res.status(400).json({ error: 'ID Barang tidak valid' });
     }
@@ -769,7 +830,10 @@ router.post('/addReturGudang', async (req, res) => {
       return res.status(404).json({ error: 'Barang tidak ditemukan' });
     }
 
+    // Create a unique ID for the return
     const idReturGudang = `${idBarang}-${Date.now()}`;
+    
+    // Create the returGudang document
     const retur = new ReturGudang({
       idReturGudang,
       idBarang: stock._id,
@@ -781,6 +845,7 @@ router.post('/addReturGudang', async (req, res) => {
 
     await retur.save();
 
+    // Respond with success
     res.status(201).json({
       message: 'Barang retur berhasil ditambahkan',
       data: retur,

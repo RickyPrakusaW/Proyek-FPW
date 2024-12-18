@@ -90,6 +90,7 @@ const TambahBarangMasukKepalaGudang = () => {
           className={`shadow-lg rounded-lg p-6 ${isDarkMode ? "bg-gray-800" : "bg-gray-100"}`}
         >
           <div className="space-y-4">
+            
             {/* ID Barang */}
             <div>
               <label className="block font-medium mb-1">ID Barang</label>
