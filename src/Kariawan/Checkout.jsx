@@ -39,7 +39,10 @@ function Checkout() {
   }, []);
 
   // Total belanja
-  const totalBelanja = cartItems.reduce((total, item) => total + item.totalBelanja, 0);
+  const totalBelanja = cartItems.reduce(
+    (total, item) => total + item.harga * item.totalProduct,
+    0
+  );
 
   // Handle perubahan input
   const handleChange = (e) => {
@@ -51,13 +54,16 @@ function Checkout() {
   const handleCheckout = async () => {
     try {
       // Kirim data pelanggan ke backend
-      const customerResponse = await fetch("http://localhost:3000/api/admin/addCustomer", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const customerResponse = await fetch(
+        "http://localhost:3000/api/admin/addCustomer",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (!customerResponse.ok) {
         throw new Error("Gagal menambahkan pelanggan");
@@ -66,26 +72,27 @@ function Checkout() {
       const customerData = await customerResponse.json();
 
       // Kirim data penjualan ke backend
-      const orderResponse = await fetch("http://localhost:3000/api/admin/addPenjualan", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          customerId: customerData.data._id, // ID pelanggan dari backend
-          cartId: cartItems.map(item => item._id), // Kirim ID cart item
-          total: totalBelanja, // Total belanja
-          status: true, // Contoh status penjualan
-        }),
-      });
-      
+      const orderResponse = await fetch(
+        "http://localhost:3000/api/admin/addPenjualan",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            customerId: customerData.data._id, // ID pelanggan dari backend
+            cartId: cartItems.map((item) => item._id), // Kirim ID cart item
+            status: true, // Contoh status penjualan
+          }),
+        }
+      );
 
       if (!orderResponse.ok) {
         throw new Error("Gagal menyelesaikan penjualan");
       }
 
-      const orderResponseData = await orderResponse.json();
-      console.log("Order Response:", orderResponseData);
+      const orderData = await orderResponse.json();
+      console.log("Order Response:", orderData);
 
       // Redirect ke halaman pembayaran
       navigate("/Pembayaran");
@@ -188,7 +195,7 @@ function Checkout() {
                       <div>
                         <h3 className="font-bold">{item.namaBarang}</h3>
                         <p className="text-sm">Jumlah: {item.totalProduct}</p>
-                        <p className="text-sm">Rp. {item.totalBelanja}</p>
+                        <p className="text-sm">Rp. {item.harga * item.totalProduct}</p>
                       </div>
                       <div className="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center">
                         📦

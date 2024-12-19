@@ -1,15 +1,14 @@
 // models/ReturGudang.js
 const mongoose = require('mongoose');
-const StockGudang = require('./Stock_gudang'); // pastikan pathnya benar
 
 const returGudangSchema = new mongoose.Schema({
   idReturGudang: {
     type: String,
     required: true,
   },
-  idBarang: {
+  id_stock: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'StockGudang',  // Harus sesuai dengan nama model yang di-import
+    ref: 'Stock', // Nama model Stock yang digunakan untuk referensi
     required: true,
   },
   namaBarang: {

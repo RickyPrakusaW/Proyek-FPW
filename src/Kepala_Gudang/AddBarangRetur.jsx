@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 function AddBarangRetur() {
-  const [idBarang, setIdBarang] = useState('');
+  const [id_stock, setIdStock] = useState('');
   const [namaBarang, setNamaBarang] = useState('');
   const [jumlahBarang, setJumlahBarang] = useState('');
-  const [photoBarang, setPhotoBarang] = useState('');
+  const [photo_product, setphoto_product] = useState(null); // Untuk file
   const [tanggal, setTanggal] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -15,27 +15,39 @@ function AddBarangRetur() {
     e.preventDefault();
 
     // Validasi input form
-    if (!idBarang || !namaBarang || !jumlahBarang || !photoBarang || !tanggal) {
+    if (!id_stock || !namaBarang || !jumlahBarang || !photo_product || !tanggal) {
       setError('Semua data wajib diisi');
       return;
     }
 
     try {
+      // Buat FormData untuk mengunggah file
+      const formData = new FormData();
+      formData.append('id_stock', id_stock);
+      formData.append('namaBarang', namaBarang);
+      formData.append('jumlahBarang', jumlahBarang);
+      formData.append('photo_product', photo_product); // File diunggah sebagai blob
+      formData.append('tanggal', tanggal);
+
       // Mengirim data ke backend API
-      const response = await axios.post('http://localhost:3000/api/admin/addReturGudang', {
-        idBarang,
-        namaBarang,
-        jumlahBarang,
-        photoBarang,
-        tanggal,
+      const response = await axios.post('http://localhost:3000/api/admin/addReturGudang', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Header untuk file upload
+        },
       });
 
       // Menampilkan pesan sukses
-      setMessage('Barang retur berhasil ditambahkan');
+      setMessage(response.data.message || 'Barang retur berhasil ditambahkan');
       setError('');
+      // Reset form
+      setIdStock('');
+      setNamaBarang('');
+      setJumlahBarang('');
+      setphoto_product(null);
+      setTanggal('');
     } catch (err) {
-      console.error('Error:', err);
-      setError('Terjadi kesalahan saat menambahkan retur');
+      console.error('Error:', err.response?.data || err.message);
+      setError(err.response?.data?.error || 'Terjadi kesalahan saat menambahkan retur');
       setMessage('');
     }
   };
@@ -51,12 +63,12 @@ function AddBarangRetur() {
       {/* Form Input */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="idBarang" className="block font-semibold">ID Barang</label>
+          <label htmlFor="id_stock" className="block font-semibold">ID Stock</label>
           <input
             type="text"
-            id="idBarang"
-            value={idBarang}
-            onChange={(e) => setIdBarang(e.target.value)}
+            id="id_stock"
+            value={id_stock}
+            onChange={(e) => setIdStock(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded mt-1"
             required
           />
@@ -87,12 +99,11 @@ function AddBarangRetur() {
         </div>
 
         <div>
-          <label htmlFor="photoBarang" className="block font-semibold">Foto Barang (URL)</label>
+          <label htmlFor="photo_product" className="block font-semibold">Foto Barang</label>
           <input
-            type="text"
-            id="photoBarang"
-            value={photoBarang}
-            onChange={(e) => setPhotoBarang(e.target.value)}
+            type="file"
+            id="photo_product"
+            onChange={(e) => setphoto_product (e.target.files[0])} // File input
             className="w-full p-2 border border-gray-300 rounded mt-1"
             required
           />

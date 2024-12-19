@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
+import axios from "axios";
 
 const Penjualan = () => {
   const navigate = useNavigate();
   const { isDarkMode, toggleTheme } = useTheme();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [penjualanData, setPenjualanData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
@@ -19,35 +21,36 @@ const Penjualan = () => {
     ? "bg-blue-600 hover:bg-blue-500"
     : "bg-blue-400 hover:bg-blue-300";
 
-  const dummyData = [
-    { id: 1, name: "Produk A", qty: 10, price: 20000, total: 200000 },
-    { id: 2, name: "Produk B", qty: 5, price: 50000, total: 250000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-    { id: 3, name: "Produk C", qty: 2, price: 100000, total: 200000 },
-  ];
   const handleBarang_keluar = () => {
     navigate("/Barang_keluar");
   };
 
+  useEffect(() => {
+    const fetchPenjualanData = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/admin/getPenjualan");
+        if (response.data && Array.isArray(response.data)) {
+          setPenjualanData(response.data); // Pastikan data adalah array
+        } else {
+          console.error("Unexpected response format:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching penjualan data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPenjualanData();
+  }, []);
+
+  if (loading) {
+    return <div className={`min-h-screen flex ${themeClasses}`}>Loading...</div>;
+  }
+
   return (
     <div className={`min-h-screen flex ${themeClasses}`}>
-      {/* Main Content */}
       <div className={`flex-1 p-5 space-y-5 ${isSidebarOpen ? "ml-64" : "ml-16"}`}>
-        {/* Statistik Utama */}
         <div className="grid grid-cols-3 gap-5">
           <div
             className={`${buttonClasses} p-5 rounded-md text-center cursor-pointer`}
@@ -57,7 +60,10 @@ const Penjualan = () => {
             <p className="text-2xl font-bold">Rp. 1.000.000</p>
           </div>
 
-          <div className={`${buttonClasses} p-5 rounded-md text-center`} onClick={handleBarang_keluar}>
+          <div
+            className={`${buttonClasses} p-5 rounded-md text-center`}
+            onClick={handleBarang_keluar}
+          >
             <h3 className="text-xl font-semibold">Total Barang Keluar</h3>
             <p className="text-2xl font-bold">1000</p>
           </div>
@@ -67,7 +73,6 @@ const Penjualan = () => {
           </div>
         </div>
 
-        {/* Data Dummy Penjualan */}
         <div className={`${sidebarClasses} p-5 rounded-md`}>
           <h3 className="text-xl font-semibold mb-5">Data Penjualan</h3>
           <div className="overflow-auto">
@@ -82,13 +87,13 @@ const Penjualan = () => {
                 </tr>
               </thead>
               <tbody>
-                {dummyData.map((item, index) => (
-                  <tr key={item.id} className="border-b">
+                {penjualanData.map((item, index) => (
+                  <tr key={item.idPenjualan || index} className="border-b">
                     <td className="p-3">{index + 1}</td>
-                    <td className="p-3">{item.name}</td>
-                    <td className="p-3">{item.qty}</td>
-                    <td className="p-3">Rp. {item.price.toLocaleString()}</td>
-                    <td className="p-3">Rp. {item.total.toLocaleString()}</td>
+                    <td className="p-3">{item.namaBarang || "N/A"}</td>
+                    <td className="p-3">{item.totalBarang || 0}</td>
+                    <td className="p-3">Rp. {(item.hargaSatuan || 0).toLocaleString()}</td>
+                    <td className="p-3">Rp. {(item.totalHarga || 0).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>

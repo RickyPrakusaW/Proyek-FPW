@@ -64,8 +64,7 @@ const uploadStock = multer({
 const uploadReturGudang = multer({
   storage: createStorage('uploads/retur_gudang'), // Direktori penyimpanan file
   fileFilter, // Filter file untuk memvalidasi jenis file
-}).single('photo_product');
-
+}).single('photo_product'); // Nama field form-data
 
 //login
 const initializeAdmin = async () => {
@@ -812,31 +811,27 @@ router.delete('/deleteStock/:id', async (req, res) => {
 //retur kepala gudang 
 router.post('/addReturGudang', uploadReturGudang, async (req, res) => {
   try {
-    const { idBarang, namaBarang, jumlahBarang, tanggal } = req.body;
-    const photoBarang = req.file ? req.file.path : ''; // Get the uploaded photo path
+    const { id_stock, namaBarang, jumlahBarang, tanggal } = req.body;
+    const photoBarang = req.file ? req.file.path : ''; // Ambil path file jika ada
 
-    // Validate data
-    if (!idBarang || !namaBarang || !jumlahBarang || !photoBarang || !tanggal) {
+    // Validasi input
+    if (!id_stock || !namaBarang || !jumlahBarang || !photoBarang || !tanggal) {
       return res.status(400).json({ error: 'Semua data wajib diisi' });
     }
 
-    // Validate the ID of the barang
-    if (!mongoose.Types.ObjectId.isValid(idBarang)) {
-      return res.status(400).json({ error: 'ID Barang tidak valid' });
-    }
-
-    const stock = await StockGudang.findById(idBarang);
+    // Validasi ID Stock
+    const stock = await Stock.findById(id_stock); // Cari ID di Stock
     if (!stock) {
-      return res.status(404).json({ error: 'Barang tidak ditemukan' });
+      return res.status(404).json({ error: 'Barang dengan ID tersebut tidak ditemukan' });
     }
 
-    // Create a unique ID for the return
-    const idReturGudang = `${idBarang}-${Date.now()}`;
-    
-    // Create the returGudang document
+    // Buat ID unik untuk retur
+    const idReturGudang = `${id_stock}-${Date.now()}`;
+
+    // Simpan data retur
     const retur = new ReturGudang({
       idReturGudang,
-      idBarang: stock._id,
+      id_stock: stock._id, // Referensi ke Stock
       namaBarang,
       jumlahBarang,
       photoBarang,
@@ -845,7 +840,7 @@ router.post('/addReturGudang', uploadReturGudang, async (req, res) => {
 
     await retur.save();
 
-    // Respond with success
+    // Kirim respon sukses
     res.status(201).json({
       message: 'Barang retur berhasil ditambahkan',
       data: retur,
@@ -855,20 +850,30 @@ router.post('/addReturGudang', uploadReturGudang, async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+
 //liat retur kepala gudang 
 
-router.get('/returGudang', async (req, res) => {
+router.get('/getReturGudang', async (req, res) => {
   try {
-    const returBarang = await ReturGudang.find()
-      .populate('idBarang', 'nama_barang total_barang photo_barang')  // Memastikan populate dengan benar
-      .exec();
+    // Mengambil semua data retur barang
+    const returGudangList = await ReturGudang.find().populate('id_stock'); // Populate ID stock if you want stock details
 
-    res.status(200).json(returBarang);
+    // Jika data retur tidak ditemukan
+    if (!returGudangList || returGudangList.length === 0) {
+      return res.status(404).json({ error: 'Tidak ada data retur ditemukan' });
+    }
+
+    // Kirim data retur
+    res.status(200).json({
+      message: 'Data retur berhasil diambil',
+      data: returGudangList,
+    });
   } catch (error) {
-    console.error('Error saat mengambil data retur barang:', error.message);
-    res.status(500).json({ error: 'Terjadi kesalahan saat mengambil data retur barang' });
+    console.error('Error saat mengambil data retur:', error.message);
+    res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+
 //cart
 router.post("/addToCart", async (req, res) => {
   const { idBarang, namaBarang, totalProduct, harga, photo } = req.body;
@@ -1046,58 +1051,103 @@ router.get('/getCustomers', async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
-
-
-
-//penjualan
 router.post('/addPenjualan', async (req, res) => {
   const { customerId, cartId, status } = req.body;
 
-  console.log('Received Data:', req.body); // Log data yang diterima
-
-  // Validasi input
   if (!customerId || !cartId || typeof status !== 'boolean') {
     return res.status(400).json({ error: 'Data pelanggan, keranjang, dan status wajib diisi' });
   }
 
   try {
-    // Ambil data pelanggan
-    const customer = await Customer.findById(customerId);
+    console.log('Request data:', { customerId, cartId, status });
+
+    // Ambil data customer
+    const customer = await Customer.findOne({ Customer_id: customerId });
     if (!customer) {
       return res.status(404).json({ error: 'Pelanggan tidak ditemukan' });
     }
 
-    // Ambil data keranjang
-    const cart = await Cart.findById(cartId).populate('items');
-    if (!cart || !cart.items || cart.items.length === 0) {
-      return res.status(404).json({ error: 'Keranjang kosong atau tidak valid' });
+    // Cari cart
+    const cart = await Cart.findOne({ idCart: cartId });
+    console.log('Cart found:', cart);
+    
+    if (!cart) {
+      return res.status(404).json({ error: 'Keranjang tidak ditemukan' });
     }
 
-    console.log('Cart Data:', cart);
+    // Buat data penjualan dengan struktur cart yang baru
+    const penjualanData = {
+      idPenjualan: `PJ${Date.now()}`,
+      idCart: cart._id,
+      namaBarang: cart.namaBarang,
+      totalBarang: cart.totalProduct,
+      totalHarga: cart.harga * cart.totalProduct,
+      tanggalPembelian: new Date(),
+      Customer_id: customer._id,
+      status,
+    };
 
-    // Iterasi barang dalam keranjang dan buat data penjualan
-    const penjualanData = cart.items.map((item, index) => ({
-      idPenjualan: `PJ${Date.now()}${index}`, // ID unik
-      idCart: cart._id, // Relasi ke keranjang
-      namaBarang: item.nama, // Nama barang
-      totalBarang: item.jumlah, // Jumlah barang
-      totalHarga: item.harga * item.jumlah, // Total harga
-      tanggalPembelian: new Date(), // Tanggal pembelian
-      Customer_id: customer._id, // Referensi ke Customer_id
-      status, // Status penjualan
-    }));
+    // Simpan penjualan
+    const penjualanRecord = await Penjualan.create(penjualanData);
 
-    // Simpan data penjualan ke database
-    const penjualanRecords = await Penjualan.insertMany(penjualanData);
+    // Populate data penjualan
+    const populatedPenjualan = await Penjualan.findById(penjualanRecord._id)
+      .populate('Customer_id')
+      .populate('idCart');
 
     res.status(201).json({
       message: 'Penjualan berhasil disimpan',
-      data: penjualanRecords,
+      data: populatedPenjualan,
     });
+
   } catch (error) {
-    console.error('Error saat menyimpan penjualan:', error.message);  // Log pesan error di sini
-    res.status(500).json({ error: 'Terjadi kesalahan pada server' });
+    console.error('Error saat menyimpan penjualan:', error);
+    res.status(500).json({ 
+      error: 'Terjadi kesalahan pada server',
+      details: error.message,
+      cartId: req.body.cartId
+    });
   }
 });
 
+router.get('/getPenjualan', async (req, res) => {
+  const { idPenjualan, Customer_id, status } = req.query;
+
+  try {
+    // Bangun query dinamis berdasarkan parameter
+    const query = {};
+
+    if (idPenjualan) {
+      query.idPenjualan = idPenjualan;
+    }
+
+    if (Customer_id) {
+      query.Customer_id = Customer_id;
+    }
+
+    if (typeof status !== 'undefined') {
+      query.status = status === 'true'; // Konversi string menjadi boolean
+    }
+
+    // Ambil data penjualan berdasarkan query
+    const penjualanData = await Penjualan.find(query)
+      .populate('Customer_id') // Populate data customer
+      .populate('idCart');    // Populate data cart
+
+    if (!penjualanData || penjualanData.length === 0) {
+      return res.status(404).json({ message: 'Data penjualan tidak ditemukan' });
+    }
+
+    res.status(200).json({
+      message: 'Data penjualan berhasil diambil',
+      data: penjualanData,
+    });
+  } catch (error) {
+    console.error('Error saat mengambil data penjualan:', error);
+    res.status(500).json({
+      error: 'Terjadi kesalahan pada server',
+      details: error.message,
+    });
+  }
+});
 module.exports = router;
