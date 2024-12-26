@@ -18,16 +18,18 @@ function Checkout() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Fetch data keranjang
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
         const response = await fetch("http://localhost:3000/api/admin/getCart");
         if (!response.ok) {
-          throw new Error("Gagal mengambil data keranjang");
+          throw new Error("Gagal mengambil data keranjang.");
         }
         const data = await response.json();
-        setCartItems(data.data);
+        setCartItems(data.data || []);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -50,8 +52,21 @@ function Checkout() {
     setFormData({ ...formData, [name]: value });
   };
 
+  // Validasi input pelanggan
+  const validateForm = () => {
+    const { Nama_lengkap, No_telepone, Alamat, Kota, Negara, Kodepos } = formData;
+    if (!Nama_lengkap || !No_telepone || !Alamat || !Kota || !Negara || !Kodepos) {
+      alert("Semua data pelanggan harus diisi.");
+      return false;
+    }
+    return true;
+  };
+
   // Handle submit data pelanggan dan pesanan
   const handleCheckout = async () => {
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
     try {
       // Kirim data pelanggan ke backend
       const customerResponse = await fetch(
@@ -66,7 +81,8 @@ function Checkout() {
       );
 
       if (!customerResponse.ok) {
-        throw new Error("Gagal menambahkan pelanggan");
+        const errorData = await customerResponse.json();
+        throw new Error(errorData.error || "Gagal menambahkan pelanggan.");
       }
 
       const customerData = await customerResponse.json();
@@ -88,7 +104,8 @@ function Checkout() {
       );
 
       if (!orderResponse.ok) {
-        throw new Error("Gagal menyelesaikan penjualan");
+        const errorData = await orderResponse.json();
+        throw new Error(errorData.error || "Gagal menyelesaikan penjualan.");
       }
 
       const orderData = await orderResponse.json();
@@ -99,6 +116,8 @@ function Checkout() {
     } catch (err) {
       console.error("Error saat checkout:", err);
       alert(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -116,74 +135,21 @@ function Checkout() {
               <div className="md:col-span-2">
                 <h2 className="mb-4 text-xl font-semibold">Informasi Data Pelanggan</h2>
                 <form className="space-y-4">
-                  <div>
-                    <label className="block text-gray-700">Nama Lengkap</label>
-                    <input
-                      type="text"
-                      name="Nama_lengkap"
-                      value={formData.Nama_lengkap}
-                      onChange={handleChange}
-                      placeholder="Nama Lengkap"
-                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700">Nomor Telepon</label>
-                    <input
-                      type="text"
-                      name="No_telepone"
-                      value={formData.No_telepone}
-                      onChange={handleChange}
-                      placeholder="Nomor Telepon"
-                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700">Alamat</label>
-                    <textarea
-                      name="Alamat"
-                      value={formData.Alamat}
-                      onChange={handleChange}
-                      placeholder="Alamat"
-                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
-                      rows="3"
-                    ></textarea>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-gray-700">Kota</label>
+                  {Object.keys(formData).map((key) => (
+                    <div key={key}>
+                      <label className="block text-gray-700">
+                        {key.replace("_", " ")}
+                      </label>
                       <input
                         type="text"
-                        name="Kota"
-                        value={formData.Kota}
+                        name={key}
+                        value={formData[key]}
                         onChange={handleChange}
-                        placeholder="Kota"
+                        placeholder={key.replace("_", " ")}
                         className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
                       />
                     </div>
-                    <div>
-                      <label className="block text-gray-700">Kode Pos</label>
-                      <input
-                        type="text"
-                        name="Kodepos"
-                        value={formData.Kodepos}
-                        onChange={handleChange}
-                        placeholder="Kode Pos"
-                        className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-gray-700">Negara</label>
-                    <input
-                      type="text"
-                      name="Negara"
-                      value={formData.Negara}
-                      onChange={handleChange}
-                      placeholder="Negara"
-                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
-                    />
-                  </div>
+                  ))}
                 </form>
               </div>
 
@@ -212,10 +178,13 @@ function Checkout() {
 
           <div className="mt-6 text-right">
             <button
-              className="px-6 py-3 text-white bg-green-500 rounded-lg hover:bg-green-600"
+              className={`px-6 py-3 text-white rounded-lg ${
+                isSubmitting ? "bg-gray-400" : "bg-green-500 hover:bg-green-600"
+              }`}
               onClick={handleCheckout}
+              disabled={isSubmitting}
             >
-              Pembayaran
+              {isSubmitting ? "Proses..." : "Pembayaran"}
             </button>
           </div>
         </div>

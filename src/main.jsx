@@ -31,6 +31,8 @@ import AddBarangRetur from "./Kepala_Gudang/AddBarangRetur";
 import KaryawanPage from "./KaryawanPage"
 import List_barang_kariawan from "./Kariawan/List_barang_kariawan";
 import CekStockGudang from "./Kariawan/CekStockGudang";
+//admin
+import Chatadmin from"./Admin/Chat"
 
 //kepala gudang 
 
@@ -103,6 +105,10 @@ const router = createBrowserRouter([
       {
         path: "detailkariawan",
         element: <Detailkariawan/>
+      },
+      {
+        path: "chatadmin",
+        element: <Chatadmin/>
       }
     ]
   },

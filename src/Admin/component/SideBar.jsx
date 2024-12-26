@@ -125,6 +125,13 @@ function SideBar() {
             <span>📋</span>
             {isSidebarOpen && <span>List Barang</span>}
           </li>
+          <li
+            className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer hover:${buttonClasses}`}
+            onClick={() => navigate("/admin/Chat")}
+          >
+            <span>📋</span>
+            {isSidebarOpen && <span>List Barang</span>}
+          </li>
         </ul>
 
         {/* Logout Button */}

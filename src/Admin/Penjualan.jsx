@@ -1,108 +1,75 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useTheme } from "../ThemeContext";
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
-const Penjualan = () => {
-  const navigate = useNavigate();
-  const { isDarkMode, toggleTheme } = useTheme();
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [penjualanData, setPenjualanData] = useState([]);
+function Penjualan() {
+  const [penjualan, setPenjualan] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const themeClasses = isDarkMode
-    ? "bg-gray-900 text-white"
-    : "bg-white text-gray-900";
-  const sidebarClasses = isDarkMode
-    ? "bg-gray-800 text-white"
-    : "bg-gray-200 text-gray-900";
-  const buttonClasses = isDarkMode
-    ? "bg-blue-600 hover:bg-blue-500"
-    : "bg-blue-400 hover:bg-blue-300";
-
-  const handleBarang_keluar = () => {
-    navigate("/Barang_keluar");
-  };
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchPenjualanData = async () => {
+    // Fungsi untuk mengambil data penjualan
+    const fetchPenjualan = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/admin/getPenjualan");
-        if (response.data && Array.isArray(response.data)) {
-          setPenjualanData(response.data); // Pastikan data adalah array
-        } else {
-          console.error("Unexpected response format:", response.data);
-        }
+        const response = await axios.get('http://localhost:3000/api/admin/getPenjualan');
+        setPenjualan(response.data.data); // Data dari backend
+        setLoading(false);
       } catch (error) {
-        console.error("Error fetching penjualan data:", error);
-      } finally {
+        console.error('Error saat mengambil data penjualan:', error);
+        setError('Gagal mengambil data penjualan.');
         setLoading(false);
       }
     };
 
-    fetchPenjualanData();
+    fetchPenjualan();
   }, []);
 
-  if (loading) {
-    return <div className={`min-h-screen flex ${themeClasses}`}>Loading...</div>;
-  }
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
-    <div className={`min-h-screen flex ${themeClasses}`}>
-      <div className={`flex-1 p-5 space-y-5 ${isSidebarOpen ? "ml-64" : "ml-16"}`}>
-        <div className="grid grid-cols-3 gap-5">
-          <div
-            className={`${buttonClasses} p-5 rounded-md text-center cursor-pointer`}
-            onClick={() => navigate("/Penjualan")}
-          >
-            <h3 className="text-xl font-semibold">Penjualan Hari Ini</h3>
-            <p className="text-2xl font-bold">Rp. 1.000.000</p>
-          </div>
+    <div>
+      <h1>Data Penjualan</h1>
+      {penjualan.length === 0 ? (
+        <p>Tidak ada data penjualan.</p>
+      ) : (
+        <table border="1" style={{ width: '100%', textAlign: 'left' }}>
+          <thead>
+            <tr>
+              <th>ID Penjualan</th>
+              <th>Customer</th>
+              <th>Pembayaran</th>
+              <th>Detail</th>
+              <th>Total Harga</th>
+              <th>Total Barang</th>
+              <th>Tanggal Pembelian</th>
+            </tr>
+          </thead>
+          <tbody>
+            {penjualan.map((item) => {
+              // Pastikan idCart adalah array sebelum menggunakan reduce
+              const totalHarga = Array.isArray(item.idCart) ? item.idCart.reduce((acc, cartItem) => {
+                // Asumsikan cartItem memiliki properti price
+                return acc + (cartItem.price * cartItem.quantity);
+              }, 0) : 0; // Jika bukan array, set totalHarga ke 0
 
-          <div
-            className={`${buttonClasses} p-5 rounded-md text-center`}
-            onClick={handleBarang_keluar}
-          >
-            <h3 className="text-xl font-semibold">Total Barang Keluar</h3>
-            <p className="text-2xl font-bold">1000</p>
-          </div>
-          <div className={`${buttonClasses} p-5 rounded-md text-center`}>
-            <h3 className="text-xl font-semibold">Total Barang</h3>
-            <p className="text-2xl font-bold">0 Barang</p>
-          </div>
-        </div>
-
-        <div className={`${sidebarClasses} p-5 rounded-md`}>
-          <h3 className="text-xl font-semibold mb-5">Data Penjualan</h3>
-          <div className="overflow-auto">
-            <table className="table-auto w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b">
-                  <th className="p-3">No</th>
-                  <th className="p-3">Nama Barang</th>
-                  <th className="p-3">Jumlah</th>
-                  <th className="p-3">Harga Satuan</th>
-                  <th className="p-3">Total Harga</th>
+              return (
+                <tr key={item._id}>
+                  <td>{item.idPenjualan}</td>
+                  <td>{item.Customer_id?.Nama_lengkap  || 'Tidak ada data'}</td>
+                  <td>{item.metodePembayaran ||'Tidak ada data'}</td>
+                  <td>{item.namaBarang ||'Tidak ada data'}</td>
+                  <td>{item.totalBarang ||'Tidak ada data'}</td>
+                  <td>{item.totalHarga ||'Tidak ada data'}</td>
+                  <td>{item.tanggalPembelian ||'Tidak ada data'}</td>
+                  
                 </tr>
-              </thead>
-              <tbody>
-                {penjualanData.map((item, index) => (
-                  <tr key={item.idPenjualan || index} className="border-b">
-                    <td className="p-3">{index + 1}</td>
-                    <td className="p-3">{item.namaBarang || "N/A"}</td>
-                    <td className="p-3">{item.totalBarang || 0}</td>
-                    <td className="p-3">Rp. {(item.hargaSatuan || 0).toLocaleString()}</td>
-                    <td className="p-3">Rp. {(item.totalHarga || 0).toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
     </div>
   );
-};
+}
 
 export default Penjualan;

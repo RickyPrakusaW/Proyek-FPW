@@ -13,10 +13,14 @@ const Customer = require('../models/Customer');
 const Penjualan = require('../models/Penjualan');
 // const KepalaGudang = require('./models/KepalaGudang'); 
 const Cart = require('../models/Cart');
+//chat
+const Chat = require('../models/Chat');
+const Message = require('../models/Message');
 const moment = require('moment');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const router = express.Router();
+const { ObjectId } = mongoose.Types;
 
 // Fungsi untuk setup storage engine Multer
 const createStorage = (destinationPath) =>
@@ -1054,100 +1058,204 @@ router.get('/getCustomers', async (req, res) => {
 router.post('/addPenjualan', async (req, res) => {
   const { customerId, cartId, status } = req.body;
 
-  if (!customerId || !cartId || typeof status !== 'boolean') {
-    return res.status(400).json({ error: 'Data pelanggan, keranjang, dan status wajib diisi' });
+  // Validasi input
+  if (!customerId || !Array.isArray(cartId) || typeof status !== 'boolean') {
+    return res.status(400).json({
+      error: 'Data pelanggan, keranjang, dan status wajib diisi dengan format yang benar',
+    });
   }
 
   try {
     console.log('Request data:', { customerId, cartId, status });
 
-    // Ambil data customer
-    const customer = await Customer.findOne({ Customer_id: customerId });
+    // Ambil data pelanggan
+    const customer = await Customer.findById(customerId);
     if (!customer) {
       return res.status(404).json({ error: 'Pelanggan tidak ditemukan' });
     }
 
-    // Cari cart
-    const cart = await Cart.findOne({ idCart: cartId });
-    console.log('Cart found:', cart);
-    
-    if (!cart) {
-      return res.status(404).json({ error: 'Keranjang tidak ditemukan' });
+    // Ambil data keranjang menggunakan cartId
+    const carts = await Cart.find({ _id: { $in: cartId } });
+    if (carts.length !== cartId.length) {
+      return res.status(404).json({
+        error: 'Beberapa item dalam keranjang tidak ditemukan',
+        missingItems: cartId.filter(id => !carts.some(cart => cart._id.equals(id)))
+      });
     }
 
-    // Buat data penjualan dengan struktur cart yang baru
+    // Hitung total barang dan total harga
+    const totalBarang = carts.reduce((sum, cart) => sum + cart.totalProduct, 0);
+    const totalHarga = carts.reduce((sum, cart) => sum + cart.harga * cart.totalProduct, 0);
+
+    // Data penjualan yang akan disimpan
     const penjualanData = {
-      idPenjualan: `PJ${Date.now()}`,
-      idCart: cart._id,
-      namaBarang: cart.namaBarang,
-      totalBarang: cart.totalProduct,
-      totalHarga: cart.harga * cart.totalProduct,
-      tanggalPembelian: new Date(),
-      Customer_id: customer._id,
+      idPenjualan: `PJ${Date.now()}`, // ID unik penjualan
+      idCart: carts.map(cart => cart._id), // Simpan ObjectId dari Cart
+      namaBarang: carts.map(cart => cart.namaBarang).join(', '), // Gabungkan nama barang
+      totalBarang,
+      totalHarga,
+      tanggalPembelian: new Date(), // Tanggal pembelian
+      Customer_id: customer._id, // ID pelanggan
       status,
     };
 
-    // Simpan penjualan
+    // Simpan data penjualan ke database
     const penjualanRecord = await Penjualan.create(penjualanData);
 
-    // Populate data penjualan
+    // Populate data penjualan dengan informasi lengkap
     const populatedPenjualan = await Penjualan.findById(penjualanRecord._id)
-      .populate('Customer_id')
-      .populate('idCart');
+      .populate('Customer_id', 'Nama_lengkap No_telepone') // Populate customer info
+      .populate('idCart', 'namaBarang totalProduct harga'); // Populate cart items
 
+    // Respons sukses
     res.status(201).json({
       message: 'Penjualan berhasil disimpan',
       data: populatedPenjualan,
     });
-
   } catch (error) {
+    // Log error ke server
     console.error('Error saat menyimpan penjualan:', error);
-    res.status(500).json({ 
-      error: 'Terjadi kesalahan pada server',
-      details: error.message,
-      cartId: req.body.cartId
-    });
-  }
-});
 
-router.get('/getPenjualan', async (req, res) => {
-  const { idPenjualan, Customer_id, status } = req.query;
-
-  try {
-    // Bangun query dinamis berdasarkan parameter
-    const query = {};
-
-    if (idPenjualan) {
-      query.idPenjualan = idPenjualan;
-    }
-
-    if (Customer_id) {
-      query.Customer_id = Customer_id;
-    }
-
-    if (typeof status !== 'undefined') {
-      query.status = status === 'true'; // Konversi string menjadi boolean
-    }
-
-    // Ambil data penjualan berdasarkan query
-    const penjualanData = await Penjualan.find(query)
-      .populate('Customer_id') // Populate data customer
-      .populate('idCart');    // Populate data cart
-
-    if (!penjualanData || penjualanData.length === 0) {
-      return res.status(404).json({ message: 'Data penjualan tidak ditemukan' });
-    }
-
-    res.status(200).json({
-      message: 'Data penjualan berhasil diambil',
-      data: penjualanData,
-    });
-  } catch (error) {
-    console.error('Error saat mengambil data penjualan:', error);
+    // Kirim response error
     res.status(500).json({
       error: 'Terjadi kesalahan pada server',
       details: error.message,
     });
   }
 });
+
+router.get('/getPenjualan', async (req, res) => {
+  try {
+    // Ambil semua data penjualan tanpa filter
+    const penjualanData = await Penjualan.find()
+      .populate('Customer_id') // Populate data customer
+      .populate('idCart');    // Populate data cart
+
+    if (!penjualanData || penjualanData.length === 0) {
+      return res.status(404).json({ message: 'Tidak ada data penjualan yang ditemukan' });
+    }
+
+    res.status(200).json({
+      message: 'Semua data penjualan berhasil diambil',
+      data: penjualanData,
+    });
+  } catch (error) {
+    console.error('Error saat mengambil semua data penjualan:', error);
+    res.status(500).json({
+      error: 'Terjadi kesalahan pada server',
+      details: error.message,
+    });
+  }
+});
+
+
+//chat
+const sendMessage = async (chatId, senderId, senderRole, message) => {
+  const newMessage = new Message({
+    chatId,
+    sender: senderId,
+    senderRole,
+    message,
+  });
+
+  await newMessage.save();
+
+  // Perbarui lastMessage di chat
+  const chat = await Chat.findById(chatId);
+  chat.lastMessage = message;
+  chat.updatedAt = Date.now();
+  await chat.save();
+
+  console.log('Message sent:', newMessage);
+};
+const getMessages = async (chatId) => {
+  const messages = await Message.find({ chatId }).sort({ createdAt: 1 });
+  console.log('Messages:', messages);
+};
+
+router.post('/create', async (req, res) => {
+  const { participants, participantRoles } = req.body;
+
+  try {
+    const chat = new Chat({ participants, participantRoles });
+    await chat.save();
+    res.status(201).json(chat);
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating chat', error });
+  }
+});
+
+// Send a message
+router.post('/:chatId/messages', async (req, res) => {
+  const { chatId } = req.params;
+  const { sender, senderRole, message } = req.body;
+
+  try {
+    const newMessage = new Message({
+      chatId,
+      sender,
+      senderRole,
+      message,
+    });
+
+    await newMessage.save();
+
+    // Update lastMessage in Chat
+    const chat = await Chat.findById(chatId);
+    if (chat) {
+      chat.lastMessage = message;
+      chat.updatedAt = Date.now();
+      await chat.save();
+    }
+
+    res.status(201).json(newMessage);
+  } catch (error) {
+    res.status(500).json({ message: 'Error sending message', error });
+  }
+});
+
+// Get all chats for a participant
+router.get('/user/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const chats = await Chat.find({ participants: userId })
+      .sort({ updatedAt: -1 })
+      .populate('participants', 'nama_lengkap email');
+    res.status(200).json(chats);
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving chats', error });
+  }
+});
+
+// Get all messages for a chat
+router.get('/:chatId/messages', async (req, res) => {
+  const { chatId } = req.params;
+
+  try {
+    const messages = await Message.find({ chatId }).sort({ createdAt: 1 });
+    res.status(200).json(messages);
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving messages', error });
+  }
+});
+
+// Mark a message as read
+router.put('/messages/:messageId/read', async (req, res) => {
+  const { messageId } = req.params;
+
+  try {
+    const message = await Message.findById(messageId);
+    if (message) {
+      message.isRead = true;
+      await message.save();
+      res.status(200).json({ message: 'Message marked as read', data: message });
+    } else {
+      res.status(404).json({ message: 'Message not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Error marking message as read', error });
+  }
+});
+
 module.exports = router;
