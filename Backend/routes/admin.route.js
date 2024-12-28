@@ -1061,25 +1061,23 @@ router.post('/addPenjualan', async (req, res) => {
   // Validasi input
   if (!customerId || !Array.isArray(cartId) || typeof status !== 'boolean') {
     return res.status(400).json({
-      error: 'Data pelanggan, keranjang, dan status wajib diisi dengan format yang benar',
+      error: 'Data pelanggan, keranjang, dan status wajib diisi dengan format yang benar.',
     });
   }
 
   try {
-    console.log('Request data:', { customerId, cartId, status });
-
     // Ambil data pelanggan
-    const customer = await Customer.findById(customerId);
+    const customer = await Customer.findById(customerId).select('Nama_lengkap No_telepone');
     if (!customer) {
-      return res.status(404).json({ error: 'Pelanggan tidak ditemukan' });
+      return res.status(404).json({ error: 'Pelanggan tidak ditemukan.' });
     }
 
     // Ambil data keranjang menggunakan cartId
-    const carts = await Cart.find({ _id: { $in: cartId } });
+    const carts = await Cart.find({ _id: { $in: cartId } }).select('namaBarang totalProduct harga');
     if (carts.length !== cartId.length) {
       return res.status(404).json({
-        error: 'Beberapa item dalam keranjang tidak ditemukan',
-        missingItems: cartId.filter(id => !carts.some(cart => cart._id.equals(id)))
+        error: 'Beberapa item dalam keranjang tidak ditemukan.',
+        missingItems: cartId.filter(id => !carts.some(cart => cart._id.equals(id))),
       });
     }
 
@@ -1087,15 +1085,38 @@ router.post('/addPenjualan', async (req, res) => {
     const totalBarang = carts.reduce((sum, cart) => sum + cart.totalProduct, 0);
     const totalHarga = carts.reduce((sum, cart) => sum + cart.harga * cart.totalProduct, 0);
 
+    // Perbarui stok barang berdasarkan keranjang
+    for (const cart of carts) {
+      const product = await Product.findOne({ Nama_product: cart.namaBarang });
+      if (!product) {
+        return res.status(404).json({ error: `Produk ${cart.namaBarang} tidak ditemukan.` });
+      }
+
+      if (product.Stock_barang < cart.totalProduct) {
+        return res.status(400).json({
+          error: `Stok barang untuk ${cart.namaBarang} tidak mencukupi.`,
+          availableStock: product.Stock_barang,
+        });
+      }
+
+      // Kurangi stok barang
+      product.Stock_barang -= cart.totalProduct;
+      await product.save();
+    }
+
+    // Buat nomor invoice unik
+    const nomorInvoice = `INV-${Date.now()}`;
+
     // Data penjualan yang akan disimpan
     const penjualanData = {
-      idPenjualan: `PJ${Date.now()}`, // ID unik penjualan
-      idCart: carts.map(cart => cart._id), // Simpan ObjectId dari Cart
-      namaBarang: carts.map(cart => cart.namaBarang).join(', '), // Gabungkan nama barang
+      idPenjualan: `PJ${Date.now()}`,
+      nomorInvoice, // Tambahkan nomor invoice
+      idCart: carts.map(cart => cart._id),
+      namaBarang: carts.map(cart => cart.namaBarang).join(', '),
       totalBarang,
       totalHarga,
-      tanggalPembelian: new Date(), // Tanggal pembelian
-      Customer_id: customer._id, // ID pelanggan
+      tanggalPembelian: new Date(),
+      Customer_id: customer._id,
       status,
     };
 
@@ -1109,16 +1130,23 @@ router.post('/addPenjualan', async (req, res) => {
 
     // Respons sukses
     res.status(201).json({
-      message: 'Penjualan berhasil disimpan',
+      message: 'Penjualan berhasil disimpan dan stok barang diperbarui.',
       data: populatedPenjualan,
     });
   } catch (error) {
-    // Log error ke server
     console.error('Error saat menyimpan penjualan:', error);
 
-    // Kirim response error
+    // Penanganan error spesifik untuk validasi MongoDB
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        error: 'Data penjualan tidak valid.',
+        details: error.errors,
+      });
+    }
+
+    // Penanganan error default
     res.status(500).json({
-      error: 'Terjadi kesalahan pada server',
+      error: 'Terjadi kesalahan pada server.',
       details: error.message,
     });
   }
