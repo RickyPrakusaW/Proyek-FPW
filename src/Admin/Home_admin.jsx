@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "../ThemeContext";
-import { Bar, Pie } from "react-chartjs-2";
+import { Pie } from "react-chartjs-2";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
   ArcElement,
   Title,
   Tooltip,
@@ -15,7 +14,7 @@ import {
 } from "chart.js";
 
 // Registrasi komponen chart.js
-ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, ArcElement, Title, Tooltip, Legend);
 
 const HomeAdmin = () => {
   const { isDarkMode } = useTheme();
@@ -85,18 +84,31 @@ const HomeAdmin = () => {
       .catch((error) => console.error("Error mengambil data customer:", error));
   }, []);
 
-  // Data untuk chart
-  const pieChartData = {
-    labels: Object.keys(productTypes),
-    datasets: [
-      {
-        data: Object.values(productTypes),
-        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
-        borderWidth: 1,
-      },
-    ],
+  // Fungsi untuk membuka chat WhatsApp dengan pesan otomatis
+  const openWhatsAppChat = () => {
+    const phoneNumber = "6285100059521"; // Nomor WhatsApp tanpa tanda + (untuk Indonesia gunakan 62)
+    const message = "Halo, saya ingin bertanya tentang produk Anda!"; // Pesan yang akan dikirim
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+    // Buka URL WhatsApp di jendela baru
+    window.open(
+      url,
+      "WhatsAppChat",
+      "width=600,height=700,top=100,left=100,scrollbars=no,resizable=no"
+    );
   };
 
+  // Fungsi untuk membuka grup WhatsApp
+  const openWhatsAppGroup = () => {
+    const groupInviteLink = "https://chat.whatsapp.com/HuPk8fAJxvc452QZkOL6Ii"; // Ganti dengan link grup WhatsApp Anda
+    window.open(
+      groupInviteLink,
+      "WhatsAppGroup",
+      "width=600,height=700,top=100,left=100,scrollbars=no,resizable=no"
+    );
+  };
+
+  // Data untuk chart
   const employeePieChartData = {
     labels: Object.keys(employeeDistribution),
     datasets: [
@@ -131,6 +143,7 @@ const HomeAdmin = () => {
             <h3 className="text-xl font-semibold">Penjualan Hari Ini</h3>
             <p className="text-2xl font-bold">Rp. 1.000.000</p>
           </div>
+
           <div
             className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
             onClick={() => navigate("/Admin/Customer")}
@@ -142,6 +155,22 @@ const HomeAdmin = () => {
             <h3 className="text-xl font-semibold">Total Barang</h3>
             <p className="text-2xl font-bold">{totalProducts} Barang</p>
           </div>
+        </div>
+
+        {/* Tombol Chat WhatsApp */}
+        <div className="flex space-x-4">
+          <button
+            onClick={openWhatsAppChat}
+            className="mt-2 inline-block px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-all"
+          >
+            Chat Kepala Gudang
+          </button>
+          <button
+            onClick={openWhatsAppGroup}
+            className="mt-2 inline-block px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all"
+          >
+            Masuk Grup Kelompok SDP 2024
+          </button>
         </div>
 
         {/* Bagian Chart */}

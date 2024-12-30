@@ -225,6 +225,18 @@ const Homekepalagudang = () => {
                   <Pie data={pieChartTypeData} />
                 </div>
               </div>
+
+              {/* WhatsApp Button */}
+              <div className="flex justify-center mt-5">
+                <a
+                  href="https://wa.me/6281234567890?text=Halo,%20saya%20membutuhkan%20informasi."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-green-500 text-white px-5 py-3 rounded-md font-bold hover:bg-green-600"
+                >
+                  Chat WhatsApp
+                </a>
+              </div>
             </>
           )}
         </div>

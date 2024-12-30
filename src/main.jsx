@@ -32,8 +32,7 @@ import KaryawanPage from "./KaryawanPage"
 import List_barang_kariawan from "./Kariawan/List_barang_kariawan";
 import CekStockGudang from "./Kariawan/CekStockGudang";
 //admin
-import Chatadmin from"./Admin/Chat"
-
+import Chatadmin from"./Admin/Chat";
 //kepala gudang 
 
 import { ThemeProvider } from "./ThemeContext"; // Import ThemeProvider

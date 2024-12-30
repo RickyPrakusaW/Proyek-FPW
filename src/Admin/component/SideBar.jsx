@@ -130,7 +130,7 @@ function SideBar() {
             onClick={() => navigate("/admin/Chat")}
           >
             <span>📋</span>
-            {isSidebarOpen && <span>List Barang</span>}
+            {isSidebarOpen && <span>Chatss</span>}
           </li>
         </ul>
 
