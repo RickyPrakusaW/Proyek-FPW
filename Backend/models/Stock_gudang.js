@@ -1,35 +1,35 @@
 const mongoose = require('mongoose');
 
 const StockSchema = new mongoose.Schema({
-  id_stock: {
-    type: Number,
+  id_barang: {
+    type: String, // Gunakan String untuk ID barang
     required: true,
+    unique: true
   },
   nama_barang: {
     type: String,
-    required: true,
+    required: true
   },
   total_barang: {
-    type: String,
-    required: true,
+    type: Number, // Total stok barang
+    required: true
   },
   tipe_barang: {
     type: String,
     required: true,
-    enum: ['Tas_pakaian', 'Tas_ransel', 'Tas_selempang'],
+    enum: ['Tas_pakaian', 'Tas_ransel', 'Tas_selempang']
   },
   photo_barang: {
     type: String,
-    required: true,
+    required: true
   },
   tanggal_masuk: {
     type: Date,
-    required: true,
+    required: true
   },
   tanggal_keluar: {
-    type: Date,
-    required: false,
-  },
+    type: Date
+  }
 });
 
 const Stock = mongoose.model('Stock', StockSchema);

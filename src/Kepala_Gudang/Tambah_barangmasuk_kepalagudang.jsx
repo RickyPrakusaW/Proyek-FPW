@@ -5,11 +5,12 @@ import axios from "axios";
 const TambahBarangMasukKepalaGudang = () => {
   const { isDarkMode } = useTheme();
   const [formData, setFormData] = useState({
-    id_stock: "",
+    id_barang: "",
     nama_barang: "",
     total_barang: "",
     tipe_barang: "",
     tanggal_masuk: "",
+    tanggal_keluar: "",  // Menambahkan tanggal_keluar
   });
   const [photo_barang, setPhotoBarang] = useState(null);
   const [message, setMessage] = useState("");
@@ -56,11 +57,12 @@ const TambahBarangMasukKepalaGudang = () => {
       });
       setMessage(response.data.message || "Stock berhasil ditambahkan");
       setFormData({
-        id_stock: "",
+        id_barang: "",
         nama_barang: "",
         total_barang: "",
         tipe_barang: "",
         tanggal_masuk: "",
+        tanggal_keluar: "",  // Reset tanggal_keluar
       });
       setPhotoBarang(null);
     } catch (error) {
@@ -96,8 +98,8 @@ const TambahBarangMasukKepalaGudang = () => {
               <label className="block font-medium mb-1">ID Barang</label>
               <input
                 type="text"
-                name="id_stock"
-                value={formData.id_stock}
+                name="id_barang"
+                value={formData.id_barang}
                 onChange={handleChange}
                 placeholder="ID Barang"
                 className={inputClasses}
@@ -150,6 +152,7 @@ const TambahBarangMasukKepalaGudang = () => {
                 className={inputClasses}
               />
             </div>
+            
             {/* Foto Barang */}
             <div>
               <label className="block font-medium mb-1">Foto Barang</label>

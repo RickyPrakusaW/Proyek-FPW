@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const TambahBarangKeluarKepalaGudang = () => {
-  const [idStock, setIdStock] = useState("");
+  const [idBarang, setIdBarang] = useState(""); // Updated key name to match backend
   const [jumlahKeluar, setJumlahKeluar] = useState("");
   const [tanggalKeluar, setTanggalKeluar] = useState("");
   const [responseMessage, setResponseMessage] = useState(null);
@@ -12,6 +12,12 @@ const TambahBarangKeluarKepalaGudang = () => {
     setResponseMessage(null);
     setErrorMessage(null);
 
+    // Validate jumlah_keluar to be a positive number
+    if (jumlahKeluar <= 0) {
+      setErrorMessage("Jumlah keluar harus lebih besar dari 0!");
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:3000/api/admin/barangKeluar", {
         method: "POST",
@@ -19,7 +25,7 @@ const TambahBarangKeluarKepalaGudang = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id_stock: idStock,
+          id_barang: idBarang, // Send the correct key to backend
           jumlah_keluar: parseInt(jumlahKeluar),
           tanggal_keluar: tanggalKeluar,
         }),
@@ -27,9 +33,9 @@ const TambahBarangKeluarKepalaGudang = () => {
 
       const data = await response.json();
       if (response.ok) {
-        setResponseMessage(data.message);
+        setResponseMessage(data.message); // Set success message
       } else {
-        setErrorMessage(data.error);
+        setErrorMessage(data.error); // Set error message
       }
     } catch (error) {
       setErrorMessage("Terjadi kesalahan saat menghubungi server.");
@@ -49,8 +55,8 @@ const TambahBarangKeluarKepalaGudang = () => {
             <input
               type="text"
               placeholder="Masukkan ID Barang"
-              value={idStock}
-              onChange={(e) => setIdStock(e.target.value)}
+              value={idBarang}
+              onChange={(e) => setIdBarang(e.target.value)}
               className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />

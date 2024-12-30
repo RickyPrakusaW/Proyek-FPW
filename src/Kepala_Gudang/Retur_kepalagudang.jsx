@@ -24,11 +24,24 @@ const ReturAdmin = () => {
     fetchReturData();
   }, []);
 
+  // Fungsi untuk mengubah status retur barang menjadi "approved"
+  const handleApprove = async (idReturGudang) => {
+    try {
+      await axios.patch(`http://localhost:3000/api/admin/approveRetur/${idReturGudang}`); // Endpoint untuk mengubah status
+      // Setelah berhasil, ambil data kembali agar status terbaru tampil
+      const response = await axios.get("http://localhost:3000/api/admin/getReturGudang");
+      setReturData(response.data.data); // Perbarui data retur di state
+    } catch (error) {
+      console.error("Error approving retur:", error);
+    }
+  };
+
   const themeClasses = isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900";
   const tableHeaderClasses = isDarkMode ? "bg-blue-600 text-white" : "bg-blue-300 text-black";
   const tableRowClasses = isDarkMode ? "hover:bg-blue-700 bg-gray-700" : "hover:bg-blue-400 bg-gray-200";
   const buttonAddClasses = isDarkMode ? "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" : "bg-green-300 text-black px-4 py-2 rounded hover:bg-green-400";
   const buttonReturnClasses = isDarkMode ? "bg-green-500 px-4 py-2 text-white rounded-md hover:bg-green-600" : "bg-green-300 px-4 py-2 text-black rounded-md hover:bg-green-400";
+  const buttonActionClasses = isDarkMode ? "bg-blue-500 px-4 py-2 text-white rounded-md hover:bg-blue-600" : "bg-blue-300 px-4 py-2 text-black rounded-md hover:bg-blue-400";
 
   return (
     <div className={`min-h-screen flex flex-col ${themeClasses}`}>
@@ -51,25 +64,38 @@ const ReturAdmin = () => {
               <th className="p-3 border">Jumlah</th>
               <th className="p-3 border">Tanggal</th>
               <th className="p-3 border">Foto Barang</th>
+              <th className="p-3 border">Status</th> {/* New column for Status */}
+              <th className="p-3 border">Action</th> {/* Column for Action button */}
             </tr>
           </thead>
           <tbody>
             {returData.map((retur, index) => (
               <tr key={retur.idReturGudang} className={`${tableRowClasses} border`}>
                 <td className="p-3 border">{index + 1 < 10 ? `0${index + 1}` : index + 1}</td>
-                <td className="p-3 border">{retur.idBarang}</td>
+                <td className="p-3 border">{retur.id_barang}</td> {/* Menggunakan id_barang */}
                 <td className="p-3 border">{retur.namaBarang}</td>
                 <td className="p-3 border">{retur.jumlahBarang}</td>
                 <td className="p-3 border">{new Date(retur.tanggal).toLocaleDateString()}</td>
                 <td className="p-3 border">
                   <div className="flex justify-center">
                     <img
-                      src={`http://localhost:3000/api/admin/uploads/stock/${retur.photoBarang}`}
+                      src={`http://localhost:3000/api/admin/uploads/stock/${retur.photoBarang}`} // Menampilkan gambar dengan path yang benar
                       alt="Barang"
-                      className="w-10 h-10"
+                      className="w-20 h-20 object-cover" // Ukuran gambar disesuaikan
                     />
                   </div>
                 </td>
+                <td className="p-3 border">{retur.status}</td> {/* Display status */}
+                <td className="p-3 border">
+                  {retur.status !== "approved" && (
+                    <button
+                      className={buttonActionClasses}
+                      onClick={() => handleApprove(retur.idReturGudang)} // Handle status change to "approved"
+                    >
+                      Retur Admin
+                    </button>
+                  )}
+                </td> {/* Action Button */}
               </tr>
             ))}
           </tbody>
