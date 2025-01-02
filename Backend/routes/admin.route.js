@@ -894,6 +894,37 @@ router.post('/addReturGudang', uploadReturGudang, async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+//update status 
+router.put('/updateStatusRetur/:idReturGudang', async (req, res) => {
+  try {
+    const { idReturGudang } = req.params;
+    const { status } = req.body;
+
+    // Validasi input status
+    if (!status) {
+      return res.status(400).json({ error: 'Status retur wajib diisi' });
+    }
+
+    // Validasi apakah retur dengan ID tersebut ada
+    const retur = await ReturGudang.findOne({ idReturGudang });
+    if (!retur) {
+      return res.status(404).json({ error: 'Retur dengan ID tersebut tidak ditemukan' });
+    }
+
+    // Perbarui status retur
+    retur.status = status; // Update status
+    await retur.save();
+
+    // Kirim respon sukses
+    res.status(200).json({
+      message: 'Status retur berhasil diperbarui',
+      data: retur,
+    });
+  } catch (error) {
+    console.error('Error saat memperbarui status retur:', error.message);
+    res.status(500).json({ error: 'Terjadi kesalahan pada server' });
+  }
+});
 
 
 

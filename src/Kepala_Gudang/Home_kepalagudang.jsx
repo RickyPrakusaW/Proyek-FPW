@@ -21,21 +21,33 @@ const Homekepalagudang = () => {
   const { isDarkMode } = useTheme();
 
   const [barangData, setBarangData] = useState([]);
+  const [barangKeluarData, setBarangKeluarData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch data from backend
+  // Fetch stock data and barang keluar data from backend
   useEffect(() => {
-    const fetchStockData = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/admin/getStock");
-        const result = await response.json();
+        setIsLoading(true);
+        const [stockResponse, barangKeluarResponse] = await Promise.all([
+          fetch("http://localhost:3000/api/admin/getStock"),
+          fetch("http://localhost:3000/api/admin/barangKeluar"),
+        ]);
 
-        if (!response.ok) {
-          throw new Error(result.error || "Failed to fetch data");
+        const stockResult = await stockResponse.json();
+        const barangKeluarResult = await barangKeluarResponse.json();
+
+        if (!stockResponse.ok) {
+          throw new Error(stockResult.error || "Failed to fetch stock data");
         }
 
-        setBarangData(result.data); // Set stock data
+        if (!barangKeluarResponse.ok) {
+          throw new Error(barangKeluarResult.error || "Failed to fetch barang keluar data");
+        }
+
+        setBarangData(stockResult.data); // Set stock data
+        setBarangKeluarData(barangKeluarResult.data); // Set barang keluar data
       } catch (err) {
         setError(err.message);
       } finally {
@@ -43,7 +55,7 @@ const Homekepalagudang = () => {
       }
     };
 
-    fetchStockData();
+    fetchData();
   }, []);
 
   // Process data by date for Bar and Pie Charts
@@ -143,31 +155,12 @@ const Homekepalagudang = () => {
     ],
   };
 
-  // Chart options
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      title: {
-        display: true,
-        text: "Diagram Total Barang Berdasarkan Tanggal",
-      },
-      tooltip: {
-        callbacks: {
-          label: function (tooltipItem) {
-            return `${tooltipItem.raw} Karung`;
-          },
-        },
-      },
-    },
-  };
-
   const themeClasses = isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900";
   const cardClasses = isDarkMode ? "bg-gray-800 text-white" : "bg-blue-400 text-gray-900";
 
   return (
     <div className={`min-h-screen flex flex-col ${themeClasses}`}>
       <div className="flex flex-1">
-        {/* Main Content */}
         <div className="flex-1 p-5 space-y-5">
           {isLoading ? (
             <p>Loading data...</p>
@@ -189,7 +182,13 @@ const Homekepalagudang = () => {
                   onClick={() => navigate("/kepalaGudang/totalBarangKeluar")}
                 >
                   <h3 className="text-xl font-semibold">Total Barang Keluar</h3>
-                  <p className="text-2xl font-bold">1000 Karung</p>
+                  <p className="text-2xl font-bold">
+              {barangData.reduce(
+                (total, barang) => total + (barang.total_barang || 0),
+                0
+              )}{" "}
+              Karung
+            </p>
                 </div>
 
                 <div className={`${cardClasses} p-5 rounded-md text-center`}>
@@ -201,15 +200,13 @@ const Homekepalagudang = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-5">
-                {/* Bar Chart */}
                 <div className={`p-5 rounded-md ${themeClasses}`}>
                   <h3 className="text-xl font-semibold mb-3">Diagram Total Barang Berdasarkan Tanggal</h3>
                   <div className="w-full h-80">
-                    <Bar data={barChartData} options={chartOptions} />
+                    <Bar data={barChartData} />
                   </div>
                 </div>
 
-                {/* Pie Chart for Date Distribution */}
                 <div className={`p-5 rounded-md ${themeClasses}`}>
                   <h3 className="text-xl font-semibold mb-3">Distribusi Total Barang</h3>
                   <div className="w-full h-80">
@@ -218,24 +215,11 @@ const Homekepalagudang = () => {
                 </div>
               </div>
 
-              {/* Additional Pie Chart for Type Distribution */}
               <div className="p-5 rounded-md w-full">
                 <h3 className="text-xl font-semibold mb-3">Distribusi Barang Berdasarkan Tipe</h3>
                 <div className="w-full h-80">
                   <Pie data={pieChartTypeData} />
                 </div>
-              </div>
-
-              {/* WhatsApp Button */}
-              <div className="flex justify-center mt-5">
-                <a
-                  href="https://wa.me/6281234567890?text=Halo,%20saya%20membutuhkan%20informasi."
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-green-500 text-white px-5 py-3 rounded-md font-bold hover:bg-green-600"
-                >
-                  Chat WhatsApp
-                </a>
               </div>
             </>
           )}
