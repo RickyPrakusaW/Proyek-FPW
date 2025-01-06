@@ -73,19 +73,19 @@ function Checkout() {
     <div className="flex h-screen bg-gray-100">
       <main className="flex-1 p-6 bg-gray-50">
         <div className="p-6 bg-white shadow-md rounded-lg">
-          <h1 className="text-3xl font-bold mb-6">Proses Checkout</h1>
+          <h1 className="text-3xl font-bold mb-6 text-black">Proses Checkout</h1>
 
-          {loading && <p>Loading...</p>}
+          {loading && <p className="text-black">Loading...</p>}
           {error && <p className="text-red-500">{error}</p>}
 
           {!loading && !error && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
-                <h2 className="mb-4 text-xl font-semibold">Informasi Data Pelanggan</h2>
+                <h2 className="mb-4 text-xl font-semibold text-black">Informasi Data Pelanggan</h2>
                 <form className="space-y-4">
                   {Object.keys(formData).map((key) => (
                     <div key={key}>
-                      <label className="block text-gray-700">
+                      <label className="block text-black">
                         {key.replace("_", " ")}
                       </label>
                       <input
@@ -102,14 +102,14 @@ function Checkout() {
               </div>
 
               <div className="p-4 bg-blue-50 rounded-lg shadow-md">
-                <h2 className="mb-4 text-xl font-semibold">Pesanan</h2>
+                <h2 className="mb-4 text-xl font-semibold text-black">Pesanan</h2>
                 <div className="space-y-4">
                   {cartItems.map((item) => (
                     <div key={item._id} className="flex justify-between">
                       <div>
-                        <h3 className="font-bold">{item.namaBarang}</h3>
-                        <p className="text-sm">Jumlah: {item.totalProduct}</p>
-                        <p className="text-sm">Rp. {item.harga * item.totalProduct}</p>
+                        <h3 className="font-bold text-black">{item.namaBarang}</h3>
+                        <p className="text-sm text-black">Jumlah: {item.totalProduct}</p>
+                        <p className="text-sm text-black">Rp. {item.harga * item.totalProduct}</p>
                       </div>
                       <div className="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center">
                         📦
@@ -118,7 +118,7 @@ function Checkout() {
                   ))}
                 </div>
                 <div className="mt-4 border-t border-gray-300 pt-4">
-                  <h3 className="text-lg font-bold">Total: Rp. {totalBelanja}</h3>
+                  <h3 className="text-lg font-bold text-black">Total: Rp. {totalBelanja}</h3>
                 </div>
               </div>
             </div>
