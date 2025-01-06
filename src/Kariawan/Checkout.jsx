@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 function Checkout() {
   const navigate = useNavigate();
 
-  // State untuk form pelanggan
   const [formData, setFormData] = useState({
     Nama_lengkap: "",
     No_telepone: "",
@@ -14,12 +13,10 @@ function Checkout() {
     Kodepos: "",
   });
 
-  // State untuk keranjang
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch data keranjang
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
@@ -39,19 +36,16 @@ function Checkout() {
     fetchCartItems();
   }, []);
 
-  // Total belanja
   const totalBelanja = cartItems.reduce(
     (total, item) => total + item.harga * item.totalProduct,
     0
   );
 
-  // Handle perubahan input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Validasi input pelanggan
   const validateForm = () => {
     const { Nama_lengkap, No_telepone, Alamat, Kota, Negara, Kodepos } = formData;
     if (!Nama_lengkap || !No_telepone || !Alamat || !Kota || !Negara || !Kodepos) {
@@ -61,11 +55,9 @@ function Checkout() {
     return true;
   };
 
-  // Navigasi ke halaman pembayaran
   const handleCheckout = () => {
     if (!validateForm()) return;
 
-    // Navigasi ke halaman pembayaran dengan data pelanggan dan keranjang
     navigate("/karyawan/pembayaran", { state: { totalBelanja, formData, cartItems } });
   };
 
@@ -94,7 +86,7 @@ function Checkout() {
                         value={formData[key]}
                         onChange={handleChange}
                         placeholder={key.replace("_", " ")}
-                        className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300"
+                        className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 text-black"
                       />
                     </div>
                   ))}

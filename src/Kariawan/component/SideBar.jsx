@@ -87,7 +87,9 @@ function SideBar() {
               navigate("/karyawan/listBarang");
             }}
           >
-            <span>🏠</span>
+            <span className={`transform transition-all ${
+                  isSidebarOpen ? "" : "ml-[-10px]"
+                }`}>🏠</span>
             {isSidebarOpen && <span>List Barang</span>}
           </li>
           <li
@@ -99,7 +101,9 @@ function SideBar() {
               navigate("/karyawan/keranjang");
             }}
           >
-            <span>📦</span>
+            <span className={`transform transition-all ${
+                  isSidebarOpen ? "" : "ml-[-10px]"
+                }`}>📦</span>
             {isSidebarOpen && <span>Keranjang</span>}
           </li>
           <li
@@ -111,7 +115,9 @@ function SideBar() {
               navigate("/karyawan/cekStockGudang");
             }}
           >
-            <span>↩️</span>
+            <span className={`transform transition-all ${
+                  isSidebarOpen ? "" : "ml-[-10px]"
+                }`}>↩️</span>
             {isSidebarOpen && <span>Cek Stock Gudang</span>}
           </li>
         </ul>
@@ -121,7 +127,19 @@ function SideBar() {
           className={`mt-10 bg-pink-500 p-3 rounded-md w-full text-white font-semibold hover:bg-pink-400`}
           onClick={() => navigate("/")}
         >
-          {isSidebarOpen ? "Keluar" : "🚪"}
+          {isSidebarOpen ? (
+            "Keluar"
+          ) : (
+            <>
+              <span
+                className={`transform transition-all ${
+                  isSidebarOpen ? "" : "ml-[-10px]"
+                }`}
+              >
+                🚪
+              </span>
+            </>
+          )}
         </button>
       </div>
     </div>

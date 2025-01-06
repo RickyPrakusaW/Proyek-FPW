@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext"; // Import ThemeContext
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Avatar,
+  Card,
+  CardContent,
+} from "@mui/material";
 
 function Profile() {
   const navigate = useNavigate();
@@ -11,48 +20,39 @@ function Profile() {
   const [newPassword, setNewPassword] = useState(""); // State untuk password baru
   const [error, setError] = useState(""); // State untuk error handling
 
-  const themeClasses = isDarkMode
-    ? "bg-gray-900 text-white"
-    : "bg-gray-100 text-gray-900";
-  const cardClasses = isDarkMode
-    ? "bg-gray-800 text-white"
-    : "bg-white text-gray-900";
-  const inputClasses = isDarkMode
-    ? "bg-gray-700 text-white border-gray-600"
-    : "bg-white text-gray-900 border-gray-300";
-  const labelClasses = isDarkMode ? "text-gray-400" : "text-gray-600"; // Untuk label
-  const valueClasses = isDarkMode ? "text-white" : "text-gray-900"; // Untuk value
+  const textColor = isDarkMode ? "#ffffff" : "#000000"; // Warna teks
+  const cardBgColor = isDarkMode ? "#424242" : "#ffffff"; // Warna kartu
+  const backgroundColor = isDarkMode ? "#303030" : "#f5f5f5"; // Latar belakang
 
   const handlePasswordChange = async () => {
-    // Validasi input
     if (!oldEmail || !oldPassword || !newEmail || !newPassword) {
       setError("Semua field wajib diisi!");
       return;
     }
 
     try {
-      // Kirim request ke backend untuk validasi dan update password
-      const response = await fetch("https://localhost:3000/api/admin/updatePassword", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          oldEmail,
-          oldPassword,
-          newEmail,
-          newPassword,
-        }),
-      });
+      const response = await fetch(
+        "https://localhost:3000/api/admin/updatePassword",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            oldEmail,
+            oldPassword,
+            newEmail,
+            newPassword,
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
-        // Jika berhasil, tampilkan pesan sukses
         alert("Email dan password berhasil diperbarui!");
-        navigate("/dashboard"); // Redirect ke halaman lain jika perlu
+        navigate("/dashboard");
       } else {
-        // Jika terjadi error, tampilkan pesan error
         setError(data.error || "Terjadi kesalahan.");
       }
     } catch (error) {
@@ -61,71 +61,140 @@ function Profile() {
   };
 
   return (
-    <div className={`flex h-screen ${themeClasses}`}>
-      {/* Main Content */}
-      <div className={`w-3/4 p-6 ${cardClasses}`}>
-        {/* Header */}
-        <div className={`${cardClasses} rounded-lg shadow p-4 mb-6 flex items-center`}>
-          <div className="w-16 h-16 rounded-full overflow-hidden mr-4">
-            <img
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: backgroundColor,
+      }}
+    >
+      <Card
+        sx={{
+          width: 400,
+          bgcolor: cardBgColor,
+          color: textColor,
+          boxShadow: 3,
+          borderRadius: 2,
+          p: 3,
+        }}
+      >
+        <CardContent>
+          {/* Header */}
+          <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+            <Avatar
               src="https://via.placeholder.com/100"
               alt="Profile"
-              className="w-full h-full object-cover"
+              sx={{ width: 56, height: 56, mr: 2 }}
             />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Tiok Richie</h1>
-            <p className={labelClasses}>000000</p>
-          </div>
-        </div>
+            <Box>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: "bold", color: textColor }}
+              >
+                Tiok Richie
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: isDarkMode ? "#cccccc" : "#666666" }}
+              >
+                000000
+              </Typography>
+            </Box>
+          </Box>
 
-        {/* Biodata Section */}
-        <div className={`${cardClasses} rounded-lg shadow p-6`}>
-          <h2 className="text-lg font-bold text-blue-600 mb-4">Update Email dan Password</h2>
-          <div className="grid grid-cols-2 gap-y-4">
-            <p className={labelClasses}>Email Lama</p>
-            <input
-              type="email"
+          {/* Biodata Section */}
+          <Typography variant="h6" sx={{ color: textColor, mb: 2 }}>
+            Update Email dan Password
+          </Typography>
+
+          <Box component="form" sx={{ display: "grid", gap: 2 }}>
+            <TextField
+              label="Email Lama"
+              variant="outlined"
+              fullWidth
               value={oldEmail}
               onChange={(e) => setOldEmail(e.target.value)}
-              className={`border rounded-lg px-3 py-1 w-full ${inputClasses}`}
+              InputLabelProps={{ style: { color: textColor } }}
+              InputProps={{
+                style: {
+                  color: textColor,
+                  backgroundColor: isDarkMode ? "#616161" : "#ffffff",
+                },
+              }}
             />
 
-            <p className={labelClasses}>Password Lama</p>
-            <input
+            <TextField
+              label="Password Lama"
               type="password"
+              variant="outlined"
+              fullWidth
               value={oldPassword}
               onChange={(e) => setOldPassword(e.target.value)}
-              className={`border rounded-lg px-3 py-1 w-full ${inputClasses}`}
+              InputLabelProps={{ style: { color: textColor } }}
+              InputProps={{
+                style: {
+                  color: textColor,
+                  backgroundColor: isDarkMode ? "#616161" : "#ffffff",
+                },
+              }}
             />
 
-            <p className={labelClasses}>Email Baru</p>
-            <input
-              type="email"
+            <TextField
+              label="Email Baru"
+              variant="outlined"
+              fullWidth
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
-              className={`border rounded-lg px-3 py-1 w-full ${inputClasses}`}
+              InputLabelProps={{ style: { color: textColor } }}
+              InputProps={{
+                style: {
+                  color: textColor,
+                  backgroundColor: isDarkMode ? "#616161" : "#ffffff",
+                },
+              }}
             />
 
-            <p className={labelClasses}>Password Baru</p>
-            <input
+            <TextField
+              label="Password Baru"
               type="password"
+              variant="outlined"
+              fullWidth
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className={`border rounded-lg px-3 py-1 w-full ${inputClasses}`}
+              InputLabelProps={{ style: { color: textColor } }}
+              InputProps={{
+                style: {
+                  color: textColor,
+                  backgroundColor: isDarkMode ? "#616161" : "#ffffff",
+                },
+              }}
             />
 
-            {error && <p className="text-red-500 mt-2 col-span-2">{error}</p>}
-          </div>
-          <button
-            onClick={handlePasswordChange}
-            className="mt-6 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-          >
-            Simpan
-          </button>
-        </div>
-      </div>
-    </div>
+            {error && (
+              <Typography variant="body2" sx={{ color: "red" }}>
+                {error}
+              </Typography>
+            )}
+
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={handlePasswordChange}
+              sx={{
+                bgcolor: "green",
+                "&:hover": {
+                  bgcolor: "darkgreen",
+                },
+              }}
+            >
+              Simpan
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+    </Box>
   );
 }
 
