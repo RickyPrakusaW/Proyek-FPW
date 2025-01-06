@@ -7,7 +7,11 @@ import SideBar from "./component/SideBar";
 
 const TambahKaryawan = () => {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const { isDarkMode } = useTheme();
 
   const themeClasses = isDarkMode
@@ -34,11 +38,15 @@ const TambahKaryawan = () => {
       formData.append("password", data.password);
 
       // Kirim data ke backend menggunakan axios
-      const response = await axios.post("http://localhost:3000/api/admin/addKaryawan", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:3000/api/admin/addKaryawan",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       alert("Karyawan berhasil ditambahkan!");
       navigate("/admin"); // Navigasi kembali ke halaman admin setelah berhasil
@@ -58,7 +66,9 @@ const TambahKaryawan = () => {
       <div className="flex-1 p-10">
         <h2 className="text-2xl font-bold mb-5">Tambah Karyawan</h2>
         <form
-          className={`p-8 rounded-md shadow-md space-y-4 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}
+          className={`p-8 rounded-md shadow-md space-y-4 ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
+          }`}
           onSubmit={handleSubmit(handleAddKaryawan)}
         >
           <div className="grid grid-cols-2 gap-4">
@@ -69,9 +79,15 @@ const TambahKaryawan = () => {
                 type="text"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
                 placeholder="Masukkan Nama Lengkap"
-                {...register("nama_lengkap", { required: "Nama Lengkap wajib diisi" })}
+                {...register("nama_lengkap", {
+                  required: "Nama Lengkap wajib diisi",
+                })}
               />
-              {errors.nama_lengkap && <span className="text-red-500">{errors.nama_lengkap.message}</span>}
+              {errors.nama_lengkap && (
+                <span className="text-red-500">
+                  {errors.nama_lengkap.message}
+                </span>
+              )}
 
               <label className="block font-semibold mb-1 mt-4">Email</label>
               <input
@@ -86,32 +102,54 @@ const TambahKaryawan = () => {
                   },
                 })}
               />
-              {errors.email && <span className="text-red-500">{errors.email.message}</span>}
+              {errors.email && (
+                <span className="text-red-500">{errors.email.message}</span>
+              )}
 
-              <label className="block font-semibold mb-1 mt-4">Tempat Lahir</label>
+              <label className="block font-semibold mb-1 mt-4">
+                Tempat Lahir
+              </label>
               <input
                 type="text"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
                 placeholder="Masukkan Tempat Lahir"
-                {...register("tempat_lahir", { required: "Tempat Lahir wajib diisi" })}
+                {...register("tempat_lahir", {
+                  required: "Tempat Lahir wajib diisi",
+                })}
               />
-              {errors.tempat_lahir && <span className="text-red-500">{errors.tempat_lahir.message}</span>}
+              {errors.tempat_lahir && (
+                <span className="text-red-500">
+                  {errors.tempat_lahir.message}
+                </span>
+              )}
 
-              <label className="block font-semibold mb-1 mt-4">Tanggal Lahir</label>
+              <label className="block font-semibold mb-1 mt-4">
+                Tanggal Lahir
+              </label>
               <input
                 type="date"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
-                {...register("tanggal_lahir", { required: "Tanggal Lahir wajib diisi" })}
+                {...register("tanggal_lahir", {
+                  required: "Tanggal Lahir wajib diisi",
+                })}
               />
-              {errors.tanggal_lahir && <span className="text-red-500">{errors.tanggal_lahir.message}</span>}
+              {errors.tanggal_lahir && (
+                <span className="text-red-500">
+                  {errors.tanggal_lahir.message}
+                </span>
+              )}
 
-              <label className="block font-semibold mb-1 mt-4">Jenis Kelamin</label>
+              <label className="block font-semibold mb-1 mt-4">
+                Jenis Kelamin
+              </label>
               <div className="flex items-center space-x-4">
                 <label>
                   <input
                     type="radio"
                     value="Pria"
-                    {...register("jenis_kelamin", { required: "Jenis Kelamin wajib diisi" })}
+                    {...register("jenis_kelamin", {
+                      required: "Jenis Kelamin wajib diisi",
+                    })}
                   />
                   Pria
                 </label>
@@ -119,24 +157,41 @@ const TambahKaryawan = () => {
                   <input
                     type="radio"
                     value="Perempuan"
-                    {...register("jenis_kelamin", { required: "Jenis Kelamin wajib diisi" })}
+                    {...register("jenis_kelamin", {
+                      required: "Jenis Kelamin wajib diisi",
+                    })}
                   />
                   Perempuan
                 </label>
               </div>
-              {errors.jenis_kelamin && <span className="text-red-500">{errors.jenis_kelamin.message}</span>}
+              {errors.jenis_kelamin && (
+                <span className="text-red-500">
+                  {errors.jenis_kelamin.message}
+                </span>
+              )}
             </div>
 
             {/* Kolom Kanan */}
             <div>
               <label className="block font-semibold mb-1">Golongan Darah</label>
-              <input
-                type="text"
+              <select
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
-                placeholder="Masukkan Golongan Darah"
-                {...register("golongan_darah", { required: "Golongan Darah wajib diisi" })}
-              />
-              {errors.golongan_darah && <span className="text-red-500">{errors.golongan_darah.message}</span>}
+                {...register("golongan_darah", {
+                  required: "Golongan Darah wajib diisi",
+                })}
+              >
+                <option value="">Pilih Golongan Darah</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="AB">AB</option>
+                <option value="O">O</option>
+              </select>
+
+              {errors.golongan_darah && (
+                <span className="text-red-500">
+                  {errors.golongan_darah.message}
+                </span>
+              )}
 
               <label className="block font-semibold mb-1 mt-4">Alamat</label>
               <input
@@ -145,16 +200,26 @@ const TambahKaryawan = () => {
                 placeholder="Masukkan Alamat"
                 {...register("alamat", { required: "Alamat wajib diisi" })}
               />
-              {errors.alamat && <span className="text-red-500">{errors.alamat.message}</span>}
+              {errors.alamat && (
+                <span className="text-red-500">{errors.alamat.message}</span>
+              )}
 
-              <label className="block font-semibold mb-1 mt-4">No Telepon</label>
+              <label className="block font-semibold mb-1 mt-4">
+                No Telepon
+              </label>
               <input
                 type="text"
                 className={`w-full p-2 border rounded-md ${inputClasses}`}
                 placeholder="Masukkan No Telepon"
-                {...register("no_telepon", { required: "No Telepon wajib diisi" })}
+                {...register("no_telepon", {
+                  required: "No Telepon wajib diisi",
+                })}
               />
-              {errors.no_telepon && <span className="text-red-500">{errors.no_telepon.message}</span>}
+              {errors.no_telepon && (
+                <span className="text-red-500">
+                  {errors.no_telepon.message}
+                </span>
+              )}
 
               <label className="block font-semibold mb-1 mt-4">Agama</label>
               <input
@@ -163,9 +228,13 @@ const TambahKaryawan = () => {
                 placeholder="Masukkan Agama"
                 {...register("agama", { required: "Agama wajib diisi" })}
               />
-              {errors.agama && <span className="text-red-500">{errors.agama.message}</span>}
+              {errors.agama && (
+                <span className="text-red-500">{errors.agama.message}</span>
+              )}
 
-              <label className="block font-semibold mb-1 mt-4">Upload KTP</label>
+              <label className="block font-semibold mb-1 mt-4">
+                Upload KTP
+              </label>
               <input
                 type="file"
                 name="foto_ktp"
@@ -173,7 +242,9 @@ const TambahKaryawan = () => {
                 accept=".jpg,.jpeg,.png"
                 {...register("ktp", { required: "KTP wajib diupload" })}
               />
-              {errors.ktp && <span className="text-red-500">{errors.ktp.message}</span>}
+              {errors.ktp && (
+                <span className="text-red-500">{errors.ktp.message}</span>
+              )}
 
               <label className="block font-semibold mb-1 mt-4">Password</label>
               <input
@@ -182,7 +253,9 @@ const TambahKaryawan = () => {
                 placeholder="Masukkan Password"
                 {...register("password", { required: "Password wajib diisi" })}
               />
-              {errors.password && <span className="text-red-500">{errors.password.message}</span>}
+              {errors.password && (
+                <span className="text-red-500">{errors.password.message}</span>
+              )}
             </div>
           </div>
 

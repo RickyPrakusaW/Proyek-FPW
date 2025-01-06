@@ -2,6 +2,21 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
 import axios from "axios";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 
 const ReturAdmin = () => {
   const navigate = useNavigate();
@@ -20,12 +35,7 @@ const ReturAdmin = () => {
   const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
     : "bg-white text-gray-900";
-  const tableHeaderClasses = isDarkMode
-    ? "bg-blue-600 text-white"
-    : "bg-blue-300 text-gray-900";
-  const tableRowClasses = isDarkMode
-    ? "bg-gray-700 hover:bg-blue-700"
-    : "bg-gray-100 hover:bg-blue-100";
+  const textColor = isDarkMode ? "text-white" : "text-black"; // Define text color based on theme
 
   useEffect(() => {
     fetchReturs();
@@ -33,7 +43,9 @@ const ReturAdmin = () => {
 
   const fetchReturs = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/admin/getRetur");
+      const response = await axios.get(
+        "http://localhost:3000/api/admin/getRetur"
+      );
       setBarangReturs(response.data.data);
     } catch (error) {
       console.error("Error fetching return data:", error);
@@ -105,50 +117,69 @@ const ReturAdmin = () => {
     <div className={`flex min-h-screen ${themeClasses}`}>
       <div className="flex-1 p-5">
         <div className="flex justify-between items-center mb-5">
-          <h1 className="text-2xl font-bold">Retur Barang</h1>
-          <input
-            type="text"
-            placeholder="Cari"
+          <h1 className={`text-2xl font-bold ${textColor}`}>Retur Barang</h1>
+          <TextField
+            label="Cari"
+            variant="outlined"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`p-2 rounded-md border ${
-              isDarkMode ? "border-gray-500 text-black" : "border-gray-700"
-            } focus:outline-none`}
+            size="small"
+            fullWidth
+            sx={{
+              maxWidth: 300,
+              backgroundColor: isDarkMode ? "#2c2c2c" : "white", // Dark background in dark mode
+              "& .MuiInputBase-root": {
+                color: isDarkMode ? "white" : "black", // White text in dark mode, black text in light mode
+              },
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: isDarkMode ? "#555" : "#ccc", // Darker border in dark mode
+              },
+              "& .MuiInputLabel-root": {
+                color: isDarkMode ? "#ccc" : "#000", // Lighter label in dark mode
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: isDarkMode ? "#fff" : "#000", // Highlight border on hover
+              },
+            }}
           />
-          <button
+
+          <Button
+            variant="contained"
+            color="success"
             onClick={() => setShowModal(true)}
-            className="bg-green-500 px-5 py-2 rounded-md text-white font-semibold hover:bg-green-600"
           >
             + Tambah Retur
-          </button>
+          </Button>
         </div>
 
-        <table className="w-full text-center border-collapse">
-          <thead>
-            <tr className={`${tableHeaderClasses}`}>
-              <th className="p-3 border">No</th>
-              <th className="p-3 border">ID Barang</th>
-              <th className="p-3 border">Nama Barang</th>
-              <th className="p-3 border">Jumlah</th>
-              <th className="p-3 border">Foto Barang</th>
-              <th className="p-3 border">Status</th>
-              <th className="p-3 border">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {barangReturs.length > 0 ? (
-              barangReturs
-                .filter((barang) =>
-                  barang.Nama_barang.toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                .map((barang, index) => (
-                  <tr key={barang._id} className={`${tableRowClasses}`}>
-                    <td className="p-3 border">{index + 1}</td>
-                    <td className="p-3 border">{barang.Id_barang}</td>
-                    <td className="p-3 border">{barang.Nama_barang}</td>
-                    <td className="p-3 border">{barang.Jumlah_barang}</td>
-                    <td className="p-3 border">
-                      <div className="flex justify-center">
+        <TableContainer component={Paper} sx={{ maxHeight: "400px" }}>
+          <Table stickyHeader aria-label="retur barang table">
+            <TableHead>
+              <TableRow>
+                <TableCell className={textColor}>No</TableCell>
+                <TableCell className={textColor}>ID Barang</TableCell>
+                <TableCell className={textColor}>Nama Barang</TableCell>
+                <TableCell className={textColor}>Jumlah</TableCell>
+                <TableCell className={textColor}>Foto Barang</TableCell>
+                <TableCell className={textColor}>Status</TableCell>
+                <TableCell className={textColor}>Aksi</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {barangReturs.length > 0 ? (
+                barangReturs
+                  .filter((barang) =>
+                    barang.Nama_barang.toLowerCase().includes(
+                      searchQuery.toLowerCase()
+                    )
+                  )
+                  .map((barang, index) => (
+                    <TableRow key={barang._id}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{barang.Id_barang}</TableCell>
+                      <TableCell>{barang.Nama_barang}</TableCell>
+                      <TableCell>{barang.Jumlah_barang}</TableCell>
+                      <TableCell>
                         <img
                           src={
                             barang.Photo_product
@@ -158,118 +189,167 @@ const ReturAdmin = () => {
                           alt={barang.Nama_barang}
                           className="w-10 h-10"
                         />
-                      </div>
-                    </td>
-                    <td className="p-3 border">{barang.Status}</td>
-                    <td className="p-3 border">
-                      {barang.Status === "Barang rusak" && (
-                        <button
-                          onClick={() =>
-                            updateStatus(barang.Id_retur_admin, "Barang diretur ke supplier")
-                          }
-                          className="bg-blue-500 px-2 py-1 text-white rounded-md hover:bg-blue-600"
-                        >
-                          Retur ke Supplier
-                        </button>
-                      )}
-                      {barang.Status === "Barang diretur ke supplier" && (
-                        <button
-                          onClick={() =>
-                            updateStatus(
-                              barang.Id_retur_admin,
-                              "Barang dikembalikan dari supplier"
-                            )
-                          }
-                          className="bg-yellow-500 px-2 py-1 text-white rounded-md hover:bg-yellow-600"
-                        >
-                          Kembali dari Supplier
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="p-3 text-center text-gray-500">
-                  Tidak ada data retur barang.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                      </TableCell>
+                      <TableCell>{barang.Status}</TableCell>
+                      <TableCell>
+                        {barang.Status === "Barang rusak" && (
+                          <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={() =>
+                              updateStatus(
+                                barang.Id_retur_admin,
+                                "Barang diretur ke supplier"
+                              )
+                            }
+                            sx={{
+                              paddingX: 3,
+                              paddingY: 1.5,
+                              fontWeight: "bold",
+                              borderRadius: 2,
+                              textTransform: "capitalize",
+                              border: "2px solid", // Adds a custom border width
+                              borderColor: "primary.main", // Border color matching the primary theme
+                              "&:hover": {
+                                backgroundColor: "primary.main", // Hover effect with primary color
+                                color: "white", // Text color changes on hover
+                              },
+                            }}
+                          >
+                            Retur ke Supplier
+                          </Button>
+                        )}
+                        {barang.Status === "Barang diretur ke supplier" && (
+                          <Button
+                            variant="outlined"
+                            color="secondary"
+                            onClick={() =>
+                              updateStatus(
+                                barang.Id_retur_admin,
+                                "Barang dikembalikan dari supplier"
+                              )
+                            }
+                            sx={{
+                              paddingX: 3,
+                              paddingY: 1.5,
+                              fontWeight: "bold",
+                              borderRadius: 2,
+                              textTransform: "capitalize",
+                              border: "2px solid", // Adds a custom border width
+                              borderColor: "secondary.main", // Border color matching the secondary theme
+                              "&:hover": {
+                                backgroundColor: "secondary.main", // Hover effect with secondary color
+                                color: "white", // Text color changes on hover
+                              },
+                            }}
+                          >
+                            Kembali dari Supplier
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    Tidak ada data retur barang.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
-        {showModal && (
-          <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-md shadow-lg w-96">
-              <h3 className="text-2xl font-bold mb-4">Tambah Retur</h3>
-              <form onSubmit={handleSubmit}>
-                <div className="mb-4">
-                  <label className="block text-gray-700">ID Barang</label>
-                  <input
-                    type="text"
-                    name="Id_barang"
-                    value={newRetur.Id_barang}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border rounded-md"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-gray-700">Nama Barang</label>
-                  <input
-                    type="text"
-                    name="Nama_barang"
-                    value={newRetur.Nama_barang}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border rounded-md"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-gray-700">Jumlah Barang</label>
-                  <input
-                    type="number"
-                    name="Jumlah_barang"
-                    value={newRetur.Jumlah_barang}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border rounded-md"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-gray-700">Tanggal</label>
-                  <input
-                    type="date"
-                    name="Tanggal"
-                    value={newRetur.Tanggal}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 border rounded-md"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-gray-700">Foto Barang</label>
-                  <input
-                    type="file"
-                    onChange={handleFileChange}
-                    className="w-full p-2 mt-1 border rounded-md"
-                  />
-                </div>
-                <div className="text-right">
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    className="mr-2 bg-gray-400 px-4 py-2 rounded-md text-white"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    type="submit"
-                    className="bg-green-500 px-4 py-2 rounded-md text-white"
-                  >
-                    Simpan
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        <Dialog open={showModal} onClose={() => setShowModal(false)}>
+          <DialogTitle className="text-black">Tambah Retur</DialogTitle>
+          <DialogContent>
+            <form onSubmit={handleSubmit}>
+              <TextField
+                label="ID Barang"
+                variant="outlined"
+                name="Id_barang"
+                value={newRetur.Id_barang}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Nama Barang"
+                variant="outlined"
+                name="Nama_barang"
+                value={newRetur.Nama_barang}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Jumlah Barang"
+                variant="outlined"
+                name="Jumlah_barang"
+                value={newRetur.Jumlah_barang}
+                onChange={handleChange}
+                type="number"
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Tanggal"
+                variant="outlined"
+                name="Tanggal"
+                value={newRetur.Tanggal}
+                onChange={handleChange}
+                type="date"
+                fullWidth
+                margin="normal"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+              <input
+                type="file"
+                onChange={handleFileChange}
+                className="mt-3 w-full"
+              />
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => setShowModal(false)}
+              color="secondary"
+              variant="contained"
+              sx={{
+                marginRight: 2,
+                paddingX: 3,
+                paddingY: 1.5,
+                fontWeight: "bold",
+                borderRadius: 2,
+                textTransform: "capitalize",
+                "&:hover": {
+                  backgroundColor: "#f44336", // Hover effect with a custom color (red)
+                },
+              }}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              color="success"
+              variant="contained"
+              sx={{
+                paddingX: 3,
+                paddingY: 1.5,
+                fontWeight: "bold",
+                borderRadius: 2,
+                textTransform: "capitalize",
+                "&:hover": {
+                  backgroundColor: "#4caf50", // Hover effect with a custom color (green)
+                },
+              }}
+            >
+              Simpan
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </div>
   );

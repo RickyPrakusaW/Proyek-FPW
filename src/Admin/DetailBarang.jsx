@@ -21,15 +21,15 @@ const DetailBarang = () => {
   }, [id]);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <p className="text-black">Loading...</p>;
   }
 
   if (!product) {
-    return <p>Product not found!</p>;
+    return <p className="text-black">Product not found!</p>;
   }
 
   return (
-    <div className="p-5">
+    <div className="p-5 text-black"> {/* Tambahkan class text-black di sini */}
       <h1 className="text-2xl font-bold mb-4">{product.Nama_product}</h1>
       <div className="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-8">
         <img
@@ -38,10 +38,10 @@ const DetailBarang = () => {
           className="w-full lg:w-1/2 object-cover rounded-md"
         />
         <div className="flex-1">
-          <p className="mb-2 text-gray-700">Harga: Rp {product.Harga}</p>
-          <p className="mb-2 text-gray-700">Stok: {product.Stock_barang}</p>
-          <p className="mb-2 text-gray-700">Tanggal Masuk: {product.Tanggal_masuk}</p>
-          <p className="mb-2 text-gray-700">Deskripsi: {product.Deskripsi || "Tidak ada deskripsi."}</p>
+          <p className="mb-2">Harga: Rp {product.Harga}</p>
+          <p className="mb-2">Stok: {product.Stock_barang}</p>
+          <p className="mb-2">Tanggal Masuk: {product.Tanggal_masuk}</p>
+          <p className="mb-2">Deskripsi: {product.Deskripsi || "Tidak ada deskripsi."}</p>
         </div>
       </div>
     </div>

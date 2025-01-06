@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
+import {
+  Button,
+  CircularProgress,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  Box,
+} from '@mui/material';
 
 function Penjualan() {
   const [penjualan, setPenjualan] = useState([]);
@@ -8,11 +21,10 @@ function Penjualan() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fungsi untuk mengambil data penjualan
     const fetchPenjualan = async () => {
       try {
         const response = await axios.get('http://localhost:3000/api/admin/getPenjualan');
-        setPenjualan(response.data.data); // Data dari backend
+        setPenjualan(response.data.data);
         setLoading(false);
       } catch (error) {
         console.error('Error saat mengambil data penjualan:', error);
@@ -24,17 +36,13 @@ function Penjualan() {
     fetchPenjualan();
   }, []);
 
-  // Fungsi untuk menghitung total harga per transaksi
   const calculateTotalHarga = (idCart, totalHarga) => {
-    // Jika idCart kosong atau bukan array, gunakan totalHarga dari data langsung
     if (!Array.isArray(idCart) || idCart.length === 0) {
       return totalHarga || 0;
     }
-    // Jika idCart ada, lakukan perhitungan berdasarkan isinya
     return idCart.reduce((acc, cartItem) => acc + (cartItem.price * cartItem.quantity), 0);
   };
 
-  // Fungsi untuk menghitung total pemasukan
   const calculateTotalPemasukan = () => {
     return penjualan.reduce(
       (total, item) => total + calculateTotalHarga(item.idCart, item.totalHarga),
@@ -42,7 +50,6 @@ function Penjualan() {
     );
   };
 
-  // Fungsi untuk ekspor data ke Excel
   const exportToExcel = () => {
     const dataForExcel = penjualan.map((item) => ({
       'ID Penjualan': item.idPenjualan,
@@ -60,50 +67,67 @@ function Penjualan() {
     XLSX.writeFile(workbook, 'Data_Penjualan.xlsx');
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Typography variant="h6" color="error" align="center">
+        {error}
+      </Typography>
+    );
+  }
 
   return (
-    <div>
-      <h1>Data Penjualan</h1>
-      <button onClick={exportToExcel} style={{ marginBottom: '20px' }}>
+    <Box p={4}>
+      <Typography variant="h4" gutterBottom>
+        Data Penjualan
+      </Typography>
+      <Button variant="contained" color="primary" onClick={exportToExcel} sx={{ mb: 2 }}>
         Ekspor ke Excel
-      </button>
+      </Button>
       {penjualan.length === 0 ? (
-        <p>Tidak ada data penjualan.</p>
+        <Typography variant="body1">Tidak ada data penjualan.</Typography>
       ) : (
-        <table border="1" style={{ width: '100%', textAlign: 'left' }}>
-          <thead>
-            <tr>
-              <th>ID Penjualan</th>
-              <th>Customer</th>
-              <th>Pembayaran</th>
-              <th>Detail</th>
-              <th>Total Barang</th>
-              <th>Total Harga</th>
-              <th>Tanggal Pembelian</th>
-            </tr>
-          </thead>
-          <tbody>
-            {penjualan.map((item) => (
-              <tr key={item._id}>
-                <td>{item.idPenjualan}</td>
-                <td>{item.Customer_id?.Nama_lengkap || 'Tidak ada data'}</td>
-                <td>{item.metodePembayaran || 'Tidak ada data'}</td>
-                <td>{item.namaBarang || 'Tidak ada data'}</td>
-                <td>{item.totalBarang || 'Tidak ada data'}</td>
-                <td>{calculateTotalHarga(item.idCart, item.totalHarga).toLocaleString('id-ID')}</td>
-                <td>{item.tanggalPembelian || 'Tidak ada data'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID Penjualan</TableCell>
+                <TableCell>Customer</TableCell>
+                <TableCell>Pembayaran</TableCell>
+                <TableCell>Detail</TableCell>
+                <TableCell>Total Barang</TableCell>
+                <TableCell>Total Harga</TableCell>
+                <TableCell>Tanggal Pembelian</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {penjualan.map((item) => (
+                <TableRow key={item._id}>
+                  <TableCell>{item.idPenjualan}</TableCell>
+                  <TableCell>{item.Customer_id?.Nama_lengkap || 'Tidak ada data'}</TableCell>
+                  <TableCell>{item.metodePembayaran || 'Tidak ada data'}</TableCell>
+                  <TableCell>{item.namaBarang || 'Tidak ada data'}</TableCell>
+                  <TableCell>{item.totalBarang || 'Tidak ada data'}</TableCell>
+                  <TableCell> Rp. {item.totalHarga || 'Tidak ada data'} </TableCell>
+                  <TableCell>{item.tanggalPembelian || 'Tidak ada data'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
-      <h2 style={{ marginTop: '20px' }}>
+      <Typography variant="h6" sx={{ mt: 3 }}>
         Total Pemasukan: Rp{' '}
         {calculateTotalPemasukan().toLocaleString('id-ID', { minimumFractionDigits: 0 })}
-      </h2>
-    </div>
+      </Typography>
+    </Box>
   );
 }
 

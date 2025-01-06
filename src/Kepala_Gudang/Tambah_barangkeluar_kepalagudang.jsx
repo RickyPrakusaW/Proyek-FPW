@@ -19,17 +19,20 @@ const TambahBarangKeluarKepalaGudang = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/admin/barangKeluar", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id_barang: idBarang, // Send the correct key to backend
-          jumlah_keluar: parseInt(jumlahKeluar),
-          tanggal_keluar: tanggalKeluar,
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:3000/api/admin/barangKeluar",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id_barang: idBarang, // Send the correct key to backend
+            jumlah_keluar: parseInt(jumlahKeluar),
+            tanggal_keluar: tanggalKeluar,
+          }),
+        }
+      );
 
       const data = await response.json();
       if (response.ok) {
@@ -45,11 +48,13 @@ const TambahBarangKeluarKepalaGudang = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">
-        <h1 className="text-2xl font-bold mb-4">Tambah Barang Keluar</h1>
+        <h1 className="text-2xl font-bold mb-4 text-black">
+          Tambah Barang Keluar
+        </h1>
         <form onSubmit={handleSubmit}>
           {/* ID Barang */}
           <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2">
+            <label className="block text-black font-medium mb-2">
               ID Barang
             </label>
             <input
@@ -57,13 +62,13 @@ const TambahBarangKeluarKepalaGudang = () => {
               placeholder="Masukkan ID Barang"
               value={idBarang}
               onChange={(e) => setIdBarang(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
               required
             />
           </div>
           {/* Jumlah Barang Keluar */}
           <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2">
+            <label className="block text-black font-medium mb-2">
               Jumlah Barang Keluar
             </label>
             <input
@@ -71,20 +76,20 @@ const TambahBarangKeluarKepalaGudang = () => {
               placeholder="Masukkan Jumlah Barang Keluar"
               value={jumlahKeluar}
               onChange={(e) => setJumlahKeluar(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
               required
             />
           </div>
           {/* Tanggal Keluar */}
           <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2">
+            <label className="block text-black font-medium mb-2">
               Tanggal Keluar
             </label>
             <input
               type="date"
               value={tanggalKeluar}
               onChange={(e) => setTanggalKeluar(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
               required
             />
           </div>

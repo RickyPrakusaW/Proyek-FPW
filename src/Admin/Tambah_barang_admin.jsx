@@ -50,15 +50,15 @@ function TambahBarangPopup({ onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white w-1/2 rounded-lg shadow-lg p-5">
+      <div className="bg-white w-1/2 rounded-lg shadow-lg p-5 text-black">
         <div className="border-b pb-3 mb-5">
-          <h2 className="text-xl font-bold text-gray-800">Tambah Barang</h2>
+          <h2 className="text-xl font-bold">Tambah Barang</h2>
         </div>
 
         <form onSubmit={handleSubmit(handleAddBarang)}>
           <div className="space-y-4">
             <div>
-              <label className="block text-gray-700 font-medium mb-1">ID Barang</label>
+              <label className="block font-medium mb-1">ID Barang</label>
               <input
                 type="text"
                 placeholder="ID Barang"
@@ -70,7 +70,7 @@ function TambahBarangPopup({ onClose }) {
               )}
             </div>
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Nama Barang</label>
+              <label className="block font-medium mb-1">Nama Barang</label>
               <input
                 type="text"
                 placeholder="Nama Barang"
@@ -82,7 +82,7 @@ function TambahBarangPopup({ onClose }) {
               )}
             </div>
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Jumlah Barang</label>
+              <label className="block font-medium mb-1">Jumlah Barang</label>
               <input
                 type="number"
                 placeholder="Jumlah Barang"
@@ -94,7 +94,7 @@ function TambahBarangPopup({ onClose }) {
               )}
             </div>
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Harga Barang</label>
+              <label className="block font-medium mb-1">Harga Barang</label>
               <input
                 type="number"
                 placeholder="Harga Barang"
@@ -106,7 +106,7 @@ function TambahBarangPopup({ onClose }) {
               )}
             </div>
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Tipe Barang</label>
+              <label className="block font-medium mb-1">Tipe Barang</label>
               <input
                 type="text"
                 placeholder="Tipe Barang"
@@ -118,7 +118,7 @@ function TambahBarangPopup({ onClose }) {
               )}
             </div>
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Tanggal Masuk</label>
+              <label className="block font-medium mb-1">Tanggal Masuk</label>
               <input
                 type="date"
                 className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -129,7 +129,7 @@ function TambahBarangPopup({ onClose }) {
               )}
             </div>
             <div>
-              <label className="block text-gray-700 font-medium mb-1">Foto Barang</label>
+              <label className="block font-medium mb-1">Foto Barang</label>
               <input
                 type="file"
                 accept="image/*"

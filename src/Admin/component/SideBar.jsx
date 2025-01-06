@@ -1,14 +1,15 @@
 import { useTheme } from "../../ThemeContext";
-import React, {useState} from 'react'
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function SideBar() {
-    const { isDarkMode, toggleTheme } = useTheme();
-    const navigate = useNavigate();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { isDarkMode, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [activeButton, setActiveButton] = useState("dashboard"); // Tambahkan state untuk tombol aktif
 
-    const themeClasses = isDarkMode
+  const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
     : "bg-white text-gray-900";
   const sidebarClasses = isDarkMode
@@ -18,28 +19,53 @@ function SideBar() {
     ? "bg-blue-600 hover:bg-blue-500"
     : "bg-blue-400 hover:bg-blue-300";
 
+  // Fungsi untuk menangani klik menu
+  const handleMenuClick = (menuId, path) => {
+    setActiveButton(menuId);
+    navigate(path);
+  };
+
+  // Fungsi untuk mendapatkan class button berdasarkan status aktif
+  const getButtonClass = (menuId) => {
+    const baseClasses =
+      "flex items-center space-x-3 p-3 rounded-md cursor-pointer";
+    const activeClass = isDarkMode ? "bg-blue-600" : "bg-blue-400";
+    const hoverClass = `hover:${buttonClasses}`;
+
+    return `${baseClasses} ${
+      activeButton === menuId ? activeClass : ""
+    } ${hoverClass}`;
+  };
+
   return (
     <div className={`min-h-screen flex ${themeClasses}`}>
-      {/* Sidebar */}
       <div
         className={`${
           isSidebarOpen ? "w-64" : "w-16"
         } h-screen ${sidebarClasses} p-5 transition-all duration-300`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between" onClick={() => navigate('/admin/profileAdmin')}>
-          {isSidebarOpen && (
-            <div className="flex items-center space-x-3">
+        <div
+          className="flex items-center justify-between"
+          onClick={() => navigate("/admin/profileAdmin")}
+        >
+          <div className="flex items-center">
+            {isSidebarOpen && (
               <img
                 src="https://via.placeholder.com/50"
                 alt="Admin Avatar"
                 className="rounded-full w-12 h-12"
               />
-              <h2 className="text-xl font-semibold">Admin</h2>
-            </div>
-          )}
+            )}
+            {isSidebarOpen && (
+              <h2 className="text-xl font-semibold ml-3">Admin</h2>
+            )}
+          </div>
           <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsSidebarOpen(!isSidebarOpen);
+            }}
             className="p-2 rounded-md focus:outline-none"
           >
             {isSidebarOpen ? "❮" : "❯"}
@@ -75,57 +101,105 @@ function SideBar() {
         {/* Menu Items */}
         <ul className="space-y-4">
           <li
-            className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer ${buttonClasses}`}
-            onClick={() => navigate("/admin")}
+            className={getButtonClass("dashboard")}
+            onClick={() => handleMenuClick("dashboard", "/admin")}
           >
-            <span>🏠</span>
-            {isSidebarOpen && <span>Dashboard</span>}
+            <span
+              className={`transform transition-all ${
+                isSidebarOpen ? "" : "ml-[-10px]"
+              }`}
+            >
+              🏠
+            </span>
+            {isSidebarOpen && <span className="ml-3">Dashboard</span>}
           </li>
           <li
-            className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer hover:${buttonClasses}`}
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className={getButtonClass("manage-karyawan")}
+            onClick={() => {
+              setIsDropdownOpen(!isDropdownOpen);
+              handleMenuClick("manage-karyawan", "#");
+            }}
           >
-            <span>👥</span>
-            {isSidebarOpen && <span>Manage Karyawan</span>}
+            <span
+              className={`transform transition-all ${
+                isSidebarOpen ? "" : "ml-[-10px]"
+              }`}
+            >
+              👥
+            </span>
+            {isSidebarOpen && <span className="ml-3">Manage Karyawan</span>}
           </li>
           {isDropdownOpen && isSidebarOpen && (
             <ul className="ml-6 space-y-2">
               <li
-                className="p-2 hover:bg-gray-300 rounded-md cursor-pointer"
-                onClick={() => navigate("/admin/addKaryawan")}
+                className={`p-2 rounded-md cursor-pointer ${
+                  activeButton === "add-karyawan"
+                    ? "bg-blue-400"
+                    : "hover:bg-gray-300"
+                }`}
+                onClick={() =>
+                  handleMenuClick("add-karyawan", "/admin/addKaryawan")
+                }
               >
                 Tambah Karyawan
               </li>
               <li
-                className="p-2 hover:bg-gray-300 rounded-md cursor-pointer"
-                onClick={() => navigate("/admin/manageKaryawan")}
+                className={`p-2 rounded-md cursor-pointer ${
+                  activeButton === "list-karyawan"
+                    ? "bg-blue-400"
+                    : "hover:bg-gray-300"
+                }`}
+                onClick={() =>
+                  handleMenuClick("list-karyawan", "/admin/manageKaryawan")
+                }
               >
                 Daftar Karyawan
               </li>
             </ul>
           )}
           <li
-            className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer hover:${buttonClasses}`}
-            onClick={() => navigate("/admin/stockGudang")}
+            className={getButtonClass("stock-gudang")}
+            onClick={() =>
+              handleMenuClick("stock-gudang", "/admin/stockGudang")
+            }
           >
-            <span>📦</span>
-            {isSidebarOpen && <span>Stock Gudang</span>}
+            <span
+              className={`transform transition-all ${
+                isSidebarOpen ? "" : "ml-[-10px]"
+              }`}
+            >
+              📦
+            </span>
+            {isSidebarOpen && <span className="ml-3">Stock Gudang</span>}
           </li>
           <li
-            className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer hover:${buttonClasses}`}
-            onClick={() => navigate("/admin/returBarang")}
+            className={getButtonClass("retur-barang")}
+            onClick={() =>
+              handleMenuClick("retur-barang", "/admin/returBarang")
+            }
           >
-            <span>↩️</span>
-            {isSidebarOpen && <span>Retur Barang</span>}
+            <span
+              className={`transform transition-all ${
+                isSidebarOpen ? "" : "ml-[-10px]"
+              }`}
+            >
+              ↩️
+            </span>
+            {isSidebarOpen && <span className="ml-3">Retur Barang</span>}
           </li>
           <li
-            className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer hover:${buttonClasses}`}
-            onClick={() => navigate("/admin/listBarang")}
+            className={getButtonClass("list-barang")}
+            onClick={() => handleMenuClick("list-barang", "/admin/listBarang")}
           >
-            <span>📋</span>
-            {isSidebarOpen && <span>List Barang</span>}
+            <span
+              className={`transform transition-all ${
+                isSidebarOpen ? "" : "ml-[-10px]"
+              }`}
+            >
+              📋
+            </span>
+            {isSidebarOpen && <span className="ml-3">List Barang</span>}
           </li>
-        
         </ul>
 
         {/* Logout Button */}
@@ -133,11 +207,23 @@ function SideBar() {
           className={`mt-10 bg-pink-500 p-3 rounded-md w-full text-white font-semibold hover:bg-pink-400`}
           onClick={() => navigate("/")}
         >
-          {isSidebarOpen ? "Keluar" : "🚪"}
+          {isSidebarOpen ? (
+            "Keluar"
+          ) : (
+            <>
+              <span
+                className={`transform transition-all ${
+                  isSidebarOpen ? "" : "ml-[-10px]"
+                }`}
+              >
+                🚪
+              </span>
+            </>
+          )}
         </button>
       </div>
     </div>
-  )
+  );
 }
 
-export default SideBar
+export default SideBar;
