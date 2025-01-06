@@ -2,6 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useTheme } from "./../ThemeContext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import {
+  Box,
+  Typography,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Avatar,
+} from "@mui/material";
 
 const ReturAdmin = () => {
   const { isDarkMode } = useTheme();
@@ -12,7 +25,9 @@ const ReturAdmin = () => {
   useEffect(() => {
     const fetchReturData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/admin/getReturGudang");
+        const response = await axios.get(
+          "http://localhost:3000/api/admin/getReturGudang"
+        );
         setReturData(response.data.data);
       } catch (error) {
         console.error("Error fetching retur data:", error);
@@ -24,99 +39,174 @@ const ReturAdmin = () => {
 
   const handleApprove = async (idReturGudang) => {
     try {
-      await axios.put(`http://localhost:3000/api/admin/updateStatusRetur/${idReturGudang}`, {
-        status: "approved",
-      });
+      await axios.put(
+        `http://localhost:3000/api/admin/updateStatusRetur/${idReturGudang}`,
+        {
+          status: "approved",
+        }
+      );
 
-      const response = await axios.get("http://localhost:3000/api/admin/getReturGudang");
+      const response = await axios.get(
+        "http://localhost:3000/api/admin/getReturGudang"
+      );
       setReturData(response.data.data);
     } catch (error) {
       console.error("Error approving retur:", error);
     }
   };
 
-  // Theme classes dengan warna teks yang konsisten
-  const themeClasses = isDarkMode 
-    ? "bg-gray-900 text-white" 
-    : "bg-white text-gray-900";
-  
-  const tableHeaderClasses = isDarkMode 
-    ? "bg-blue-600 text-white" 
-    : "bg-blue-300 text-gray-900";
-  
-  const tableRowClasses = isDarkMode 
-    ? "hover:bg-blue-700 bg-gray-700 text-white" 
-    : "hover:bg-blue-400 bg-gray-200 text-gray-900";
-  
-  const buttonAddClasses = isDarkMode 
-    ? "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" 
-    : "bg-green-300 text-gray-900 px-4 py-2 rounded hover:bg-green-400";
-  
-  const buttonActionClasses = isDarkMode 
-    ? "bg-blue-500 px-4 py-2 text-white rounded-md hover:bg-blue-600" 
-    : "bg-blue-300 px-4 py-2 text-gray-900 rounded-md hover:bg-blue-400";
-  
-  const titleClasses = isDarkMode 
-    ? "text-2xl font-bold text-white" 
-    : "text-2xl font-bold text-gray-900";
+  const textColor = isDarkMode ? "white" : "black";
+  const bgColor = isDarkMode ? "#424242" : "#ffffff";
 
   return (
-    <div className={`min-h-screen flex flex-col ${themeClasses}`}>
-      <div className="flex-1 p-5 mx-auto w-4/5">
-        <div className="flex justify-between items-center mb-5">
-          <h1 className={titleClasses}>Retur Barang</h1>
-          <button className={buttonAddClasses} onClick={() => navigate("/kepalagudang/addBarangRetur")}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: isDarkMode ? "#303030" : "#f5f5f5",
+        color: textColor,
+        p: 3,
+      }}
+    >
+      <Box sx={{ maxWidth: "90%", mx: "auto" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+          }}
+        >
+          <Typography variant="h4" fontWeight="bold">
+            Retur Barang
+          </Typography>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "green",
+              "&:hover": { backgroundColor: "darkgreen" },
+            }}
+            onClick={() => navigate("/kepalagudang/addBarangRetur")}
+          >
             + Barang
-          </button>
-        </div>
+          </Button>
+        </Box>
 
-        <table className="w-full text-center border-collapse">
-          <thead>
-            <tr className={tableHeaderClasses}>
-              <th className="p-3 border">No</th>
-              <th className="p-3 border">ID Barang</th>
-              <th className="p-3 border">Nama Barang</th>
-              <th className="p-3 border">Jumlah</th>
-              <th className="p-3 border">Tanggal</th>
-              <th className="p-3 border">Foto Barang</th>
-              <th className="p-3 border">Status</th>
-              <th className="p-3 border">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {returData.map((retur, index) => (
-              <tr key={retur.idReturGudang} className={`${tableRowClasses} border`}>
-                <td className="p-3 border">{index + 1 < 10 ? `0${index + 1}` : index + 1}</td>
-                <td className="p-3 border">{retur.id_barang}</td>
-                <td className="p-3 border">{retur.namaBarang}</td>
-                <td className="p-3 border">{retur.jumlahBarang}</td>
-                <td className="p-3 border">{new Date(retur.tanggal).toLocaleDateString()}</td>
-                <td className="p-3 border">
-                  <div className="flex justify-center">
-                    <img
+        <TableContainer
+          component={Paper}
+          sx={{
+            backgroundColor: bgColor,
+          }}
+        >
+          <Table>
+            <TableHead>
+              <TableRow
+                sx={{
+                  backgroundColor: isDarkMode ? "#1976d2" : "#bbdefb",
+                }}
+              >
+                <TableCell align="center" sx={{ color: textColor }}>
+                  No
+                </TableCell>
+                <TableCell align="center" sx={{ color: textColor }}>
+                  ID Barang
+                </TableCell>
+                <TableCell align="center" sx={{ color: textColor }}>
+                  Nama Barang
+                </TableCell>
+                <TableCell align="center" sx={{ color: textColor }}>
+                  Jumlah
+                </TableCell>
+                <TableCell align="center" sx={{ color: textColor }}>
+                  Tanggal
+                </TableCell>
+                <TableCell align="center" sx={{ color: textColor }}>
+                  Foto Barang
+                </TableCell>
+                <TableCell align="center" sx={{ color: textColor }}>
+                  Status
+                </TableCell>
+                <TableCell align="center" sx={{ color: textColor }}>
+                  Action
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {returData.map((retur, index) => (
+                <TableRow
+                  key={retur.idReturGudang}
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: isDarkMode ? "#1565c0" : "#e3f2fd",
+                    },
+                  }}
+                >
+                  <TableCell
+                    align="center"
+                    sx={{ color: isDarkMode ? "white" : "black" }}
+                  >
+                    {index + 1}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{ color: isDarkMode ? "white" : "black" }}
+                  >
+                    {retur.id_barang}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{ color: isDarkMode ? "white" : "black" }}
+                  >
+                    {retur.namaBarang}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{ color: isDarkMode ? "white" : "black" }}
+                  >
+                    {retur.jumlahBarang}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{ color: isDarkMode ? "white" : "black" }}
+                  >
+                    {new Date(retur.tanggal).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell align="center">
+                    <Avatar
+                      variant="square"
                       src={`http://localhost:3000/api/admin/uploads/stock/${retur.photoBarang}`}
                       alt="Barang"
-                      className="w-20 h-20 object-cover"
+                      sx={{ width: 56, height: 56, mx: "auto" }}
                     />
-                  </div>
-                </td>
-                <td className="p-3 border">{retur.status}</td>
-                <td className="p-3 border">
-                  {retur.status !== "approved" && (
-                    <button
-                      className={buttonActionClasses}
-                      onClick={() => handleApprove(retur.idReturGudang)}
-                    >
-                      Retur Admin
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{ color: isDarkMode ? "white" : "black" }}
+                  >
+                    {retur.status}
+                  </TableCell>
+                  <TableCell align="center">
+                    {retur.status !== "approved" && (
+                      <Button
+                        variant="contained"
+                        sx={{
+                          bgcolor: "green",
+                          "&:hover": {
+                            bgcolor: "darkgreen",
+                          },
+                        }}
+                        onClick={() => handleApprove(retur.idReturGudang)}
+                      >
+                        Retur Admin
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+    </Box>
   );
 };
 
