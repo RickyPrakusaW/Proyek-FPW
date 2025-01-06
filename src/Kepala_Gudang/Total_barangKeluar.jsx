@@ -43,7 +43,7 @@ const Homekepalagudang = () => {
               isDarkMode ? "bg-blue-600 text-white" : "bg-blue-300 text-black"
             } p-5 rounded-md text-center`}
           >
-            <h3 className="text-xl font-semibold">Total Barang Keluar</h3>
+            <h3 className="text-xl font-semibold ">Total Barang Keluar</h3>
             <p className="text-2xl font-bold">
               {barangData.reduce(
                 (total, barang) => total + (barang.total_barang || 0),

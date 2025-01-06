@@ -5,24 +5,42 @@ import axios from "axios";
 const StockGudang = () => {
   const { isDarkMode } = useTheme();
   const [stocks, setStocks] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");  // State untuk query pencarian
+  const [searchQuery, setSearchQuery] = useState("");
 
+  // Updated theme classes dengan warna teks yang konsisten
   const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
     : "bg-white text-gray-900";
+
   const cardClasses = isDarkMode
     ? "bg-gray-800 text-white shadow-lg"
-    : "bg-white text-gray-900 shadow-md";
-  const inputClasses = isDarkMode
-    ? "p-2 rounded-md border border-gray-700 text-black focus:outline-none"
-    : "p-2 rounded-md border border-gray-300 text-black focus:outline-none";
+    : "bg-gray-100 text-gray-900 shadow-md";
 
-  // Fetch data from backend
+  const inputClasses = isDarkMode
+    ? "p-2 rounded-md border border-gray-700 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+    : "p-2 rounded-md border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500";
+
+  const titleClasses = isDarkMode
+    ? "text-2xl font-bold text-white"
+    : "text-2xl font-bold text-gray-900";
+
+  const stockTextClasses = isDarkMode
+    ? "text-sm text-gray-300"
+    : "text-sm text-gray-600";
+
+  const stockNumberClasses = isDarkMode
+    ? "font-semibold text-white"
+    : "font-semibold text-gray-900";
+
+  const cardTitleClasses = isDarkMode
+    ? "text-lg font-bold text-white"
+    : "text-lg font-bold text-gray-900";
+
   useEffect(() => {
     const fetchStockData = async () => {
       try {
         const response = await axios.get("http://localhost:3000/api/admin/getStock");
-        setStocks(response.data.data); // Assuming `data` is the key for the stock array
+        setStocks(response.data.data);
       } catch (error) {
         console.error("Error fetching stock data:", error);
       }
@@ -30,12 +48,10 @@ const StockGudang = () => {
     fetchStockData();
   }, []);
 
-  // Filtered stocks based on search query
   const filteredStocks = stocks.filter((stock) =>
     stock.nama_barang.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Handle change in search input
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -44,12 +60,12 @@ const StockGudang = () => {
     <div className={`min-h-screen flex flex-col ${themeClasses}`}>
       {/* Header */}
       <div className="flex justify-between items-center p-5">
-        <h1 className="text-2xl font-bold">Stock Di Gudang</h1>
+        <h1 className={titleClasses}>Stock Di Gudang</h1>
         <input
           type="text"
           placeholder="Search"
-          value={searchQuery}  // Bind value to searchQuery state
-          onChange={handleSearchChange}  // Update state when input changes
+          value={searchQuery}
+          onChange={handleSearchChange}
           className={inputClasses}
         />
       </div>
@@ -63,15 +79,15 @@ const StockGudang = () => {
           >
             {/* Image */}
             <img
-              src={stock.photo_url}  // Gunakan URL gambar dari API response
+              src={stock.photo_url}
               alt={stock.nama_barang}
               className="w-full h-48 object-cover rounded-md mb-4"
             />
             {/* Nama Barang */}
-            <h2 className="text-lg font-bold mb-2">{stock.nama_barang}</h2>
+            <h2 className={cardTitleClasses}>{stock.nama_barang}</h2>
             {/* Stock Barang */}
-            <p className="text-sm text-gray-500">
-              Jumlah: <span className="font-semibold">{stock.total_barang}</span>
+            <p className={stockTextClasses}>
+              Jumlah: <span className={stockNumberClasses}>{stock.total_barang}</span>
             </p>
           </div>
         ))}
@@ -81,4 +97,3 @@ const StockGudang = () => {
 };
 
 export default StockGudang;
-  

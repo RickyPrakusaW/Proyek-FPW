@@ -155,13 +155,13 @@ const ManageKaryawan = () => {
               {filteredKaryawans.length > 0 ? (
                 filteredKaryawans.map((karyawan, index) => (
                   <tr key={karyawan.id_karyawan} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                    <td className="p-3 border text-center">{karyawan.id_karyawan}</td>
-                    <td className="p-3 border">{karyawan.nama_lengkap}</td>
-                    <td className="p-3 border">{karyawan.tempat_lahir}</td>
-                    <td className="p-3 border">{karyawan.tanggal_lahir}</td>
-                    <td className="p-3 border">{karyawan.jenis_kelamin}</td>
-                    <td className="p-3 border">{karyawan.golongan_darah}</td>
-                    <td className="p-3 border">{karyawan.no_telepon}</td>
+                    <td className="p-3 border text-center text-black">{karyawan.id_karyawan}</td>
+                    <td className="p-3 border text-center text-black">{karyawan.nama_lengkap}</td>
+                    <td className="p-3 border text-center text-black">{karyawan.tempat_lahir}</td>
+                    <td className="p-3 border text-center text-black">{karyawan.tanggal_lahir}</td>
+                    <td className="p-3 border text-center text-black">{karyawan.jenis_kelamin}</td>
+                    <td className="p-3 border text-center text-black">{karyawan.golongan_darah}</td>
+                    <td className="p-3 border text-center text-black">{karyawan.no_telepon}</td>
                     <td
                       className={`p-3 border text-center font-bold ${
                         karyawan.status === "Aktif" ? "text-green-500" : "text-red-500"

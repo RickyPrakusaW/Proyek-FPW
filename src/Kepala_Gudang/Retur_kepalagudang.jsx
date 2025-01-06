@@ -9,7 +9,6 @@ const ReturAdmin = () => {
 
   const [returData, setReturData] = useState([]);
 
-  // Mengambil data dari backend saat komponen dimuat
   useEffect(() => {
     const fetchReturData = async () => {
       try {
@@ -23,14 +22,12 @@ const ReturAdmin = () => {
     fetchReturData();
   }, []);
 
-  // Fungsi untuk mengubah status retur barang menjadi "approved"
   const handleApprove = async (idReturGudang) => {
     try {
       await axios.put(`http://localhost:3000/api/admin/updateStatusRetur/${idReturGudang}`, {
         status: "approved",
       });
 
-      // Ambil data terbaru setelah perubahan
       const response = await axios.get("http://localhost:3000/api/admin/getReturGudang");
       setReturData(response.data.data);
     } catch (error) {
@@ -38,17 +35,36 @@ const ReturAdmin = () => {
     }
   };
 
-  const themeClasses = isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900";
-  const tableHeaderClasses = isDarkMode ? "bg-blue-600 text-white" : "bg-blue-300 text-black";
-  const tableRowClasses = isDarkMode ? "hover:bg-blue-700 bg-gray-700" : "hover:bg-blue-400 bg-gray-200";
-  const buttonAddClasses = isDarkMode ? "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" : "bg-green-300 text-black px-4 py-2 rounded hover:bg-green-400";
-  const buttonActionClasses = isDarkMode ? "bg-blue-500 px-4 py-2 text-white rounded-md hover:bg-blue-600" : "bg-blue-300 px-4 py-2 text-black rounded-md hover:bg-blue-400";
+  // Theme classes dengan warna teks yang konsisten
+  const themeClasses = isDarkMode 
+    ? "bg-gray-900 text-white" 
+    : "bg-white text-gray-900";
+  
+  const tableHeaderClasses = isDarkMode 
+    ? "bg-blue-600 text-white" 
+    : "bg-blue-300 text-gray-900";
+  
+  const tableRowClasses = isDarkMode 
+    ? "hover:bg-blue-700 bg-gray-700 text-white" 
+    : "hover:bg-blue-400 bg-gray-200 text-gray-900";
+  
+  const buttonAddClasses = isDarkMode 
+    ? "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" 
+    : "bg-green-300 text-gray-900 px-4 py-2 rounded hover:bg-green-400";
+  
+  const buttonActionClasses = isDarkMode 
+    ? "bg-blue-500 px-4 py-2 text-white rounded-md hover:bg-blue-600" 
+    : "bg-blue-300 px-4 py-2 text-gray-900 rounded-md hover:bg-blue-400";
+  
+  const titleClasses = isDarkMode 
+    ? "text-2xl font-bold text-white" 
+    : "text-2xl font-bold text-gray-900";
 
   return (
     <div className={`min-h-screen flex flex-col ${themeClasses}`}>
       <div className="flex-1 p-5 mx-auto w-4/5">
         <div className="flex justify-between items-center mb-5">
-          <h1 className="text-2xl font-bold">Retur Barang</h1>
+          <h1 className={titleClasses}>Retur Barang</h1>
           <button className={buttonAddClasses} onClick={() => navigate("/kepalagudang/addBarangRetur")}>
             + Barang
           </button>
