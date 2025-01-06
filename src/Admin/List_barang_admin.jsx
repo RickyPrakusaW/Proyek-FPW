@@ -2,24 +2,37 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
 import axios from "axios";
+import {
+  Box,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  CardActions,
+  Button,
+  Typography,
+  TextField,
+  Dialog,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 
-const List_barang_admin = () => {
+const ListBarangAdmin = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState(null); // State to hold the selected product for the popup
-  const [showPopup, setShowPopup] = useState(false); // State to control the visibility of the popup
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
 
-  const themeClasses = isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900";
-  const textColor = isDarkMode ? "text-white" : "text-black";
-  const tableRowClasses = isDarkMode ? "bg-gray-700 hover:bg-blue-700" : "bg-gray-100 hover:bg-blue-100";
+  const textColor = isDarkMode ? "white" : "black";
+  const bgColor = isDarkMode ? "rgba(33, 33, 33, 1)" : "white";
 
   useEffect(() => {
     axios
       .get("http://localhost:3000/api/admin/products")
       .then((response) => {
-        setProducts(response.data.data); // Assume API returns { data: [...] }
+        setProducts(response.data.data);
       })
       .catch((error) => {
         console.error("Error fetching product data:", error);
@@ -31,95 +44,156 @@ const List_barang_admin = () => {
   );
 
   const handleDetail = (product) => {
-    setSelectedProduct(product); // Set the selected product for the popup
-    setShowPopup(true); // Show the popup
+    setSelectedProduct(product);
+    setShowPopup(true);
   };
 
   const handleClosePopup = () => {
-    setShowPopup(false); // Close the popup
+    setShowPopup(false);
   };
 
   return (
-    <div className={`flex min-h-screen ${themeClasses}`}>
-      <div className="flex-1 p-5">
-        <div className="flex justify-between items-center mb-5">
-          <h1 className={`text-2xl font-bold ${textColor}`}>List Barang</h1>
-          <div className="flex items-center space-x-4">
-            <button
-              className="bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded text-white"
-              onClick={() => navigate("/admin/tambahBarang")}
-            >
-              + Tambah Barang
-            </button>
-            <input
-              type="text"
-              placeholder="Cari"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={`border py-2 px-4 rounded ${textColor}`}
-            />
-          </div>
-        </div>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: isDarkMode ? "grey.900" : "grey.100",
+        color: textColor,
+        padding: 4,
+      }}
+    >
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+        <Typography variant="h4" fontWeight="bold" color={textColor}>
+          List Barang
+        </Typography>
+        <Box display="flex" alignItems="center" gap={2}>
+          <Button
+            variant="contained"
+            sx={{
+              bgcolor: "green",
+              "&:hover": {
+                bgcolor: "darkgreen",
+              },
+            }}
+            onClick={() => navigate("/admin/tambahBarang")}
+          >
+            + Tambah Barang
+          </Button>
+          <TextField
+            variant="outlined"
+            placeholder="Cari"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{
+              input: { color: textColor },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: isDarkMode ? "white" : "grey.400",
+                },
+                "&:hover fieldset": {
+                  borderColor: isDarkMode ? "white" : "grey.600",
+                },
+              },
+            }}
+          />
+        </Box>
+      </Box>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <div key={product.Id_product} className="border rounded-md p-4 shadow-lg">
-                <img
-                  src={`http://localhost:3000/uploads/product/${product.Photo_product}`}
+      <Grid container spacing={4}>
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => (
+            <Grid item xs={12} sm={6} md={4} key={product.Id_product}>
+              <Card
+                sx={{
+                  backgroundColor: bgColor,
+                  color: textColor,
+                  border: isDarkMode ? "1px solid white" : "1px solid grey.400",
+                  boxShadow: 3,
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={`http://localhost:3000/uploads/product/${product.Photo_product}`}
                   alt={product.Nama_product}
-                  className="w-full h-64 object-cover mb-4"
                 />
-                <h3 className={`text-xl font-semibold ${textColor}`}>{product.Nama_product}</h3>
-                <p className={`${textColor}`}>Harga: Rp {product.Harga}</p>
-                <p className={`${textColor}`}>Stock: {product.Stock_barang}</p>
-                <p className={`${textColor}`}>Tanggal Masuk: {product.Tanggal_masuk}</p>
-                <button
-                  className="bg-blue-500 text-white py-2 px-4 rounded mt-4 w-full"
-                  onClick={() => handleDetail(product)}
-                >
-                  Detail
-                </button>
-              </div>
-            ))
-          ) : (
-            <p className={`text-center ${textColor}`}>Tidak ada barang yang ditemukan.</p>
-          )}
-        </div>
-      </div>
+                <CardContent>
+                  <Typography variant="h6" fontWeight="bold" gutterBottom>
+                    {product.Nama_product}
+                  </Typography>
+                  <Typography variant="body1">Harga: Rp {product.Harga}</Typography>
+                  <Typography variant="body1">Stock: {product.Stock_barang}</Typography>
+                  <Typography variant="body1">
+                    Tanggal Masuk: {product.Tanggal_masuk}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    onClick={() => handleDetail(product)}
+                  >
+                    Detail
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))
+        ) : (
+          <Typography variant="h6" color={textColor} textAlign="center" width="100%">
+            Tidak ada barang yang ditemukan.
+          </Typography>
+        )}
+      </Grid>
 
       {/* Popup Modal */}
-      {showPopup && selectedProduct && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className={`bg-white rounded-lg p-6 w-3/4 md:w-1/2 shadow-lg relative ${themeClasses}`}>
-            <button
-              onClick={handleClosePopup}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-            >
-              &times;
-            </button>
-            <h2 className={`text-2xl font-semibold mb-4 ${`text-black`}`}>{selectedProduct.Nama_product}</h2>
-            <img
-              src={`http://localhost:3000/uploads/product/${selectedProduct.Photo_product}`}
-              alt={selectedProduct.Nama_product}
-              className="w-full h-64 object-cover mb-4"
-            />
-            <p className={`text-black`}>Harga: Rp {selectedProduct.Harga}</p>
-            <p className={`text-black`}>Stock: {selectedProduct.Stock_barang}</p>
-            <p className={`text-black`}>Tanggal Masuk: {selectedProduct.Tanggal_masuk}</p>
-
-            {/* Back Button */}
-            <button
-              onClick={handleClosePopup}
-              className="bg-blue-600 hover:bg-blue-500 py-2 px-4 rounded text-white mt-4 w-full"
-            >
-              Kembali
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+      <Dialog open={showPopup} onClose={handleClosePopup} fullWidth maxWidth="sm">
+        <DialogContent
+          sx={{
+            backgroundColor: bgColor,
+            color: textColor,
+          }}
+        >
+          {selectedProduct && (
+            <>
+              <Typography variant="h5" fontWeight="bold" gutterBottom>
+                {selectedProduct.Nama_product}
+              </Typography>
+              <CardMedia
+                component="img"
+                height="300"
+                image={`http://localhost:3000/uploads/product/${selectedProduct.Photo_product}`}
+                alt={selectedProduct.Nama_product}
+                sx={{ borderRadius: 2, marginBottom: 2 }}
+              />
+              <Typography variant="body1">Harga: Rp {selectedProduct.Harga}</Typography>
+              <Typography variant="body1">
+                Stock: {selectedProduct.Stock_barang}
+              </Typography>
+              <Typography variant="body1">
+                Tanggal Masuk: {selectedProduct.Tanggal_masuk}
+              </Typography>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions
+          sx={{
+            backgroundColor: bgColor,
+            color: textColor,
+          }}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleClosePopup}
+            fullWidth
+          >
+            Kembali
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
-export default List_barang_admin;
+export default ListBarangAdmin;
