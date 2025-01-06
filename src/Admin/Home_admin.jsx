@@ -158,6 +158,9 @@ const HomeAdmin = () => {
     ],
   };
 
+  // WhatsApp link
+  const whatsappLink = "https://wa.me/6285172182144";
+
   return (
     <div className={`flex min-h-screen ${themeClasses}`}>
       <div className="flex-1 p-5 space-y-5">
@@ -183,7 +186,13 @@ const HomeAdmin = () => {
             <p className="text-2xl font-bold">{totalProducts} Barang</p>
           </div>
         </div>
-
+        <div className="text-center mt-3">
+            <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+              <button className="bg-green-500 text-white py-2 px-4 rounded-md">
+                Chat Kepala Gudang
+              </button>
+            </a>
+          </div>
         {/* Bagian Chart */}
         <div className="grid grid-cols-2 gap-5">
           {/* Distribusi Karyawan */}
@@ -192,6 +201,7 @@ const HomeAdmin = () => {
             <div className="w-56 h-56 mx-auto">
               <Pie data={employeePieChartData} options={{ maintainAspectRatio: false }} />
             </div>
+
           </div>
 
           {/* Customer Berdasarkan Kota */}
@@ -209,6 +219,7 @@ const HomeAdmin = () => {
           <div className="w-full h-64">
             <Line data={dailySalesChartData} options={{ maintainAspectRatio: false }} />
           </div>
+     
         </div>
       </div>
     </div>
