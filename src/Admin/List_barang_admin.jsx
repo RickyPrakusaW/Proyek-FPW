@@ -39,8 +39,10 @@ const ListBarangAdmin = () => {
       });
   }, []);
 
-  const filteredProducts = products.filter((product) =>
-    product.Nama_product && product.Nama_product.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProducts = products.filter(
+    (product) =>
+      product.Nama_product &&
+      product.Nama_product.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleDetail = (product) => {
@@ -61,7 +63,12 @@ const ListBarangAdmin = () => {
         padding: 4,
       }}
     >
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={4}
+      >
         <Typography variant="h4" fontWeight="bold" color={textColor}>
           List Barang
         </Typography>
@@ -120,10 +127,17 @@ const ListBarangAdmin = () => {
                   <Typography variant="h6" fontWeight="bold" gutterBottom>
                     {product.Nama_product}
                   </Typography>
-                  <Typography variant="body1">Harga: Rp {product.Harga}</Typography>
-                  <Typography variant="body1">Stock: {product.Stock_barang}</Typography>
                   <Typography variant="body1">
-                    Tanggal Masuk: {product.Tanggal_masuk}
+                    Harga: Rp {product.Harga}
+                  </Typography>
+                  <Typography variant="body1">
+                    Stock: {product.Stock_barang}
+                  </Typography>
+                  <Typography variant="body1">
+                    Tanggal Masuk:{" "}
+                    {new Date(product.Tanggal_masuk).toLocaleDateString(
+                      "id-ID"
+                    )}
                   </Typography>
                 </CardContent>
                 <CardActions>
@@ -140,14 +154,24 @@ const ListBarangAdmin = () => {
             </Grid>
           ))
         ) : (
-          <Typography variant="h6" color={textColor} textAlign="center" width="100%">
+          <Typography
+            variant="h6"
+            color={textColor}
+            textAlign="center"
+            width="100%"
+          >
             Tidak ada barang yang ditemukan.
           </Typography>
         )}
       </Grid>
 
       {/* Popup Modal */}
-      <Dialog open={showPopup} onClose={handleClosePopup} fullWidth maxWidth="sm">
+      <Dialog
+        open={showPopup}
+        onClose={handleClosePopup}
+        fullWidth
+        maxWidth="sm"
+      >
         <DialogContent
           sx={{
             backgroundColor: bgColor,
@@ -166,12 +190,17 @@ const ListBarangAdmin = () => {
                 alt={selectedProduct.Nama_product}
                 sx={{ borderRadius: 2, marginBottom: 2 }}
               />
-              <Typography variant="body1">Harga: Rp {selectedProduct.Harga}</Typography>
+              <Typography variant="body1">
+                Harga: Rp {selectedProduct.Harga}
+              </Typography>
               <Typography variant="body1">
                 Stock: {selectedProduct.Stock_barang}
               </Typography>
               <Typography variant="body1">
-                Tanggal Masuk: {selectedProduct.Tanggal_masuk}
+                Tanggal Masuk:{" "}
+                {new Date(selectedProduct.Tanggal_masuk).toLocaleDateString(
+                  "id-ID"
+                )}
               </Typography>
             </>
           )}

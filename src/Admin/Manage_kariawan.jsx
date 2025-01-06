@@ -2,7 +2,30 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
 import axios from "axios";
-import * as XLSX from "xlsx"; // Import xlsx library
+import * as XLSX from "xlsx";
+import {
+  Box,
+  Button,
+  IconButton,
+  InputBase,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  CircularProgress,
+  Modal,
+  Avatar,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import AddIcon from "@mui/icons-material/Add";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import CloseIcon from "@mui/icons-material/Close";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import BlockRoundedIcon from "@mui/icons-material/BlockRounded";
 
 const ManageKaryawan = () => {
   const navigate = useNavigate();
@@ -14,21 +37,13 @@ const ManageKaryawan = () => {
   const [selectedKaryawan, setSelectedKaryawan] = useState(null);
   const { isDarkMode } = useTheme();
 
-  const themeClasses = isDarkMode
-    ? "bg-gray-900 text-white"
-    : "bg-white text-gray-900";
-  const tableClasses = isDarkMode
-    ? "bg-gray-800 text-white"
-    : "bg-gray-100 text-gray-900";
-
-  // Fetch data karyawan
   useEffect(() => {
     const fetchKaryawans = async () => {
       try {
         const response = await axios.get(
           "http://localhost:3000/api/admin/getKaryawan"
         );
-        const data = response.data?.data || []; // Validasi data
+        const data = response.data?.data || [];
         setKaryawans(data);
         setFilteredKaryawans(data);
       } catch (err) {
@@ -42,7 +57,6 @@ const ManageKaryawan = () => {
     fetchKaryawans();
   }, []);
 
-  // Update filtered data when search query changes
   useEffect(() => {
     const lowerCaseQuery = searchQuery.toLowerCase();
     const result = karyawans.filter(
@@ -53,7 +67,6 @@ const ManageKaryawan = () => {
     setFilteredKaryawans(result);
   }, [searchQuery, karyawans]);
 
-  // Update status karyawan
   const updateStatusKaryawan = async (id, newStatus) => {
     if (
       !window.confirm(
@@ -84,226 +97,220 @@ const ManageKaryawan = () => {
 
   const closePopup = () => setSelectedKaryawan(null);
 
-  // Function to export the data to Excel
   const exportToExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(filteredKaryawans); // Convert filtered data to worksheet
-    const wb = XLSX.utils.book_new(); // Create a new workbook
-    XLSX.utils.book_append_sheet(wb, ws, "Karyawan"); // Append worksheet to the workbook
-    XLSX.writeFile(wb, "Karyawan_List.xlsx"); // Download the file as 'Karyawan_List.xlsx'
+    const ws = XLSX.utils.json_to_sheet(filteredKaryawans);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Karyawan");
+    XLSX.writeFile(wb, "Karyawan_List.xlsx");
   };
 
   if (loading) {
     return (
-      <div
-        className={`flex justify-center items-center min-h-screen ${themeClasses}`}
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+        bgcolor={isDarkMode ? "grey.900" : "background.default"}
+        color={isDarkMode ? "common.white" : "text.primary"}
       >
-        <div className="text-center">
-          <p className="text-xl font-bold">Memuat data karyawan...</p>
-          <div className="mt-3 animate-spin rounded-full h-10 w-10 border-t-2 border-blue-500"></div>
-        </div>
-      </div>
+        <Box textAlign="center">
+          <Typography variant="h6" fontWeight="bold" mb={2}>
+            Memuat data karyawan...
+          </Typography>
+          <CircularProgress />
+        </Box>
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <div
-        className={`flex justify-center items-center min-h-screen ${themeClasses}`}
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+        bgcolor={isDarkMode ? "grey.900" : "background.default"}
+        color={isDarkMode ? "common.white" : "text.primary"}
       >
-        <div className="text-center">
-          <p className="text-xl text-red-500 font-bold">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-5 bg-blue-500 px-4 py-2 rounded-md text-white font-semibold hover:bg-blue-600"
-          >
+        <Box textAlign="center">
+          <Typography variant="h6" color="error" fontWeight="bold" mb={2}>
+            {error}
+          </Typography>
+          <Button variant="contained" color="primary" onClick={() => window.location.reload()}>
             Coba Lagi
-          </button>
-        </div>
-      </div>
+          </Button>
+        </Box>
+      </Box>
     );
   }
 
   return (
-    <div className={`flex min-h-screen ${themeClasses}`}>
-      <div className="flex-1 p-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-5">
-          <h2 className="text-2xl font-bold">Daftar Karyawan</h2>
-          <div className="flex items-center space-x-4">
-            <input
-              type="text"
-              placeholder="Cari Nama atau ID"
-              className={`px-4 py-2 rounded-md shadow ${
-                isDarkMode
-                  ? "bg-gray-800 text-white"
-                  : "bg-gray-200 text-gray-900"
-              }`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button
-              className="bg-green-500 px-5 py-2 rounded-md text-white font-semibold hover:bg-green-600"
+    <Box minHeight="100vh" bgcolor={isDarkMode ? "grey.900" : "background.default"} color={isDarkMode ? "common.white" : "text.primary"}>
+      <Box padding={8} flexGrow={1}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={5}>
+          <Typography variant="h5" fontWeight="bold">
+            Daftar Karyawan
+          </Typography>
+          <Box display="flex" alignItems="center" gap={2}>
+            <Paper component="form" sx={{ p: '2px 4px', display: 'flex', alignItems: 'center' }}>
+              <InputBase
+                placeholder="Cari Nama atau ID"
+                inputProps={{ 'aria-label': 'cari karyawan' }}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                sx={{ ml: 1, flex: 1, color: isDarkMode ? 'common.white' : 'text.primary' }}
+              />
+              <IconButton type="button" sx={{ p: '10px' }} aria-label="search">
+                <SearchIcon color="primary" />
+              </IconButton>
+            </Paper>
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<AddIcon />}
               onClick={() => navigate("/admin/addKaryawan")}
             >
-              + Tambah Karyawan
-            </button>
-            <button
-              className="bg-blue-500 px-5 py-2 rounded-md text-white font-semibold hover:bg-blue-600"
+              Tambah Karyawan
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<FileDownloadIcon />}
               onClick={exportToExcel}
             >
               Export ke Excel
-            </button>
-            <span className="ml-5 text-lg font-medium">
+            </Button>
+            <Typography variant="subtitle1" ml={5}>
               Total Karyawan: {filteredKaryawans.length}
-            </span>
-          </div>
-        </div>
+            </Typography>
+          </Box>
+        </Box>
 
-        {/* Table */}
-        <div className="overflow-x-auto shadow-md rounded-lg">
-          <table className="min-w-full table-auto">
-            <thead>
-              <tr
-                className={`text-white ${
-                  isDarkMode ? "bg-blue-600" : "bg-blue-400"
-                }`}
-              >
-                <th className="p-4 border">ID</th>
-                <th className="p-4 border">Nama Lengkap</th>
-                <th className="p-4 border">Tempat Lahir</th>
-                <th className="p-4 border">Tanggal Lahir</th>
-                <th className="p-4 border">Jenis Kelamin</th>
-                <th className="p-4 border">Golongan Darah</th>
-                <th className="p-4 border">No Telepon</th>
-                <th className="p-4 border">Status</th>
-                <th className="p-4 border">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredKaryawans.length > 0 ? (
-                filteredKaryawans.map((karyawan, index) => (
-                  <tr
-                    key={karyawan.id_karyawan}
-                    className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
-                  >
-                    <td className="p-3 border text-center text-black">
-                      {karyawan.id_karyawan}
-                    </td>
-                    <td className="p-3 border text-center text-black">
-                      {karyawan.nama_lengkap}
-                    </td>
-                    <td className="p-3 border text-center text-black">
-                      {karyawan.tempat_lahir}
-                    </td>
-                    <td className="p-3 border text-center text-black">
-                      {
-                        new Date(karyawan.tanggal_lahir)
-                          .toISOString()
-                          .split("T")[0]
-                      }
-                    </td>
-                    <td className="p-3 border text-center text-black">
-                      {karyawan.jenis_kelamin}
-                    </td>
-                    <td className="p-3 border text-center text-black">
-                      {karyawan.golongan_darah}
-                    </td>
-                    <td className="p-3 border text-center text-black">
-                      {karyawan.no_telepon}
-                    </td>
-                    <td
-                      className={`p-3 border text-center font-bold ${
-                        karyawan.status === "Aktif"
-                          ? "text-green-500"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {karyawan.status}
-                    </td>
-                    <td className="p-3 border text-center space-x-2">
-                      <button
-                        className="bg-blue-500 px-3 py-1 rounded-md text-white font-semibold hover:bg-blue-600"
-                        onClick={() => setSelectedKaryawan(karyawan)}
-                      >
-                        Detail
-                      </button>
-                      <button
-                        className={`px-3 py-1 rounded-md text-white font-semibold ${
-                          karyawan.status === "Aktif"
-                            ? "bg-pink-500 hover:bg-pink-600"
-                            : "bg-purple-500 hover:bg-purple-600"
-                        }`}
-                        onClick={() =>
-                          updateStatusKaryawan(
-                            karyawan.id_karyawan,
-                            karyawan.status === "Aktif" ? "Nonaktif" : "Aktif"
-                          )
-                        }
-                      >
-                        {karyawan.status === "Aktif"
-                          ? "Nonaktifkan"
-                          : "Aktifkan"}
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="9" className="p-3 text-center text-gray-500">
-                    Tidak ada karyawan yang ditemukan.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Popup */}
-        {selectedKaryawan && (
-          <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-            <div
-              className={`p-6 rounded-md shadow-lg ${
-                isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
-              }`}
-            >
-              <h3 className="text-2xl font-bold mb-4">Detail Karyawan</h3>
-              <img
-                src={selectedKaryawan.foto || "https://via.placeholder.com/150"}
-                alt={selectedKaryawan.nama_lengkap}
-                className="w-32 h-32 rounded-full mb-4 mx-auto"
-              />
-              <p>
-                <strong>Nama:</strong> {selectedKaryawan.nama_lengkap}
-              </p>
-              <p>
-                <strong>Alamat:</strong> {selectedKaryawan.alamat || "-"}
-              </p>
-              <p>
-                <strong>Jenis Kelamin:</strong> {selectedKaryawan.jenis_kelamin}
-              </p>
-              <p>
-                <strong>Golongan Darah:</strong>{" "}
-                {selectedKaryawan.golongan_darah}
-              </p>
-              <p>
-                <strong>No Telepon:</strong> {selectedKaryawan.no_telepon}
-              </p>
-              <p>
-                <strong>Status:</strong> {selectedKaryawan.status}
-              </p>
-              <div className="mt-4 text-right">
-                <button
-                  className="bg-red-500 px-4 py-2 rounded-md text-white font-semibold hover:bg-red-600"
-                  onClick={closePopup}
+        <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+          <Table aria-label="daftar karyawan">
+            <TableHead>
+              <TableRow bgcolor={isDarkMode ? "primary.dark" : "primary.light"}>
+                <TableCell sx={{ color: 'common.white', fontWeight: 'bold' }}>ID</TableCell>
+                <TableCell sx={{ color: 'common.white', fontWeight: 'bold' }}>Nama Lengkap</TableCell>
+                <TableCell sx={{ color: 'common.white', fontWeight: 'bold' }}>Tempat Lahir</TableCell>
+                <TableCell sx={{ color: 'common.white', fontWeight: 'bold' }}>Tanggal Lahir</TableCell>
+                <TableCell sx={{ color: 'common.white', fontWeight: 'bold' }}>Jenis Kelamin</TableCell>
+                <TableCell sx={{ color: 'common.white', fontWeight: 'bold' }}>Golongan Darah</TableCell>
+                <TableCell sx={{ color: 'common.white', fontWeight: 'bold' }}>No Telepon</TableCell>
+                <TableCell sx={{ color: 'common.white', fontWeight: 'bold' }}>Status</TableCell>
+                <TableCell sx={{ color: 'common.white', fontWeight: 'bold' }}>Aksi</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredKaryawans.map((karyawan) => (
+                <TableRow
+                  key={karyawan.id_karyawan}
+                  sx={{ bgcolor: karyawan.index % 2 === 0 ? 'grey.50' : 'common.white' }}
                 >
-                  Tutup
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+                  <TableCell>{karyawan.id_karyawan}</TableCell>
+                  <TableCell>{karyawan.nama_lengkap}</TableCell>
+                  <TableCell>{karyawan.tempat_lahir}</TableCell>
+                  <TableCell>
+                    {new Date(karyawan.tanggal_lahir).toLocaleDateString("id-ID", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })}
+                  </TableCell>
+                  <TableCell>{karyawan.jenis_kelamin}</TableCell>
+                  <TableCell>{karyawan.golongan_darah}</TableCell>
+                  <TableCell>{karyawan.no_telepon}</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold', color: karyawan.status === "Aktif" ? 'success.main' : 'error.main' }}>
+                    {karyawan.status}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      onClick={() => setSelectedKaryawan(karyawan)}
+                      sx={{ marginRight: 1 }}
+                    >
+                      Detail
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color={karyawan.status === "Aktif" ? "warning" : "secondary"}
+                      startIcon={karyawan.status === "Aktif" ? <BlockRoundedIcon /> : <CheckCircleOutlineIcon />}
+                      onClick={() =>
+                        updateStatusKaryawan(
+                          karyawan.id_karyawan,
+                          karyawan.status === "Aktif" ? "Nonaktif" : "Aktif"
+                        )
+                      }
+                    >
+                      {karyawan.status === "Aktif" ? "Nonaktifkan" : "Aktifkan"}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filteredKaryawans.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={9} align="center">
+                    Tidak ada karyawan yang ditemukan.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <Modal
+          open={!!selectedKaryawan}
+          onClose={closePopup}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 400,
+              bgcolor: isDarkMode ? 'grey.800' : 'background.paper',
+              color: isDarkMode ? 'common.white' : 'text.primary',
+              border: '2px solid #000',
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            <Typography id="modal-modal-title" variant="h6" component="h2" mb={3}>
+              Detail Karyawan
+              <IconButton aria-label="close" onClick={closePopup} sx={{ position: 'absolute', right: 8, top: 8 }}>
+                <CloseIcon />
+              </IconButton>
+            </Typography>
+            <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
+              <Avatar
+                alt={selectedKaryawan?.nama_lengkap}
+                src={selectedKaryawan?.foto || "https://via.placeholder.com/150"}
+                sx={{ width: 100, height: 100, mb: 2 }}
+              />
+              <Typography><strong>Nama:</strong> {selectedKaryawan?.nama_lengkap}</Typography>
+              <Typography><strong>Alamat:</strong> {selectedKaryawan?.alamat || "-"}</Typography>
+              <Typography><strong>Jenis Kelamin:</strong> {selectedKaryawan?.jenis_kelamin}</Typography>
+              <Typography><strong>Golongan Darah:</strong> {selectedKaryawan?.golongan_darah}</Typography>
+              <Typography><strong>No Telepon:</strong> {selectedKaryawan?.no_telepon}</Typography>
+              <Typography><strong>Status:</strong> {selectedKaryawan?.status}</Typography>
+            </Box>
+            <Box textAlign="right">
+              <Button variant="contained" color="error" onClick={closePopup}>
+                Tutup
+              </Button>
+            </Box>
+          </Box>
+        </Modal>
+      </Box>
+    </Box>
   );
 };
 
