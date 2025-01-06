@@ -1,14 +1,15 @@
 import { useTheme } from "../../ThemeContext";
-import React, {useState} from 'react'
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function SideBar() {
-    const { isDarkMode, toggleTheme } = useTheme();
-    const navigate = useNavigate();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { isDarkMode, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState(""); // State untuk menu aktif
 
-    const themeClasses = isDarkMode
+  const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
     : "bg-white text-gray-900";
   const sidebarClasses = isDarkMode
@@ -27,7 +28,10 @@ function SideBar() {
         } h-screen ${sidebarClasses} p-5 transition-all duration-300`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between" onClick={() => navigate('/karyawan')}>
+        <div
+          className="flex items-center justify-between"
+          onClick={() => navigate("/karyawan")}
+        >
           {isSidebarOpen && (
             <div className="flex items-center space-x-3">
               <img
@@ -75,22 +79,37 @@ function SideBar() {
         {/* Menu Items */}
         <ul className="space-y-4">
           <li
-            className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer ${buttonClasses}`}
-            onClick={() => navigate("/karyawan/listBarang")}
+            className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer ${
+              activeMenu === "listBarang" ? buttonClasses : "hover:" + buttonClasses
+            }`}
+            onClick={() => {
+              setActiveMenu("listBarang");
+              navigate("/karyawan/listBarang");
+            }}
           >
             <span>🏠</span>
             {isSidebarOpen && <span>List Barang</span>}
           </li>
           <li
-            className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer hover:${buttonClasses}`}
-            onClick={() => navigate("/karyawan/keranjang")}
+            className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer ${
+              activeMenu === "keranjang" ? buttonClasses : "hover:" + buttonClasses
+            }`}
+            onClick={() => {
+              setActiveMenu("keranjang");
+              navigate("/karyawan/keranjang");
+            }}
           >
             <span>📦</span>
             {isSidebarOpen && <span>Keranjang</span>}
           </li>
           <li
-            className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer hover:${buttonClasses}`}
-            onClick={() => navigate("/karyawan/cekStockGudang")}
+            className={`flex items-center space-x-3 p-3 rounded-md cursor-pointer ${
+              activeMenu === "cekStockGudang" ? buttonClasses : "hover:" + buttonClasses
+            }`}
+            onClick={() => {
+              setActiveMenu("cekStockGudang");
+              navigate("/karyawan/cekStockGudang");
+            }}
           >
             <span>↩️</span>
             {isSidebarOpen && <span>Cek Stock Gudang</span>}
@@ -106,7 +125,7 @@ function SideBar() {
         </button>
       </div>
     </div>
-  )
+  );
 }
 
-export default SideBar
+export default SideBar;

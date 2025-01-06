@@ -1,23 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
+import {
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  CardMedia,
+  Typography,
+  Button,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
 
-function List_barang_kariawan() {
+function ListBarangKaryawan() {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const themeClasses = isDarkMode
-    ? "bg-gray-900 text-white"
-    : "bg-gray-100 text-gray-900";
-  const cardClasses = isDarkMode
-    ? "bg-gray-800 text-white"
-    : "bg-white text-gray-900";
-  const buttonClasses = isDarkMode
-    ? "bg-green-600 hover:bg-green-700"
-    : "bg-green-500 hover:bg-green-600";
+  const cardStyles = {
+    backgroundColor: isDarkMode ? "#424242" : "#fff",
+    color: isDarkMode ? "#fff" : "#000",
+  };
+
+  const buttonStyles = {
+    backgroundColor: isDarkMode ? "#66bb6a" : "#4caf50",
+    '&:hover': {
+      backgroundColor: isDarkMode ? "#388e3c" : "#388e3c",
+    },
+  };
+
+  const textColor = {
+    color: isDarkMode ? "#fff" : "#000",
+  };
 
   // Fetch products from backend
   useEffect(() => {
@@ -49,19 +66,19 @@ function List_barang_kariawan() {
         },
         body: JSON.stringify({
           idBarang: product._id,
-          Id_product: product._id, // Tambahkan properti ini
+          Id_product: product._id,
           namaBarang: product.Nama_product,
-          totalProduct: 1, // Jumlah awal
+          totalProduct: 1,
           harga: product.Harga,
-          photo: product.Photo_product || "", // Pastikan property sesuai
+          photo: product.Photo_product || "",
         }),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to add product to cart");
       }
-  
+
       const data = await response.json();
       alert(data.message || "Product successfully added to cart");
     } catch (error) {
@@ -69,46 +86,69 @@ function List_barang_kariawan() {
       alert("An error occurred while adding product to the cart");
     }
   };
-  
 
   return (
-    <div className={`flex flex-col h-screen ${themeClasses}`}>
-      <div className={`w-full p-6 ${isDarkMode ? "bg-gray-800" : "bg-blue-50"}`}>
-        <h1 className="text-2xl font-bold text-blue-600 mb-6">List Barang</h1>
-        {loading && <p className="text-gray-500">Loading...</p>}
-        {error && <p className="text-red-500">{error}</p>}
-        {!loading && !error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <div
-                key={product._id}
-                className={`rounded-lg shadow-lg p-4 flex flex-col items-center ${cardClasses}`}
-              >
+    <div
+      style={{
+        backgroundColor: isDarkMode ? "#303030" : "#f5f5f5",
+        minHeight: "100vh",
+        padding: "16px",
+      }}
+    >
+      <Typography
+        variant="h4"
+        style={{
+          color: isDarkMode ? "#bbdefb" : "#1976d2",
+          marginBottom: "16px",
+          ...textColor,
+        }}
+      >
+        List Barang
+      </Typography>
+      {loading && <CircularProgress color={isDarkMode ? "secondary" : "primary"} />}
+      {error && <Alert severity="error" style={textColor}>{error}</Alert>}
+      {!loading && !error && (
+        <Grid container spacing={3}>
+          {products.map((product) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={product._id}>
+              <Card style={cardStyles}>
                 {product.Photo_product ? (
-                   <img
-                   src={`http://localhost:3000/uploads/product/${product.Photo_product}`}
-                   alt={product.Nama_product}
-                   className="w-full h-64 object-cover mb-4"
-                 />
+                  <CardMedia
+                    component="img"
+                    height="140"
+                    image={`http://localhost:3000/uploads/product/${product.Photo_product}`}
+                    alt={product.Nama_product}
+                  />
                 ) : (
-                  <div className="w-full h-40 bg-gray-300 rounded-lg mb-4"></div>
+                  <div style={{ height: "140px", backgroundColor: "#e0e0e0" }} />
                 )}
-                <h2 className="text-lg font-semibold text-center">{product.Nama_product}</h2>
-                <p className="text-center">Rp. {product.Harga}</p>
-                <p className="text-center">Stock: {product.Stock_barang}</p>
-                <button
-                  onClick={() => addToCart(product)}
-                  className={`mt-4 px-6 py-2 text-white rounded-lg shadow ${buttonClasses}`}
-                >
-                  Add to Cart
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+                <CardContent>
+                  <Typography variant="h6" component="div" style={textColor}>
+                    {product.Nama_product}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" style={textColor}>
+                    Rp. {product.Harga}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" style={textColor}>
+                    Stock: {product.Stock_barang}
+                  </Typography>
+                </CardContent>
+                <CardActions>
+                  <Button
+                    style={buttonStyles}
+                    variant="contained"
+                    onClick={() => addToCart(product)}
+                  >
+                    Add to Cart
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </div>
   );
 }
 
-export default List_barang_kariawan;
+export default ListBarangKaryawan;

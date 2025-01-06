@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "../ThemeContext"; // Import ThemeContext
+import { useTheme } from "../ThemeContext";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  TableContainer,
+  Paper,
+  Button,
+  Typography,
+} from "@mui/material";
 
 function Keranjang() {
   const navigate = useNavigate();
@@ -9,18 +20,7 @@ function Keranjang() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const themeClasses = isDarkMode
-    ? "bg-gray-900 text-white"
-    : "bg-gray-100 text-gray-900";
-  const tableHeaderClasses = isDarkMode
-    ? "bg-gray-700 text-white"
-    : "bg-blue-500 text-white";
-  const tableRowClasses = isDarkMode
-    ? "bg-gray-800 hover:bg-gray-700"
-    : "bg-blue-100 hover:bg-blue-200";
-  const cardClasses = isDarkMode
-    ? "bg-gray-800 text-white"
-    : "bg-white text-gray-900";
+  const textColor = isDarkMode ? "white" : "black";
 
   // Fetch cart items from backend
   useEffect(() => {
@@ -56,7 +56,9 @@ function Keranjang() {
 
       setCartItems((prevItems) =>
         prevItems.map((item) =>
-          item._id === id ? { ...item, totalProduct: newQuantity, totalBelanja: newQuantity * item.harga } : item
+          item._id === id
+            ? { ...item, totalProduct: newQuantity, totalBelanja: newQuantity * item.harga }
+            : item
         )
       );
     } catch (error) {
@@ -86,102 +88,107 @@ function Keranjang() {
   );
 
   return (
-    <div className={`flex h-screen ${themeClasses}`}>
-      {/* Main Content */}
-      <main className={`flex-1 p-6 ${themeClasses}`}>
-        <div className={`p-4 shadow-md rounded-lg ${cardClasses}`}>
-          <h1 className="text-2xl font-bold">Keranjang</h1>
+    <div
+      style={{
+        backgroundColor: isDarkMode ? "#121212" : "#f5f5f5",
+        color: textColor,
+        minHeight: "100vh",
+        padding: "16px",
+      }}
+    >
+      <Typography variant="h4" gutterBottom>
+        Keranjang
+      </Typography>
 
-          {loading && <p>Loading...</p>}
-          {error && <p className="text-red-500">{error}</p>}
+      {loading && <Typography>Loading...</Typography>}
+      {error && <Typography color="error">{error}</Typography>}
 
-          {!loading && !error && cartItems.length === 0 && (
-            <p className="text-gray-500 mt-4">Keranjang kosong</p>
-          )}
+      {!loading && !error && cartItems.length === 0 && (
+        <Typography>Keranjang kosong</Typography>
+      )}
 
-          {!loading && !error && cartItems.length > 0 && (
-            <>
-              <table className="w-full mt-4 text-center border-collapse">
-                <thead className={tableHeaderClasses}>
-                  <tr>
-                    <th className="px-4 py-2 border">No</th>
-                    <th className="px-4 py-2 border">ID Barang</th>
-                    <th className="px-4 py-2 border">Nama Barang</th>
-                    <th className="px-4 py-2 border">Jumlah</th>
-                    <th className="px-4 py-2 border">Foto</th>
-                    <th className="px-4 py-2 border">Harga</th>
-                    <th className="px-4 py-2 border">Total</th>
-                    <th className="px-4 py-2 border">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cartItems.map((item, index) => (
-                    <tr key={item._id} className={tableRowClasses}>
-                      <td className="px-4 py-2 border">{index + 1}</td>
-                      <td className="px-4 py-2 border">{item.Id_product}</td>
-                      <td className="px-4 py-2 border">{item.namaBarang}</td>
-                      <td className="px-4 py-2 border">
-                        <div className="flex items-center justify-center space-x-2">
-                          <button
-                            className="px-2 py-1 bg-red-500 text-white rounded"
-                            onClick={() =>
-                              updateCartItem(item._id, Math.max(item.totalProduct - 1, 1))
-                            }
-                          >
-                            -
-                          </button>
-                          <span>{item.totalProduct}</span>
-                          <button
-                            className="px-2 py-1 bg-green-500 text-white rounded"
-                            onClick={() =>
-                              updateCartItem(item._id, item.totalProduct + 1)
-                            }
-                          >
-                            +
-                          </button>
-                        </div>
-                      </td>
-                      <td className="px-4 py-2 border">
-                        {item.photo ? (
-                          <img
-                            src={item.photo}
-                            alt={item.namaBarang}
-                            className="w-12 h-12 object-cover"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 bg-gray-300"></div>
-                        )}
-                      </td>
-                      <td className="px-4 py-2 border">Rp. {item.harga}</td>
-                      <td className="px-4 py-2 border">Rp. {item.totalBelanja}</td>
-                      <td className="px-4 py-2 border">
-                        <button
-                          className="px-2 py-1 bg-red-600 text-white rounded"
-                          onClick={() => deleteCartItem(item._id)}
-                        >
-                          Hapus
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+      {!loading && !error && cartItems.length > 0 && (
+        <TableContainer component={Paper} style={{ backgroundColor: isDarkMode ? "#333" : "white" }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell style={{ color: textColor }}>No</TableCell>
+                <TableCell style={{ color: textColor }}>ID Barang</TableCell>
+                <TableCell style={{ color: textColor }}>Nama Barang</TableCell>
+                <TableCell style={{ color: textColor }}>Jumlah</TableCell>
+                <TableCell style={{ color: textColor }}>Foto</TableCell>
+                <TableCell style={{ color: textColor }}>Harga</TableCell>
+                <TableCell style={{ color: textColor }}>Total</TableCell>
+                <TableCell style={{ color: textColor }}>Aksi</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {cartItems.map((item, index) => (
+                <TableRow key={item._id}>
+                  <TableCell style={{ color: textColor }}>{index + 1}</TableCell>
+                  <TableCell style={{ color: textColor }}>{item.Id_product}</TableCell>
+                  <TableCell style={{ color: textColor }}>{item.namaBarang}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      size="small"
+                      onClick={() => updateCartItem(item._id, Math.max(item.totalProduct - 1, 1))}
+                    >
+                      -
+                    </Button>
+                    <span style={{ margin: "0 8px", color: textColor }}>{item.totalProduct}</span>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      onClick={() => updateCartItem(item._id, item.totalProduct + 1)}
+                    >
+                      +
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    {item.photo ? (
+                      <img
+                        src={item.photo}
+                        alt={item.namaBarang}
+                        style={{ width: 48, height: 48, objectFit: "cover" }}
+                      />
+                    ) : (
+                      <div style={{ width: 48, height: 48, backgroundColor: "#ccc" }}></div>
+                    )}
+                  </TableCell>
+                  <TableCell style={{ color: textColor }}>Rp. {item.harga}</TableCell>
+                  <TableCell style={{ color: textColor }}>Rp. {item.totalBelanja}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      size="small"
+                      onClick={() => deleteCartItem(item._id)}
+                    >
+                      Hapus
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
-              <div className="mt-4 flex justify-between items-center">
-                <h2 className="text-lg font-bold">
-                  Total Penjualan: Rp. {totalPenjualan}
-                </h2>
-                <button
-                  className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                  onClick={() => navigate("/karyawan/checkOut")}
-                >
-                  Proses
-                </button>
-              </div>
-            </>
-          )}
+      {!loading && !error && cartItems.length > 0 && (
+        <div style={{ marginTop: "16px", display: "flex", justifyContent: "space-between" }}>
+          <Typography variant="h6">Total Penjualan: Rp. {totalPenjualan}</Typography>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => navigate("/karyawan/checkOut")}
+          >
+            Proses
+          </Button>
         </div>
-      </main>
+      )}
     </div>
   );
 }
