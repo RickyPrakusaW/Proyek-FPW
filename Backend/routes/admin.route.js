@@ -1143,12 +1143,19 @@ router.get('/getCustomers', async (req, res) => {
   }
 });
 router.post('/addPenjualan', async (req, res) => {
-  const { customerId, cartId, status } = req.body;
+  const { customerId, cartId, status, metodePembayaran } = req.body;
 
   // Validasi input
-  if (!customerId || !Array.isArray(cartId) || typeof status !== 'boolean') {
+  if (!customerId || !Array.isArray(cartId) || typeof status !== 'boolean' || !metodePembayaran) {
     return res.status(400).json({
-      error: 'Data pelanggan, keranjang, dan status wajib diisi dengan format yang benar.',
+      error: 'Data pelanggan, keranjang, status, dan metode pembayaran wajib diisi dengan format yang benar.',
+    });
+  }
+
+  // Validasi metode pembayaran
+  if (!['cash', 'transfer'].includes(metodePembayaran)) {
+    return res.status(400).json({
+      error: 'Metode pembayaran harus berupa "cash" atau "transfer".',
     });
   }
 
@@ -1194,6 +1201,9 @@ router.post('/addPenjualan', async (req, res) => {
     // Buat nomor invoice unik
     const nomorInvoice = `INV-${Date.now()}`;
 
+    // Format tanggal menggunakan moment.js
+    const formattedDate = moment().format('DD/MM/YYYY, HH:mm:ss');
+
     // Data penjualan yang akan disimpan
     const penjualanData = {
       idPenjualan: `PJ${Date.now()}`,
@@ -1202,9 +1212,10 @@ router.post('/addPenjualan', async (req, res) => {
       namaBarang: carts.map(cart => cart.namaBarang).join(', '),
       totalBarang,
       totalHarga,
-      tanggalPembelian: new Date(),
+      tanggalPembelian: formattedDate, // Gunakan format tanggal yang diperbaiki
       Customer_id: customer._id,
       status,
+      metodePembayaran, // Tambahkan metode pembayaran
     };
 
     // Simpan data penjualan ke database
@@ -1238,6 +1249,7 @@ router.post('/addPenjualan', async (req, res) => {
     });
   }
 });
+
 
 router.get('/getPenjualan', async (req, res) => {
   try {

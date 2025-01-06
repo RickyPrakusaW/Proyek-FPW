@@ -31,6 +31,7 @@ import AddBarangRetur from "./Kepala_Gudang/AddBarangRetur";
 import KaryawanPage from "./KaryawanPage"
 import List_barang_kariawan from "./Kariawan/List_barang_kariawan";
 import CekStockGudang from "./Kariawan/CekStockGudang";
+import Pembayaran from "./Kariawan/Pembayaran";
 //admin
 import Chatadmin from"./Admin/Chat";
 //kepala gudang 
@@ -172,7 +173,11 @@ const router = createBrowserRouter([
       {
         path: "checkOut",
         element: <Checkout/>
-      }
+      },
+      {
+        path: "pembayaran",
+        element: <Pembayaran/>,
+      },
     ]
   }
 ]);

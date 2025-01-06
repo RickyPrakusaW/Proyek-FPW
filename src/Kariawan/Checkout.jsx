@@ -18,7 +18,6 @@ function Checkout() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch data keranjang
   useEffect(() => {
@@ -62,63 +61,12 @@ function Checkout() {
     return true;
   };
 
-  // Handle submit data pelanggan dan pesanan
-  const handleCheckout = async () => {
+  // Navigasi ke halaman pembayaran
+  const handleCheckout = () => {
     if (!validateForm()) return;
 
-    setIsSubmitting(true);
-    try {
-      // Kirim data pelanggan ke backend
-      const customerResponse = await fetch(
-        "http://localhost:3000/api/admin/addCustomer",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      if (!customerResponse.ok) {
-        const errorData = await customerResponse.json();
-        throw new Error(errorData.error || "Gagal menambahkan pelanggan.");
-      }
-
-      const customerData = await customerResponse.json();
-
-      // Kirim data penjualan ke backend
-      const orderResponse = await fetch(
-        "http://localhost:3000/api/admin/addPenjualan",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            customerId: customerData.data._id, // ID pelanggan dari backend
-            cartId: cartItems.map((item) => item._id), // Kirim ID cart item
-            status: true, // Contoh status penjualan
-          }),
-        }
-      );
-
-      if (!orderResponse.ok) {
-        const errorData = await orderResponse.json();
-        throw new Error(errorData.error || "Gagal menyelesaikan penjualan.");
-      }
-
-      const orderData = await orderResponse.json();
-      console.log("Order Response:", orderData);
-
-      // Redirect ke halaman pembayaran
-      navigate("/Pembayaran");
-    } catch (err) {
-      console.error("Error saat checkout:", err);
-      alert(err.message);
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Navigasi ke halaman pembayaran dengan data pelanggan dan keranjang
+    navigate("/karyawan/pembayaran", { state: { totalBelanja, formData, cartItems } });
   };
 
   return (
@@ -178,13 +126,10 @@ function Checkout() {
 
           <div className="mt-6 text-right">
             <button
-              className={`px-6 py-3 text-white rounded-lg ${
-                isSubmitting ? "bg-gray-400" : "bg-green-500 hover:bg-green-600"
-              }`}
+              className="px-6 py-3 text-white rounded-lg bg-green-500 hover:bg-green-600"
               onClick={handleCheckout}
-              disabled={isSubmitting}
             >
-              {isSubmitting ? "Proses..." : "Pembayaran"}
+              Pembayaran
             </button>
           </div>
         </div>
