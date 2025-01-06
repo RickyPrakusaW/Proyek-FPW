@@ -103,45 +103,50 @@ const initializeAdmin = async () => {
 };
 
 initializeAdmin();
-
-// Login Route
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Cek apakah email ada di koleksi Admin
-    const admin = await Admin.findOne({ Email: email });
+    // Validasi input
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email dan password wajib diisi' });
+    }
+
+    const normalizedEmail = email.toLowerCase();
+
+    // Cek di koleksi Admin
+    const admin = await Admin.findOne({ Email: normalizedEmail });
     if (admin) {
-      const isPasswordValid = await bcrypt.compare(password, admin.Password);
-      if (!isPasswordValid) {
+      if (password !== admin.Password) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
       return res.status(200).json({ message: 'Selamat datang Admin', role: 'admin' });
     }
 
-    // Jika bukan admin, cek di koleksi Karyawan
-    const karyawan = await Karyawan.findOne({ email: email });
+    // Cek di koleksi Karyawan
+    const karyawan = await Karyawan.findOne({ email: normalizedEmail });
     if (karyawan) {
-      // Pastikan akun karyawan aktif
-      if (!karyawan.status) {
-        return res.status(401).json({ message: 'Akun Anda telah dinonaktifkan' });
+      if (karyawan.status !== 'Aktif') {
+        return res.status(403).json({ message: 'Akun Anda telah dinonaktifkan' });
       }
 
-      const isPasswordValid = await bcrypt.compare(password, karyawan.password);
-      if (!isPasswordValid) {
+      if (password !== karyawan.password) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
       return res.status(200).json({ message: `Halo, ${karyawan.nama_lengkap}!`, role: 'karyawan' });
     }
 
-    // Jika email tidak ditemukan di kedua koleksi
-    res.status(404).json({ message: 'User not found' });
+    // Jika email tidak ditemukan
+    return res.status(404).json({ message: 'User not found' });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
+
 
 
 router.put('/update', async (req, res) => {
@@ -180,7 +185,7 @@ router.put('/update', async (req, res) => {
 // untuk multer
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Route untuk menambahkan Karyawan
+// Route untuk menambahkan Karyawan tanpa hashing
 router.post('/addKaryawan', uploadKaryawan, async (req, res) => {
   try {
     const {
@@ -192,8 +197,8 @@ router.post('/addKaryawan', uploadKaryawan, async (req, res) => {
       alamat,
       no_telepon,
       agama,
-      email, // Tambahkan email
-      password, // Password
+      email,
+      password, // Password langsung
     } = req.body;
 
     const foto_ktp = req.file?.filename;
@@ -207,8 +212,8 @@ router.post('/addKaryawan', uploadKaryawan, async (req, res) => {
       !alamat ||
       !no_telepon ||
       !agama ||
-      !email || // Validasi email
-      !password // Validasi password
+      !email ||
+      !password
     ) {
       return res.status(400).json({ error: 'Semua field wajib diisi!' });
     }
@@ -225,13 +230,12 @@ router.post('/addKaryawan', uploadKaryawan, async (req, res) => {
       return res.status(400).json({ error: 'Email sudah digunakan!' });
     }
 
-    // Hash password sebelum menyimpan ke database
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    // Generate ID Karyawan baru
     const lastKaryawan = await Karyawan.findOne().sort({ id_karyawan: -1 });
     const lastId = lastKaryawan ? lastKaryawan.id_karyawan : 'K000';
     const newId = `K${String(parseInt(lastId.substring(1)) + 1).padStart(3, '0')}`;
 
+    // Simpan data karyawan tanpa hashing password
     const newKaryawan = new Karyawan({
       id_karyawan: newId,
       nama_lengkap,
@@ -242,9 +246,9 @@ router.post('/addKaryawan', uploadKaryawan, async (req, res) => {
       alamat,
       no_telepon,
       agama,
-      email, // Simpan email
+      email,
       foto_ktp,
-      password: hashedPassword, // Simpan password yang sudah di-hash
+      password, // Simpan password langsung
     });
 
     const savedKaryawan = await newKaryawan.save();
@@ -254,6 +258,7 @@ router.post('/addKaryawan', uploadKaryawan, async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+
 router.put('/updateKaryawan/:id', uploadKaryawan, async (req, res) => {
   try {
     const { id } = req.params; // Ambil id_karyawan dari parameter URL
