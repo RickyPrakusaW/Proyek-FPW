@@ -213,7 +213,12 @@ const ListBarangAdmin = () => {
         >
           <Button
             variant="contained"
-            color="primary"
+            sx={{
+              bgcolor: "red",
+              "&:hover": {
+                bgcolor: "darkred",
+              },
+            }}
             onClick={handleClosePopup}
             fullWidth
           >

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTheme } from "../ThemeContext";
+import { Grid, Card, Typography, CircularProgress, Box } from "@mui/material";
 
 const Homekepalagudang = () => {
   const { isDarkMode } = useTheme();
@@ -29,72 +30,98 @@ const Homekepalagudang = () => {
   }, []);
 
   return (
-    <div
-      className={`min-h-screen ${
-        isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900"
-      } flex flex-col p-5 transition-colors duration-300`}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: isDarkMode ? "#121212" : "#fff",
+        color: isDarkMode ? "#fff" : "#000",
+        p: 3,
+        transition: "background-color 0.3s ease, color 0.3s ease",
+      }}
     >
       {/* Main Content Section */}
-      <div className="flex-1 p-5 space-y-5">
+      <Box sx={{ flex: 1, p: 3 }}>
         {/* Cards Section */}
-        <div className="grid grid-cols-3 gap-5">
-          <div
-            className={`${
-              isDarkMode ? "bg-blue-600 text-white" : "bg-blue-300 text-black"
-            } p-5 rounded-md text-center`}
-          >
-            <h3 className="text-xl font-semibold ">Total Barang Keluar</h3>
-            <p className="text-2xl font-bold">
-              {barangData.reduce(
-                (total, barang) => total + (barang.total_barang || 0),
-                0
-              )}{" "}
-              Karung
-            </p>
-          </div>
-          <div
-            className={`${
-              isDarkMode ? "bg-blue-600 text-white" : "bg-blue-300 text-black"
-            } p-5 rounded-md text-center`}
-          >
-            <h3 className="text-xl font-semibold">Total Barang</h3>
-            <p className="text-2xl font-bold">{barangData.length} Barang</p>
-          </div>
-        </div>
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={4}>
+            <Card
+              sx={{
+                backgroundColor: isDarkMode ? "#1976d2" : "#64b5f6",
+                textAlign: "center",
+                p: 3,
+              }}
+            >
+              <Typography variant="h6" fontWeight="bold">
+                Total Barang Keluar
+              </Typography>
+              <Typography variant="h4" fontWeight="bold">
+                {barangData.reduce(
+                  (total, barang) => total + (barang.total_barang || 0),
+                  0
+                )}{" "}
+                Karung
+              </Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Card
+              sx={{
+                backgroundColor: isDarkMode ? "#1976d2" : "#64b5f6",
+                textAlign: "center",
+                p: 3,
+              }}
+            >
+              <Typography variant="h6" fontWeight="bold">
+                Total Barang
+              </Typography>
+              <Typography variant="h4" fontWeight="bold">
+                {barangData.length} Barang
+              </Typography>
+            </Card>
+          </Grid>
+        </Grid>
 
         {/* Barang Cards Section */}
         {isLoading ? (
-          <p>Loading data...</p>
+          <Box sx={{ textAlign: "center", mt: 4 }}>
+            <CircularProgress />
+          </Box>
         ) : error ? (
-          <p className="text-red-500">{error}</p>
+          <Typography color="error">{error}</Typography>
         ) : (
-          <div className="grid grid-cols-3 gap-5">
+          <Grid container spacing={3} sx={{ mt: 4 }}>
             {barangData.map((barang, index) => (
-              <div
-                key={barang.Id_barang_keluar || index} // Use unique ID for key
-                className={`${
-                  isDarkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-black"
-                } p-5 rounded-md text-center transition-colors`}
-              >
-                <h4 className="text-lg font-bold">{barang.Nama_barang}</h4>
-                <p className="text-sm">ID: {barang.Id_barang_keluar}</p>
-                <p className="text-sm">Tipe: {barang.Tipe_barang}</p>
-                <p className="text-sm">Jumlah: {barang.Total_barang} Karung</p>
-                <p className="text-sm">Tanggal Keluar: {barang.Tanggal_keluar}</p>
-                {/* Optionally, display a photo */}
-                {barang.Photo_barang_keluar && (
-                  <img
-                    src={barang.Photo_barang_keluar}
-                    alt={barang.Nama_barang}
-                    className="mt-2 w-full h-auto rounded-md"
-                  />
-                )}
-              </div>
+              <Grid item xs={12} sm={4} key={barang.Id_barang_keluar || index}>
+                <Card
+                  sx={{
+                    backgroundColor: isDarkMode ? "#424242" : "#f5f5f5",
+                    p: 3,
+                    textAlign: "center",
+                    transition: "background-color 0.3s ease",
+                  }}
+                >
+                  <Typography variant="h6" fontWeight="bold">
+                    {barang.Nama_barang}
+                  </Typography>
+                  <Typography variant="body2">ID: {barang.Id_barang_keluar}</Typography>
+                  <Typography variant="body2">Tipe: {barang.Tipe_barang}</Typography>
+                  <Typography variant="body2">Jumlah: {barang.Total_barang} Karung</Typography>
+                  <Typography variant="body2">Tanggal Keluar: {barang.Tanggal_keluar}</Typography>
+                  {/* Optionally, display a photo */}
+                  {barang.Photo_barang_keluar && (
+                    <img
+                      src={barang.Photo_barang_keluar}
+                      alt={barang.Nama_barang}
+                      style={{ width: "100%", height: "auto", borderRadius: "8px", marginTop: "16px" }}
+                    />
+                  )}
+                </Card>
+              </Grid>
             ))}
-          </div>
+          </Grid>
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
