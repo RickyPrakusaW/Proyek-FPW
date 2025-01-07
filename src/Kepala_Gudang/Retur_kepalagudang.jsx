@@ -14,13 +14,31 @@ import {
   TableRow,
   Paper,
   Avatar,
+  Snackbar,
+  Alert,
+  Tooltip,
 } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PendingIcon from "@mui/icons-material/Pending";
+import AddIcon from "@mui/icons-material/Add";
+import { styled } from "@mui/system";
+
+// Perbaikan StyledTableRow
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:hover": {
+    backgroundColor: theme.palette.mode === "dark" ? "#0d47a1" : "#003f6e", // Warna hover berdasarkan mode
+    transition: "background-color 0.3s ease",
+  },
+}));
 
 const ReturAdmin = () => {
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
 
   const [returData, setReturData] = useState([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   useEffect(() => {
     const fetchReturData = async () => {
@@ -31,6 +49,9 @@ const ReturAdmin = () => {
         setReturData(response.data.data);
       } catch (error) {
         console.error("Error fetching retur data:", error);
+        setSnackbarMessage("Gagal memuat data retur");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
       }
     };
 
@@ -50,9 +71,19 @@ const ReturAdmin = () => {
         "http://localhost:3000/api/admin/getReturGudang"
       );
       setReturData(response.data.data);
+      setSnackbarMessage("Status retur berhasil disetujui");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
     } catch (error) {
       console.error("Error approving retur:", error);
+      setSnackbarMessage("Gagal menyetujui retur");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   const textColor = isDarkMode ? "white" : "black";
@@ -81,13 +112,14 @@ const ReturAdmin = () => {
           </Typography>
           <Button
             variant="contained"
+            startIcon={<AddIcon />}
             sx={{
               backgroundColor: "green",
               "&:hover": { backgroundColor: "darkgreen" },
             }}
             onClick={() => navigate("/kepalagudang/addBarangRetur")}
           >
-            + Barang
+            Tambah Barang
           </Button>
         </Box>
 
@@ -95,6 +127,8 @@ const ReturAdmin = () => {
           component={Paper}
           sx={{
             backgroundColor: bgColor,
+            borderRadius: 2,
+            boxShadow: 3,
           }}
         >
           <Table>
@@ -125,47 +159,27 @@ const ReturAdmin = () => {
                 <TableCell align="center" sx={{ color: textColor }}>
                   Status
                 </TableCell>
-            
+                {/* <TableCell align="center" sx={{ color: textColor }}>
+                  Aksi
+                </TableCell> */}
               </TableRow>
             </TableHead>
             <TableBody>
               {returData.map((retur, index) => (
-                <TableRow
-                  key={retur.idReturGudang}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: isDarkMode ? "#1565c0" : "#e3f2fd",
-                    },
-                  }}
-                >
-                  <TableCell
-                    align="center"
-                    sx={{ color: isDarkMode ? "white" : "black" }}
-                  >
+                <StyledTableRow key={retur.idReturGudang}>
+                  <TableCell align="center" sx={{ color: textColor }}>
                     {index + 1}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{ color: isDarkMode ? "white" : "black" }}
-                  >
+                  <TableCell align="center" sx={{ color: textColor }}>
                     {retur.id_barang}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{ color: isDarkMode ? "white" : "black" }}
-                  >
+                  <TableCell align="center" sx={{ color: textColor }}>
                     {retur.namaBarang}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{ color: isDarkMode ? "white" : "black" }}
-                  >
+                  <TableCell align="center" sx={{ color: textColor }}>
                     {retur.jumlahBarang}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{ color: isDarkMode ? "white" : "black" }}
-                  >
+                  <TableCell align="center" sx={{ color: textColor }}>
                     {new Date(retur.tanggal).toLocaleDateString()}
                   </TableCell>
                   <TableCell align="center">
@@ -176,19 +190,49 @@ const ReturAdmin = () => {
                       sx={{ width: 56, height: 56, mx: "auto" }}
                     />
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    sx={{ color: isDarkMode ? "white" : "black" }}
-                  >
-                    {retur.status}
+                  <TableCell align="center" sx={{ color: textColor }}>
+                    {retur.status === "approved" ? (
+                      <Tooltip title="Approved">
+                        <CheckCircleIcon sx={{ color: "green" }} />
+                      </Tooltip>
+                    ) : (
+                      <Tooltip title="Pending">
+                        <PendingIcon sx={{ color: "orange" }} />
+                      </Tooltip>
+                    )}
                   </TableCell>
-                  
-                </TableRow>
+                  {/* <TableCell align="center">
+                    {retur.status !== "approved" && (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleApprove(retur.idReturGudang)}
+                      >
+                        Approve
+                      </Button>
+                    )}
+                  </TableCell> */}
+                </StyledTableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
       </Box>
+
+      {/* Snackbar untuk feedback */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
