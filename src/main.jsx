@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Link  } from "react-router-dom";
 import App from "./App";
 import Login from "./Login"
 import HomeAdmin from "./Admin/Home_admin"
@@ -23,7 +23,7 @@ import TotalBarangKeluar from './Kepala_Gudang/Total_barangKeluar'
 import PenjualanToday from './Admin/Penjualan'
 import ProfileAdmin from "./Admin/ProfileAdmin";
 import TotalBarangKeluar2 from "./Admin/TotalBarangKeluar";
-import ReturAdminGudang from "./Admin/Retur_Gudang_Admin"
+import ReturGudang from "./Admin/Retur_Gudang_Admin"
 import DetailBarang from './Admin/DetailBarang'
 import Customer from './Admin/Customer'
 import Detailkariawan from './Admin/Detail_kariawan'
@@ -112,8 +112,8 @@ const router = createBrowserRouter([
         element: <Chatadmin/>
       },
       {
-        path: "ReturAdminGudang",
-        element: <ReturAdminGudang/>
+        path: "ReturGudang",
+        element: <ReturGudang/>
       }
     ]
   },

@@ -211,7 +211,7 @@ const HomeAdmin = () => {
           </div>
           <div
             className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
-            onClick={() => navigate("/Admin/Retur_Gudang_Admin")}
+            onClick={() => navigate("/Admin/ReturGudang")}
           >
             <h3 className="text-xl font-semibold">Retur Gudang</h3>
             
