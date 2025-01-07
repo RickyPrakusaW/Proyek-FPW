@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
 import {
@@ -9,40 +9,81 @@ import {
   Avatar,
   Card,
   CardContent,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 function Profile() {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
-  const [oldEmail, setOldEmail] = useState("");
-  const [oldPassword, setOldPassword] = useState("");
+  const [profile, setProfile] = useState({
+    nama_lengkap: "",
+    id_karyawan: "",
+    email: "",
+    password: "",
+  });
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState("");
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const textColor = isDarkMode ? "#ffffff" : "#000000";
   const cardBgColor = isDarkMode ? "#424242" : "#ffffff";
   const backgroundColor = isDarkMode ? "#303030" : "#f5f5f5";
 
+  // Fetch data user saat halaman dimuat
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      if (!user) {
+        setError("Tidak ada pengguna yang login.");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/admin/profile/${user.email}`
+        );
+        const data = await response.json();
+
+        if (response.ok) {
+          setProfile(data);
+        } else {
+          setError(data.message || "Gagal mengambil data profil.");
+        }
+      } catch (error) {
+        setError("Terjadi kesalahan pada server.");
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
   const handlePasswordChange = async () => {
-    if (!oldEmail || !oldPassword || !newEmail || !newPassword) {
+    if (!profile.email || !profile.password || !newEmail || !newPassword) {
       setError("Semua field wajib diisi!");
       return;
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/admin/updatePassword", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          oldEmail,
-          oldPassword,
-          newEmail,
-          newPassword,
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:3000/api/admin/updatePassword",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            oldEmail: profile.email,
+            oldPassword: profile.password,
+            newEmail,
+            newPassword,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -57,11 +98,14 @@ function Profile() {
     }
   };
 
+  const handleToggleOldPassword = () => setShowOldPassword(!showOldPassword);
+  const handleToggleNewPassword = () => setShowNewPassword(!showNewPassword);
+
   return (
     <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", backgroundColor }}>
       {/* Header */}
       <Box sx={{ bgcolor: "blue", color: "white", p: 2, textAlign: "center" }}>
-        <Typography variant="h5">Selamat Datang Admin</Typography>
+        <Typography variant="h5">Selamat Datang {profile.nama_lengkap || "User"}</Typography>
       </Box>
 
       <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -85,10 +129,10 @@ function Profile() {
               />
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: "bold", color: textColor }}>
-                  Tiok Richie
+                  {profile.nama_lengkap || "User"}
                 </Typography>
                 <Typography variant="body2" sx={{ color: isDarkMode ? "#cccccc" : "#666666" }}>
-                  000000
+                  {profile.id_karyawan || "000000"}
                 </Typography>
               </Box>
             </Box>
@@ -102,29 +146,36 @@ function Profile() {
                 label="Email Lama"
                 variant="outlined"
                 fullWidth
-                value={oldEmail}
-                onChange={(e) => setOldEmail(e.target.value)}
+                value={profile.email}
                 InputLabelProps={{ style: { color: textColor } }}
                 InputProps={{
+                  readOnly: true,
                   style: {
                     color: textColor,
-                    backgroundColor: isDarkMode ? "#616161" : "#ffffff",
+                    backgroundColor: isDarkMode ? "#616161" : "#f0f0f0",
                   },
                 }}
               />
               <TextField
                 label="Password Lama"
-                type="password"
+                type={showOldPassword ? "text" : "password"}
                 variant="outlined"
                 fullWidth
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
+                value={profile.password}
                 InputLabelProps={{ style: { color: textColor } }}
                 InputProps={{
+                  readOnly: true,
                   style: {
                     color: textColor,
-                    backgroundColor: isDarkMode ? "#616161" : "#ffffff",
+                    backgroundColor: isDarkMode ? "#616161" : "#f0f0f0",
                   },
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleToggleOldPassword} edge="end">
+                        {showOldPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
                 }}
               />
               <TextField
@@ -133,27 +184,22 @@ function Profile() {
                 fullWidth
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
-                InputLabelProps={{ style: { color: textColor } }}
-                InputProps={{
-                  style: {
-                    color: textColor,
-                    backgroundColor: isDarkMode ? "#616161" : "#ffffff",
-                  },
-                }}
               />
               <TextField
                 label="Password Baru"
-                type="password"
+                type={showNewPassword ? "text" : "password"}
                 variant="outlined"
                 fullWidth
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                InputLabelProps={{ style: { color: textColor } }}
                 InputProps={{
-                  style: {
-                    color: textColor,
-                    backgroundColor: isDarkMode ? "#616161" : "#ffffff",
-                  },
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleToggleNewPassword} edge="end">
+                        {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
                 }}
               />
               {error && (
@@ -177,11 +223,6 @@ function Profile() {
             </Box>
           </CardContent>
         </Card>
-      </Box>
-
-      {/* Footer */}
-      <Box sx={{ bgcolor: "blue", color: "white", p: 2, textAlign: "center" }}>
-        <Typography variant="body2">Proyek FPW 2025</Typography>
       </Box>
     </Box>
   );

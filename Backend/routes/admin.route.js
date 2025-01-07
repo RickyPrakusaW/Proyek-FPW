@@ -108,22 +108,21 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Validasi input
     if (!email || !password) {
       return res.status(400).json({ message: 'Email dan password wajib diisi' });
     }
 
     const normalizedEmail = email.toLowerCase();
 
-    // Check if the user is an admin
-    const admin = await Admin.findOne({ Email: normalizedEmail });
-    if (admin) {
-      if (password !== admin.Password) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
-      return res.status(200).json({ message: 'Selamat datang Admin', role: 'admin' });
+    // Hardcoded admin dan kepala gudang
+    if (normalizedEmail === "admin" && password === "admin") {
+      return res.status(200).json({ email: "admin@company.com", role: "admin", nama_lengkap: "Admin" });
+    } else if (normalizedEmail === "thio" && password === "thio") {
+      return res.status(200).json({ email: "kepala@company.com", role: "kepala_gudang", nama_lengkap: "Thio" });
     }
 
-    // Check if the user is a karyawan (employee)
+    // Cek di koleksi Karyawan
     const karyawan = await Karyawan.findOne({ email: normalizedEmail });
     if (karyawan) {
       if (karyawan.status !== 'Aktif') {
@@ -134,11 +133,12 @@ router.post('/login', async (req, res) => {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
+      // Berhasil login
       return res.status(200).json({
-        message: `Halo, ${karyawan.nama_lengkap}!`,
-        role: 'karyawan',
+        id_karyawan: karyawan.id_karyawan,
         nama_lengkap: karyawan.nama_lengkap,
-        foto_ktp: karyawan.foto_ktp, // return photo URL
+        email: karyawan.email,
+        role: 'karyawan'
       });
     }
 
@@ -146,6 +146,23 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Endpoint untuk mengambil data profil
+router.get('/profile/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    const karyawan = await Karyawan.findOne({ email }).select('-password');
+
+    if (!karyawan) {
+      return res.status(404).json({ message: 'Profil tidak ditemukan' });
+    }
+
+    res.status(200).json(karyawan);
+  } catch (error) {
+    console.error('Error mengambil profil:', error);
+    res.status(500).json({ message: 'Terjadi kesalahan pada server' });
   }
 });
 
