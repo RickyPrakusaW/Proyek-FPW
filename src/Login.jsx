@@ -15,30 +15,22 @@ const Login = () => {
     setIsLoading(true);
     setErrorMessage("");
 
-    // Hard-coded validation for Admin and Kepala Gudang
-    if (username === "admin" && password === "admin") {
-      navigate("/admin");
-      setIsLoading(false);
-      return;
-    } else if (username === "thio" && password === "thio") {
-      navigate("/kepalagudang");
-      setIsLoading(false);
-      return;
-    }
-
-    // Database validation for Karyawan
     try {
       const response = await axios.post("http://localhost:3000/api/admin/login", {
-        email: username.toLowerCase(), // Normalize email
+        email: username.toLowerCase(),
         password,
       });
 
-      if (response.data.role === "karyawan") {
-        navigate("/karyawan");
-      } else if (response.data.role === "admin") {
-        navigate("/admin");
-      } else {
-        setErrorMessage("Role not recognized");
+      if (response.status === 200) {
+        localStorage.setItem("user", JSON.stringify(response.data));
+
+        if (response.data.role === "karyawan") {
+          navigate("/karyawan");
+        } else if (response.data.role === "admin") {
+          navigate("/admin");
+        } else if (response.data.role === "kepala_gudang") {
+          navigate("/kepalagudang");
+        }
       }
     } catch (error) {
       setErrorMessage(error.response?.data?.message || "Invalid username or password");
@@ -66,20 +58,20 @@ const Login = () => {
               type="text"
               {...register("username", { required: true })}
               placeholder="Enter Username"
-              className="p-2 mb-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="p-2 mb-4 border"
               style={{ borderRadius: "12px" }}
             />
             <input
               type="password"
               {...register("password", { required: true })}
               placeholder="Password"
-              className="p-2 mb-4 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="p-2 mb-4 border"
               style={{ borderRadius: "12px" }}
             />
             <button
               type="submit"
               disabled={isLoading}
-              className={`bg-green-500 text-white py-2 font-semibold hover:bg-green-600 ${
+              className={`bg-green-500 text-white py-2 ${
                 isLoading ? "opacity-50 cursor-not-allowed" : ""
               }`}
               style={{ borderRadius: "12px" }}
@@ -89,11 +81,7 @@ const Login = () => {
           </form>
         </div>
         <div className="w-1/2 pl-8">
-          <img
-            src={logo}
-            alt="Logo"
-            style={{ borderRadius: "30px" }}
-          />
+          <img src={logo} alt="Logo" style={{ borderRadius: "30px" }} />
         </div>
       </div>
     </div>
