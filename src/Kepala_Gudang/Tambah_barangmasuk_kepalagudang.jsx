@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTheme } from "./../ThemeContext";
 import axios from "axios";
+import { Alert, Snackbar } from "@mui/material"; // Import komponen Alert dan Snackbar
 
 const TambahBarangMasukKepalaGudang = () => {
   const { isDarkMode } = useTheme();
@@ -14,12 +15,13 @@ const TambahBarangMasukKepalaGudang = () => {
   });
   const [photo_barang, setPhotoBarang] = useState(null);
   const [message, setMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false); // State untuk mengontrol Snackbar
 
   // Updated theme classes dengan warna teks yang konsisten
   const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
     : "bg-white text-gray-900";
-    
+
   const formContainerClasses = isDarkMode
     ? "bg-gray-800 text-white"
     : "bg-gray-100 text-gray-900";
@@ -31,10 +33,6 @@ const TambahBarangMasukKepalaGudang = () => {
   const labelClasses = isDarkMode
     ? "block font-medium mb-1 text-white"
     : "block font-medium mb-1 text-gray-900";
-
-  const messageClasses = isDarkMode
-    ? "mb-4 p-3 rounded bg-gray-700 text-white"
-    : "mb-4 p-3 rounded bg-gray-200 text-gray-900";
 
   const buttonBackClasses = isDarkMode
     ? "bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600"
@@ -74,12 +72,17 @@ const TambahBarangMasukKepalaGudang = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:3000/api/admin/addStock", formPayload, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:3000/api/admin/addStock",
+        formPayload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       setMessage(response.data.message || "Stock berhasil ditambahkan");
+      setOpenSnackbar(true); // Buka Snackbar
       setFormData({
         id_barang: "",
         nama_barang: "",
@@ -90,8 +93,15 @@ const TambahBarangMasukKepalaGudang = () => {
       });
       setPhotoBarang(null);
     } catch (error) {
-      setMessage(error.response?.data?.error || "Terjadi kesalahan pada server");
+      setMessage(
+        error.response?.data?.error || "Terjadi kesalahan pada server"
+      );
+      setOpenSnackbar(true); // Buka Snackbar
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false); // Tutup Snackbar
   };
 
   return (
@@ -100,12 +110,6 @@ const TambahBarangMasukKepalaGudang = () => {
         <div className="mb-6">
           <h1 className={titleClasses}>Tambah Barang Masuk</h1>
         </div>
-
-        {message && (
-          <div className={messageClasses}>
-            {message}
-          </div>
-        )}
 
         <form
           onSubmit={handleSubmit}
@@ -147,14 +151,17 @@ const TambahBarangMasukKepalaGudang = () => {
             </div>
             <div>
               <label className={labelClasses}>Tipe Barang</label>
-              <input
-                type="text"
+              <select
                 name="tipe_barang"
                 value={formData.tipe_barang}
                 onChange={handleChange}
-                placeholder="Tipe Barang"
                 className={inputClasses}
-              />
+              >
+                <option value="">Pilih Tipe Barang</option>
+                <option value="Tas_pakaian">Tas Pakaian</option>
+                <option value="Tas_ransel">Tas Ransel</option>
+                <option value="Tas_selempang">Tas Selempang</option>
+              </select>
             </div>
             <div>
               <label className={labelClasses}>Tanggal Masuk</label>
@@ -186,6 +193,21 @@ const TambahBarangMasukKepalaGudang = () => {
           </div>
         </form>
       </div>
+
+      {/* Snackbar untuk menampilkan pesan */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000} // Snackbar akan hilang setelah 6 detik
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={message?.includes("berhasil") ? "success" : "error"} // Tentukan jenis Alert (success/error)
+          sx={{ width: "100%" }}
+        >
+          {message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
