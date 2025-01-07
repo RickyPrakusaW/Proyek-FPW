@@ -1,5 +1,20 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Typography,
+  CircularProgress,
+  Avatar,
+  Alert,
+  Box,
+} from "@mui/material";
 
 function TotalBarangKeluar() {
   const [barangKeluar, setBarangKeluar] = useState([]);
@@ -45,113 +60,64 @@ function TotalBarangKeluar() {
   };
 
   // Jika masih loading
-  if (loading) return <p style={styles.loading}>Loading...</p>;
+  if (loading) return <CircularProgress style={{ display: 'block', margin: '20px auto' }} />;
 
   // Jika terjadi error
-  if (error) return <p style={styles.error}>{error}</p>;
+  if (error) return <Alert severity="error" style={{ margin: '20px auto', width: 'fit-content' }}>{error}</Alert>;
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.header}>Daftar Barang Keluar</h1>
+    <Box sx={{ maxWidth: 800, margin: '20px auto', padding: 3, boxShadow: 3, borderRadius: 2, backgroundColor: 'background.paper' }}>
+      <Typography variant="h4" align="center" gutterBottom color="black">
+        Daftar Barang Keluar
+      </Typography>
       {barangKeluar.length === 0 ? (
-        <p style={styles.noData}>Tidak ada data barang keluar</p>
+        <Typography variant="body1" align="center" color="textSecondary">
+          Tidak ada data barang keluar
+        </Typography>
       ) : (
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th>Nama Barang</th>
-              <th>Jumlah</th>
-              <th>Photo</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {barangKeluar.map((barang) => (
-              <tr key={barang.Id_barang_keluar}>
-                <td>{barang.Nama_barang}</td>
-                <td>{barang.Jumlah}</td>
-                <td>
-                  <img
-                    src={barang.photo_url}
-                    alt={barang.Nama_barang}
-                    style={styles.image}
-                  />
-                </td>
-                <td>{barang.Status}</td>
-                <td>
-                  {barang.Status === "Pending" ? (
-                    <button
-                      style={styles.button}
-                      onClick={() => handleApprove(barang.Id_barang_keluar)}
-                    >
-                      Approve
-                    </button>
-                  ) : (
-                    <span style={styles.approved}>Approved</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>Nama Barang</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Jumlah</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Photo</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Aksi</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {barangKeluar.map((barang) => (
+                <TableRow key={barang.Id_barang_keluar}>
+                  <TableCell>{barang.Nama_barang}</TableCell>
+                  <TableCell>{barang.Jumlah}</TableCell>
+                  <TableCell>
+                    <Avatar src={barang.photo_url} alt={barang.Nama_barang} />
+                  </TableCell>
+                  <TableCell>{barang.Status}</TableCell>
+                  <TableCell>
+                    {barang.Status === "Pending" ? (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleApprove(barang.Id_barang_keluar)}
+                      >
+                        Approve
+                      </Button>
+                    ) : (
+                      <Typography color="success.main" fontWeight="bold">
+                        Approved
+                      </Typography>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
-    </div>
+    </Box>
   );
 }
-
-// CSS-in-JS Styles
-const styles = {
-  container: {
-    maxWidth: "800px",
-    margin: "20px auto",
-    padding: "20px",
-    fontFamily: "Arial, sans-serif",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    borderRadius: "8px",
-    backgroundColor: "#f9f9f9",
-  },
-  header: {
-    textAlign: "center",
-    color: "#333",
-    marginBottom: "20px",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    marginBottom: "20px",
-  },
-  image: {
-    width: "80px",
-    borderRadius: "4px",
-  },
-  button: {
-    padding: "8px 12px",
-    backgroundColor: "#4CAF50",
-    color: "#fff",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-    fontSize: "14px",
-  },
-  approved: {
-    color: "#4CAF50",
-    fontWeight: "bold",
-  },
-  noData: {
-    textAlign: "center",
-    color: "#666",
-  },
-  loading: {
-    textAlign: "center",
-    fontSize: "18px",
-    color: "#888",
-  },
-  error: {
-    textAlign: "center",
-    fontSize: "18px",
-    color: "#e74c3c",
-  },
-};
 
 export default TotalBarangKeluar;

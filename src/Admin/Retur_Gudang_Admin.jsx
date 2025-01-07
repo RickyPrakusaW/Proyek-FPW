@@ -1,5 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Typography,
+  CircularProgress,
+  Alert,
+  Box,
+} from '@mui/material';
 
 function Retur_Gudang_Admin() {
   const [returGudang, setReturGudang] = useState([]);
@@ -41,47 +55,61 @@ function Retur_Gudang_Admin() {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <CircularProgress style={{ display: 'block', margin: '20px auto' }} />;
+  if (error) return <Alert severity="error" style={{ margin: '20px auto', width: 'fit-content' }}>{error}</Alert>;
 
   return (
-    <div>
-      <h1>Daftar Retur Gudang</h1>
+    <Box sx={{ maxWidth: 800, margin: '20px auto', padding: 3, boxShadow: 3, borderRadius: 2, backgroundColor: 'background.paper' }}>
+      <Typography variant="h4" align="center" gutterBottom color='black'>
+        Daftar Retur Gudang
+      </Typography>
       {returGudang.length === 0 ? (
-        <p>Tidak ada data retur ditemukan</p>
+        <Typography variant="body1" align="center" color="textSecondary">
+          Tidak ada data retur ditemukan
+        </Typography>
       ) : (
-        <table border="1" style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th>ID Barang</th>
-              <th>Nama Barang</th>
-              <th>Jumlah Retur</th>
-              <th>Keterangan</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {returGudang.map((retur) => (
-              <tr key={retur.idReturGudang}>
-                <td>{retur.idReturGudang}</td>
-                <td>{retur.namaBarang || 'N/A'}</td>
-                <td>{retur.jumlahBarang}</td>
-                <td>{retur.keterangan || 'Tidak ada'}</td>
-                <td>{retur.status}</td>
-                <td>
-                  {retur.status !== 'approve' ? (
-                    <button onClick={() => handleApprove(retur.idReturGudang)}>Approve</button>
-                  ) : (
-                    <p>Approved</p>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 'bold' }}>ID Barang</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Nama Barang</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Jumlah Retur</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Keterangan</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Action</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {returGudang.map((retur) => (
+                <TableRow key={retur.idReturGudang}>
+                  <TableCell>{retur.idReturGudang}</TableCell>
+                  <TableCell>{retur.namaBarang || 'N/A'}</TableCell>
+                  <TableCell>{retur.jumlahBarang}</TableCell>
+                  <TableCell>{retur.keterangan || 'Tidak ada'}</TableCell>
+                  <TableCell>{retur.status}</TableCell>
+                  <TableCell>
+                    {retur.status !== 'approve' ? (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleApprove(retur.idReturGudang)}
+                      >
+                        Approve
+                      </Button>
+                    ) : (
+                      <Typography color="success.main" fontWeight="bold">
+                        Approved
+                      </Typography>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
-    </div>
+    </Box>
   );
 }
 
