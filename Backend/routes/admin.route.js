@@ -103,18 +103,18 @@ const initializeAdmin = async () => {
 };
 
 initializeAdmin();
+// login endpoint
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Validasi input
     if (!email || !password) {
       return res.status(400).json({ message: 'Email dan password wajib diisi' });
     }
 
     const normalizedEmail = email.toLowerCase();
 
-    // Cek di koleksi Admin
+    // Check if the user is an admin
     const admin = await Admin.findOne({ Email: normalizedEmail });
     if (admin) {
       if (password !== admin.Password) {
@@ -123,7 +123,7 @@ router.post('/login', async (req, res) => {
       return res.status(200).json({ message: 'Selamat datang Admin', role: 'admin' });
     }
 
-    // Cek di koleksi Karyawan
+    // Check if the user is a karyawan (employee)
     const karyawan = await Karyawan.findOne({ email: normalizedEmail });
     if (karyawan) {
       if (karyawan.status !== 'Aktif') {
@@ -134,17 +134,20 @@ router.post('/login', async (req, res) => {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
-      return res.status(200).json({ message: `Halo, ${karyawan.nama_lengkap}!`, role: 'karyawan' });
+      return res.status(200).json({
+        message: `Halo, ${karyawan.nama_lengkap}!`,
+        role: 'karyawan',
+        nama_lengkap: karyawan.nama_lengkap,
+        foto_ktp: karyawan.foto_ktp, // return photo URL
+      });
     }
 
-    // Jika email tidak ditemukan
     return res.status(404).json({ message: 'User not found' });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
 
 
 
@@ -259,79 +262,45 @@ router.post('/addKaryawan', uploadKaryawan, async (req, res) => {
   }
 });
 
-router.put('/updateKaryawan/:id', uploadKaryawan, async (req, res) => {
+router.put('/updateKaryawan/:id', async (req, res) => {
   try {
-    const { id } = req.params; // Ambil id_karyawan dari parameter URL
-    const {
-      nama_lengkap,
-      tempat_lahir,
-      tanggal_lahir,
-      jenis_kelamin,
-      golongan_darah,
-      alamat,
-      no_telepon,
-      agama,
-      email, // Email baru (jika ada)
-      password, // Password baru (jika ada)
-    } = req.body;
+    const { id } = req.params;
+    const { email, password } = req.body;
 
-    const foto_ktp = req.file?.filename;
-
-    // Validasi input (opsional, hanya jika ada data yang diubah)
-    if (email) {
-      const emailRegex = /.+@.+\..+/;
-      if (!emailRegex.test(email)) {
-        return res.status(400).json({ error: 'Format email tidak valid!' });
-      }
-
-      // Periksa apakah email sudah digunakan oleh karyawan lain
-      const existingEmail = await Karyawan.findOne({ email, id_karyawan: { $ne: id } });
-      if (existingEmail) {
-        return res.status(400).json({ error: 'Email sudah digunakan oleh karyawan lain!' });
-      }
+    // Validasi input
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email dan password wajib diisi!' });
     }
 
-    let hashedPassword;
-    if (password) {
-      // Hash password baru (jika diberikan)
-      hashedPassword = await bcrypt.hash(password, 10);
+    // Validasi format email
+    const emailRegex = /.+@.+\..+/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Format email tidak valid!' });
     }
 
-    // Update karyawan di database
-    const updatedData = {
-      nama_lengkap,
-      tempat_lahir,
-      tanggal_lahir,
-      jenis_kelamin,
-      golongan_darah,
-      alamat,
-      no_telepon,
-      agama,
-      email,
-      password: hashedPassword,
-      foto_ktp,
-    };
+    // Periksa apakah email sudah terdaftar oleh karyawan lain
+    const existingEmail = await Karyawan.findOne({ email, _id: { $ne: id } });
+    if (existingEmail) {
+      return res.status(400).json({ error: 'Email sudah digunakan oleh karyawan lain!' });
+    }
 
-    // Hapus field yang undefined atau null
-    Object.keys(updatedData).forEach((key) => {
-      if (updatedData[key] === undefined || updatedData[key] === null) {
-        delete updatedData[key];
-      }
-    });
+    // Hash password sebelum disimpan
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const updatedKaryawan = await Karyawan.findOneAndUpdate(
-      { id_karyawan: id },
-      updatedData,
-      { new: true }
+    // Update karyawan
+    const updatedKaryawan = await Karyawan.findByIdAndUpdate(
+      id,
+      { email, password: hashedPassword },
+      { new: true, runValidators: true }
     );
 
     if (!updatedKaryawan) {
-      return res.status(404).json({ error: 'Karyawan tidak ditemukan' });
+      return res.status(404).json({ error: 'Karyawan tidak ditemukan!' });
     }
 
-    res.status(200).json({ message: 'Karyawan berhasil diperbarui', data: updatedKaryawan });
+    res.status(200).json({ message: 'Karyawan berhasil diupdate', data: updatedKaryawan });
   } catch (error) {
-    console.error('Error saat memperbarui karyawan:', error);
+    console.error('Error saat mengupdate karyawan:', error);
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
@@ -755,21 +724,61 @@ router.post('/barangKeluar', async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+//update status
+router.put('/barangKeluar/status/:id', async (req, res) => {
+  try {
+    const { id } = req.params;  // Mendapatkan Id_barang_keluar dari parameter
+    const { status } = req.body;  // Mendapatkan status baru dari request body
+
+    // Validasi jika status diisi
+    if (!status) {
+      return res.status(400).json({ error: 'Status tidak boleh kosong!' });
+    }
+
+    // Cari barang keluar berdasarkan Id_barang_keluar
+    const barangKeluar = await BarangKeluar.findOne({ Id_barang_keluar: id });
+    if (!barangKeluar) {
+      return res.status(404).json({ error: 'Barang keluar tidak ditemukan!' });
+    }
+
+    // Update status barang keluar
+    barangKeluar.Status = status;
+
+    // Simpan perubahan
+    await barangKeluar.save();
+
+    // Return response sukses
+    res.status(200).json({ message: 'Status barang keluar berhasil diperbarui', data: barangKeluar });
+  } catch (error) {
+    console.error('Error saat memperbarui status barang keluar:', error);
+    res.status(500).json({ error: 'Terjadi kesalahan pada server' });
+  }
+});
+
+// Misalnya gambar disimpan di folder 'uploads' di server
+app.use('/uploads', express.static('uploads'));
+
 router.get('/barangKeluar', async (req, res) => {
   try {
-    // Mengambil semua data barang keluar dari database
-    const barangKeluar = await BarangKeluar.find();  // Get all data from BarangKeluar collection
+    const barangKeluar = await BarangKeluar.find();
 
     if (barangKeluar.length === 0) {
       return res.status(404).json({ message: 'Tidak ada data barang keluar ditemukan' });
     }
 
-    res.status(200).json({ message: 'Data barang keluar berhasil diambil', data: barangKeluar });
+    // Menambahkan URL gambar ke dalam response
+    const barangKeluarWithPhotoUrls = barangKeluar.map(barang => ({
+      ...barang.toObject(),
+      photo_url: `http://localhost:3000/uploads/${barang.Photo_barang}`,
+    }));
+
+    res.status(200).json({ message: 'Data barang keluar berhasil diambil', data: barangKeluarWithPhotoUrls });
   } catch (error) {
     console.error('Error saat mengambil data barang keluar:', error);
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+
 
 // Route untuk mendapatkan semua data Stock
 router.get('/getStock', async (req, res) => {

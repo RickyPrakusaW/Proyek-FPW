@@ -100,21 +100,30 @@ const Homekepalagudang = () => {
                     transition: "background-color 0.3s ease",
                   }}
                 >
+                  {/* Display photo at the top */}
+                  {/* {barang.Photo_barang_keluar && (
+                    <img
+                      src={barang.photo_url}
+                      alt={barang.Nama_barang}
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        borderRadius: "8px",
+                        marginBottom: "16px", // Adds space between image and text
+                      }}
+                    />
+                  )} */}
+
+                  {/* Display barang information */}
                   <Typography variant="h6" fontWeight="bold">
                     {barang.Nama_barang}
                   </Typography>
                   <Typography variant="body2">ID: {barang.Id_barang_keluar}</Typography>
+                  <Typography variant="body2">id_barang : {barang.id_barang}</Typography>
                   <Typography variant="body2">Tipe: {barang.Tipe_barang}</Typography>
                   <Typography variant="body2">Jumlah: {barang.Total_barang} Karung</Typography>
                   <Typography variant="body2">Tanggal Keluar: {barang.Tanggal_keluar}</Typography>
-                  {/* Optionally, display a photo */}
-                  {barang.Photo_barang_keluar && (
-                    <img
-                      src={barang.Photo_barang_keluar}
-                      alt={barang.Nama_barang}
-                      style={{ width: "100%", height: "auto", borderRadius: "8px", marginTop: "16px" }}
-                    />
-                  )}
+                  <Typography variant="body2">Status: {barang.Status}</Typography>
                 </Card>
               </Grid>
             ))}

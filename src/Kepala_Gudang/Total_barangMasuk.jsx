@@ -40,6 +40,9 @@ const Homekepalagudang = () => {
     fetchStockData();
   }, []);
 
+  // Filter barang untuk menghilangkan yang jumlahnya 0
+  const filteredBarangData = barangData.filter(barang => barang.total_barang > 0);
+
   return (
     <div className={`min-h-screen flex ${themeClasses}`}>
       {/* Main Content */}
@@ -53,7 +56,7 @@ const Homekepalagudang = () => {
             <div className="grid grid-cols-3 gap-5">
               <div className={cardClasses}>
                 <h3 className="text-xl font-semibold">Total Barang Masuk</h3>
-                <p className="text-2xl font-bold">{barangData.length} Item</p>
+                <p className="text-2xl font-bold">{filteredBarangData.length} Item</p>
               </div>
               <div className={cardClasses}>
                 <h3 className="text-xl font-semibold">Total Barang Keluar</h3>
@@ -62,7 +65,7 @@ const Homekepalagudang = () => {
               <div className={cardClasses}>
                 <h3 className="text-xl font-semibold">Total Barang</h3>
                 <p className="text-2xl font-bold">
-                  {barangData.reduce(
+                  {filteredBarangData.reduce(
                     (total, barang) => total + (barang.total_barang || 0),
                     0
                   )}{" "}
@@ -72,7 +75,7 @@ const Homekepalagudang = () => {
             </div>
 
             <div className="grid grid-cols-3 gap-5">
-              {barangData.map((barang) => (
+              {filteredBarangData.map((barang) => (
                 <div
                   key={barang._id} // Pastikan Anda menggunakan `_id` dari MongoDB
                   className={`p-5 rounded-md text-center ${sidebarClasses}`}
@@ -83,7 +86,7 @@ const Homekepalagudang = () => {
                     className="w-20 h-20 mx-auto rounded-md mb-3"
                   />
                   <h4 className="text-lg font-bold">{barang.nama}</h4>
-                  <p className="text-sm">ID: {barang.id_barang}</p>
+                  <p className="text-sm">ID: {barang.id_stock}</p>
                   <p className="text-sm">Tipe: {barang.tipe_barang}</p>
                   <p className="text-sm">Jumlah: {barang.total_barang}</p>
                   <p className="text-sm">Tanggal Masuk: {barang.tanggal_masuk}</p>

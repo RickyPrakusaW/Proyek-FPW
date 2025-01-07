@@ -48,8 +48,11 @@ const StockGudang = () => {
     fetchStockData();
   }, []);
 
-  const filteredStocks = stocks.filter((stock) =>
-    stock.nama_barang.toLowerCase().includes(searchQuery.toLowerCase())
+  // Filter stocks based on search query and total_barang > 0 (Only show stocks with quantity > 0)
+  const filteredStocks = stocks.filter(
+    (stock) =>
+      stock.nama_barang.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      stock.total_barang > 0 // Only include stocks with quantity > 0
   );
 
   const handleSearchChange = (event) => {
@@ -83,6 +86,8 @@ const StockGudang = () => {
               alt={stock.nama_barang}
               className="w-full h-48 object-cover rounded-md mb-4"
             />
+            {/* ID Stock */}
+            <h2 className={cardTitleClasses}>{stock.id_stock}</h2>
             {/* Nama Barang */}
             <h2 className={cardTitleClasses}>{stock.nama_barang}</h2>
             {/* Stock Barang */}

@@ -125,9 +125,7 @@ const ReturAdmin = () => {
                 <TableCell align="center" sx={{ color: textColor }}>
                   Status
                 </TableCell>
-                <TableCell align="center" sx={{ color: textColor }}>
-                  Action
-                </TableCell>
+            
               </TableRow>
             </TableHead>
             <TableBody>
@@ -184,22 +182,7 @@ const ReturAdmin = () => {
                   >
                     {retur.status}
                   </TableCell>
-                  <TableCell align="center">
-                    {retur.status !== "approved" && (
-                      <Button
-                        variant="contained"
-                        sx={{
-                          bgcolor: "green",
-                          "&:hover": {
-                            bgcolor: "darkgreen",
-                          },
-                        }}
-                        onClick={() => handleApprove(retur.idReturGudang)}
-                      >
-                        Retur Admin
-                      </Button>
-                    )}
-                  </TableCell>
+                  
                 </TableRow>
               ))}
             </TableBody>

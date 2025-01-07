@@ -8,7 +8,8 @@ const barangKeluarSchema = new mongoose.Schema({
   Photo_barang_keluar: { type: String, required: false },
   Tanggal_keluar: { type: Date, required: true },
   Pengirim: { type: String, required: true },
-  id_barang: { type: String, required: true } // Menyimpan id_barang
+  id_barang: { type: String, required: true }, // Menyimpan id_barang
+  Status: { type: String, required: true, default: "Pending" } // Menambahkan status
 }, { timestamps: true });
 
 const BarangKeluar = mongoose.model('BarangKeluar', barangKeluarSchema);

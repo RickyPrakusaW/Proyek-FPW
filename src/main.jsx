@@ -23,6 +23,7 @@ import TotalBarangKeluar from './Kepala_Gudang/Total_barangKeluar'
 import PenjualanToday from './Admin/Penjualan'
 import ProfileAdmin from "./Admin/ProfileAdmin";
 import TotalBarangKeluar2 from "./Admin/TotalBarangKeluar";
+import ReturAdminGudang from "./Admin/Retur_Gudang_Admin"
 import DetailBarang from './Admin/DetailBarang'
 import Customer from './Admin/Customer'
 import Detailkariawan from './Admin/Detail_kariawan'
@@ -109,6 +110,10 @@ const router = createBrowserRouter([
       {
         path: "chatadmin",
         element: <Chatadmin/>
+      },
+      {
+        path: "ReturAdminGudang",
+        element: <ReturAdminGudang/>
       }
     ]
   },

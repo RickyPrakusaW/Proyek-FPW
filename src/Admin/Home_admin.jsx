@@ -40,6 +40,9 @@ const HomeAdmin = () => {
   const [totalIncome, setTotalIncome] = useState(0);
   const [dailySalesData, setDailySalesData] = useState({ dates: [], totals: [] });
 
+  const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState("");
+
   const navigate = useNavigate();
 
   // Dynamic theme classes
@@ -121,12 +124,21 @@ const HomeAdmin = () => {
       .catch((error) => console.error("Error mengambil data penjualan:", error));
   }, []);
 
+  const openModal = (content) => {
+    setModalContent(content);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
   // Data untuk chart
   const employeePieChartData = {
-    labels: Object.keys(employeeDistribution),
+    labels: Object.keys(employeeDistribution || {}),
     datasets: [
       {
-        data: Object.values(employeeDistribution),
+        data: Object.values(employeeDistribution || {}),
         backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
         borderWidth: 1,
       },
@@ -134,10 +146,10 @@ const HomeAdmin = () => {
   };
 
   const customerCityPieChartData = {
-    labels: Object.keys(customerDistributionByCity),
+    labels: Object.keys(customerDistributionByCity || {}),
     datasets: [
       {
-        data: Object.values(customerDistributionByCity),
+        data: Object.values(customerDistributionByCity || {}),
         backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
         borderWidth: 1,
       },
@@ -158,12 +170,16 @@ const HomeAdmin = () => {
     ],
   };
 
-  // WhatsApp link
   const whatsappLink = "https://wa.me/6285172182144";
 
   return (
     <div className={`flex min-h-screen ${themeClasses}`}>
       <div className="flex-1 p-5 space-y-5">
+        {/* Header */}
+        <header className="text-center py-5">
+          <h1 className="text-3xl font-bold">Selamat Datang Admin</h1>
+        </header>
+
         {/* Kartu Atas */}
         <div className="grid grid-cols-3 gap-5">
           <div
@@ -185,14 +201,24 @@ const HomeAdmin = () => {
             <h3 className="text-xl font-semibold">Total Barang</h3>
             <p className="text-2xl font-bold">{totalProducts} Barang</p>
           </div>
-        </div>
-        <div className="text-center mt-3">
-            <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
-              <button className="bg-green-500 text-white py-2 px-4 rounded-md">
-                Chat Kepala Gudang
-              </button>
-            </a>
+          
+          <div
+            className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
+            onClick={() => navigate("/Admin/TotalBarangKeluar")}
+          >
+            <h3 className="text-xl font-semibold">Barang Keluar Gudang</h3>
+            
           </div>
+          <div
+            className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
+            onClick={() => navigate("/Admin/Retur_Gudang_Admin")}
+          >
+            <h3 className="text-xl font-semibold">Retur Gudang</h3>
+            
+          </div>
+        </div>
+
+
         {/* Bagian Chart */}
         <div className="grid grid-cols-2 gap-5">
           {/* Distribusi Karyawan */}
@@ -201,7 +227,6 @@ const HomeAdmin = () => {
             <div className="w-56 h-56 mx-auto">
               <Pie data={employeePieChartData} options={{ maintainAspectRatio: false }} />
             </div>
-
           </div>
 
           {/* Customer Berdasarkan Kota */}
@@ -214,12 +239,9 @@ const HomeAdmin = () => {
         </div>
 
         {/* Grafik Penjualan Harian */}
-        <div className={`p-5 rounded-md ${chartClasses}`}>
+        <div className={`p-5 rounded-md ${chartClasses} mt-5`}>
           <h3 className="text-xl font-semibold mb-3">Grafik Penjualan Harian</h3>
-          <div className="w-full h-64">
-            <Line data={dailySalesChartData} options={{ maintainAspectRatio: false }} />
-          </div>
-     
+          <Line data={dailySalesChartData} options={{ maintainAspectRatio: false }} />
         </div>
       </div>
     </div>

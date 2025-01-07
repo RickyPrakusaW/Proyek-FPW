@@ -52,6 +52,11 @@ function CekStockGudang() {
               <Grid item xs={12} sm={6} md={4} key={stock._id_stock}>
                 <Card>
                   <CardContent>
+                    {/* Display ID Barang first */}
+                    <Typography variant="body2" color="textSecondary">
+                      ID Barang: {stock.id_stock}
+                    </Typography>
+
                     <Typography variant="h6">{stock.nama_barang}</Typography>
                     <Typography variant="body2">
                       Jumlah: {stock.total_barang}

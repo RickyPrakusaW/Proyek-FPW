@@ -1,13 +1,30 @@
 import { useTheme } from "../../ThemeContext";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function SideBar() {
   const { isDarkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState(""); // State untuk menu aktif
+
+  // New state for storing the logged-in user's data
+  const [userData, setUserData] = useState({
+    nama_lengkap: "",
+    foto_ktp: "",
+  });
+
+  // Get data from localStorage (or from the backend response directly)
+  useEffect(() => {
+    // Assuming you store the user data in localStorage after login
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      setUserData({
+        nama_lengkap: user.nama_lengkap,
+        foto_ktp: user.foto_ktp,
+      });
+    }
+  }, []);
 
   const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
@@ -35,11 +52,11 @@ function SideBar() {
           {isSidebarOpen && (
             <div className="flex items-center space-x-3">
               <img
-                src="https://via.placeholder.com/50"
-                alt="Admin Avatar"
+                src={userData.foto_ktp || "https://via.placeholder.com/50"}
+                alt="Profile"
                 className="rounded-full w-12 h-12"
               />
-              <h2 className="text-xl font-semibold">Nama Karyawan</h2>
+              <h2 className="text-xl font-semibold">{userData.nama_lengkap}</h2>
             </div>
           )}
           <button
@@ -87,9 +104,13 @@ function SideBar() {
               navigate("/karyawan/listBarang");
             }}
           >
-            <span className={`transform transition-all ${
-                  isSidebarOpen ? "" : "ml-[-10px]"
-                }`}>🏠</span>
+            <span
+              className={`transform transition-all ${
+                isSidebarOpen ? "" : "ml-[-10px]"
+              }`}
+            >
+              🏠
+            </span>
             {isSidebarOpen && <span>List Barang</span>}
           </li>
           <li
@@ -101,9 +122,13 @@ function SideBar() {
               navigate("/karyawan/keranjang");
             }}
           >
-            <span className={`transform transition-all ${
-                  isSidebarOpen ? "" : "ml-[-10px]"
-                }`}>📦</span>
+            <span
+              className={`transform transition-all ${
+                isSidebarOpen ? "" : "ml-[-10px]"
+              }`}
+            >
+              📦
+            </span>
             {isSidebarOpen && <span>Keranjang</span>}
           </li>
           <li
@@ -115,9 +140,13 @@ function SideBar() {
               navigate("/karyawan/cekStockGudang");
             }}
           >
-            <span className={`transform transition-all ${
-                  isSidebarOpen ? "" : "ml-[-10px]"
-                }`}>↩️</span>
+            <span
+              className={`transform transition-all ${
+                isSidebarOpen ? "" : "ml-[-10px]"
+              }`}
+            >
+              ↩️
+            </span>
             {isSidebarOpen && <span>Cek Stock Gudang</span>}
           </li>
         </ul>
@@ -130,15 +159,11 @@ function SideBar() {
           {isSidebarOpen ? (
             "Keluar"
           ) : (
-            <>
-              <span
-                className={`transform transition-all ${
-                  isSidebarOpen ? "" : "ml-[-10px]"
-                }`}
-              >
-                🚪
-              </span>
-            </>
+            <span
+              className={`transform transition-all ${isSidebarOpen ? "" : "ml-[-10px]"}`}
+            >
+              🚪
+            </span>
           )}
         </button>
       </div>
