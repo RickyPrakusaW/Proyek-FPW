@@ -26,13 +26,13 @@ function Retur_Gudang_Admin() {
   const handleApprove = async (idReturGudang) => {
     try {
       const response = await axios.put(`http://localhost:3000/api/admin/updateStatusRetur/${idReturGudang}`, {
-        status: 'Approve',
+        status: 'approve',
       });
 
       // Update status di frontend tanpa refresh
       setReturGudang((prev) =>
         prev.map((retur) =>
-          retur._id === idReturGudang ? { ...retur, status: response.data.data.status } : retur
+          retur.idReturGudang === idReturGudang ? { ...retur, status: 'approve' } : retur
         )
       );
       alert('Status berhasil diperbarui menjadi Approve!');
@@ -63,15 +63,15 @@ function Retur_Gudang_Admin() {
           </thead>
           <tbody>
             {returGudang.map((retur) => (
-              <tr key={retur._id}>
-                <td>{retur.idBarang}</td>
+              <tr key={retur.idReturGudang}>
+                <td>{retur.idReturGudang}</td>
                 <td>{retur.namaBarang || 'N/A'}</td>
                 <td>{retur.jumlahBarang}</td>
                 <td>{retur.keterangan || 'Tidak ada'}</td>
                 <td>{retur.status}</td>
                 <td>
-                  {retur.status !== 'Approve' ? (
-                    <button onClick={() => handleApprove(retur._id)}>Approve</button>
+                  {retur.status !== 'approve' ? (
+                    <button onClick={() => handleApprove(retur.idReturGudang)}>Approve</button>
                   ) : (
                     <p>Approved</p>
                   )}

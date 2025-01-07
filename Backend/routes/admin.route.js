@@ -926,24 +926,29 @@ router.post('/addReturGudang', uploadReturGudang, async (req, res) => {
   }
 });
 //update status 
-router.put('/updateStatusRetur/:idReturGudang', async (req, res) => {
+router.put('/updateStatusRetur/:id', async (req, res) => {
   try {
-    const { idReturGudang } = req.params;
-    const { status } = req.body;
+    const { id } = req.params; // Ambil ID retur dari parameter URL
+    const { status } = req.body; // Ambil status baru dari body request
 
-    // Validasi input status
+    // Validasi input
     if (!status) {
-      return res.status(400).json({ error: 'Status retur wajib diisi' });
+      return res.status(400).json({ error: 'Status wajib diisi' });
     }
 
-    // Validasi apakah retur dengan ID tersebut ada
-    const retur = await ReturGudang.findById(idReturGudang);
+    // Validasi nilai status (misalnya hanya "approve" atau "rejected")
+    if (status !== 'approve' && status !== 'rejected') {
+      return res.status(400).json({ error: 'Status tidak valid. Hanya diperbolehkan status "approve" atau "rejected".' });
+    }
+
+    // Cari data retur berdasarkan ID
+    const retur = await ReturGudang.findOne({ idReturGudang: id });
     if (!retur) {
-      return res.status(404).json({ error: 'Retur dengan ID tersebut tidak ditemukan' });
+      return res.status(404).json({ error: 'Data retur dengan ID tersebut tidak ditemukan' });
     }
 
     // Perbarui status retur
-    retur.status = status; // Update status
+    retur.status = status;
     await retur.save();
 
     // Kirim respon sukses
@@ -957,33 +962,26 @@ router.put('/updateStatusRetur/:idReturGudang', async (req, res) => {
   }
 });
 
-
-
-
 //liat retur kepala gudang 
-
 router.get('/getReturGudang', async (req, res) => {
   try {
-    // Mengambil semua data retur barang
-    const returGudangList = await ReturGudang.find(); // Tidak perlu populate karena id_barang adalah string
+    const { id_barang } = req.query;
 
-    // Jika data retur tidak ditemukan
-    if (!returGudangList || returGudangList.length === 0) {
-      return res.status(404).json({ error: 'Tidak ada data retur ditemukan' });
+    // Jika ada parameter id_barang, filter berdasarkan id_barang
+    const filter = id_barang ? { id_barang: id_barang } : {};
+
+    // Ambil data retur dari database
+    const returList = await ReturGudang.find(filter);
+
+    // Jika tidak ada data yang ditemukan
+    if (returList.length === 0) {
+      return res.status(404).json({ message: 'Tidak ada data retur ditemukan' });
     }
 
-    // Ambil detail stock untuk setiap retur (optional, jika Anda ingin detail produk)
-    for (let retur of returGudangList) {
-      const stock = await Stock.findOne({ id_barang: retur.id_barang }); // Cari stock berdasarkan id_barang
-      if (stock) {
-        retur.stockDetail = stock; // Menambahkan detail stock ke objek retur
-      }
-    }
-
-    // Kirim data retur
+    // Kirim respon sukses dengan data
     res.status(200).json({
       message: 'Data retur berhasil diambil',
-      data: returGudangList,
+      data: returList,
     });
   } catch (error) {
     console.error('Error saat mengambil data retur:', error.message);
