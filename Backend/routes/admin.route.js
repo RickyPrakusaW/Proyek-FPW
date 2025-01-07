@@ -920,7 +920,7 @@ router.put('/updateStatusRetur/:idReturGudang', async (req, res) => {
     }
 
     // Validasi apakah retur dengan ID tersebut ada
-    const retur = await ReturGudang.findOne({ idReturGudang });
+    const retur = await ReturGudang.findById(idReturGudang);
     if (!retur) {
       return res.status(404).json({ error: 'Retur dengan ID tersebut tidak ditemukan' });
     }
@@ -939,6 +939,7 @@ router.put('/updateStatusRetur/:idReturGudang', async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+
 
 
 
