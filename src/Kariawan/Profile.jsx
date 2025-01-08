@@ -63,24 +63,24 @@ function Profile() {
   }, []);
 
   const handlePasswordChange = async () => {
-    if (!profile.email || !profile.password || !newEmail || !newPassword) {
+    if (!profile.email || !newEmail || !newPassword) {
       setError("Semua field wajib diisi!");
       return;
     }
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/admin/updatePassword",
+        `http://localhost:3000/api/admin/updateKaryawan`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            oldEmail: profile.email,
-            oldPassword: profile.password,
-            newEmail,
-            newPassword,
+            email_lama: profile.email,
+            password_lama: profile.password,
+            email_baru: newEmail,
+            password_baru: newPassword,
           }),
         }
       );
@@ -89,7 +89,7 @@ function Profile() {
 
       if (response.ok) {
         alert("Email dan password berhasil diperbarui!");
-        navigate("/dashboard");
+        navigate("/karyawan/listBarang");
       } else {
         setError(data.error || "Terjadi kesalahan.");
       }
@@ -149,12 +149,12 @@ function Profile() {
                 value={profile.email}
                 InputLabelProps={{ style: { color: textColor } }}
                 InputProps={{
-                  readOnly: true,
                   style: {
                     color: textColor,
                     backgroundColor: isDarkMode ? "#616161" : "#f0f0f0",
                   },
                 }}
+                onChange={(e) => setProfile({ ...profile, email: e.target.value })} // Allow email to be edited
               />
               <TextField
                 label="Password Lama"
@@ -164,7 +164,6 @@ function Profile() {
                 value={profile.password}
                 InputLabelProps={{ style: { color: textColor } }}
                 InputProps={{
-                  readOnly: true,
                   style: {
                     color: textColor,
                     backgroundColor: isDarkMode ? "#616161" : "#f0f0f0",
@@ -177,6 +176,7 @@ function Profile() {
                     </InputAdornment>
                   ),
                 }}
+                onChange={(e) => setProfile({ ...profile, password: e.target.value })} // Allow password to be edited
               />
               <TextField
                 label="Email Baru"

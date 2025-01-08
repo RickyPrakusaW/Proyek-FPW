@@ -216,6 +216,13 @@ const HomeAdmin = () => {
             <h3 className="text-xl font-semibold">Retur Gudang</h3>
             
           </div>
+          <div
+            className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
+            onClick={() => navigate("/Admin/PrintNota")}
+          >
+            <h3 className="text-xl font-semibold">Print Nota</h3>
+            
+          </div>
         </div>
 
 
@@ -236,12 +243,6 @@ const HomeAdmin = () => {
               <Pie data={customerCityPieChartData} options={{ maintainAspectRatio: false }} />
             </div>
           </div>
-        </div>
-
-        {/* Grafik Penjualan Harian */}
-        <div className={`p-5 rounded-md ${chartClasses} mt-5`}>
-          <h3 className="text-xl font-semibold mb-3">Grafik Penjualan Harian</h3>
-          <Line data={dailySalesChartData} options={{ maintainAspectRatio: false }} />
         </div>
       </div>
     </div>

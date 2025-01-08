@@ -278,46 +278,52 @@ router.post('/addKaryawan', uploadKaryawan, async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
-
-router.put('/updateKaryawan/:id', async (req, res) => {
+router.put('/updateKaryawan', async (req, res) => {
   try {
-    const { id } = req.params;
-    const { email, password } = req.body;
+    const { email_lama, password_lama, email_baru, password_baru } = req.body;
 
     // Validasi input
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email dan password wajib diisi!' });
+    if (!email_lama || !password_lama || !email_baru || !password_baru) {
+      return res.status(400).json({ error: 'Semua field wajib diisi!' });
     }
 
-    // Validasi format email
+    // Validasi format email baru
     const emailRegex = /.+@.+\..+/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ error: 'Format email tidak valid!' });
+    if (!emailRegex.test(email_baru)) {
+      return res.status(400).json({ error: 'Format email baru tidak valid!' });
     }
 
-    // Periksa apakah email sudah terdaftar oleh karyawan lain
-    const existingEmail = await Karyawan.findOne({ email, _id: { $ne: id } });
-    if (existingEmail) {
-      return res.status(400).json({ error: 'Email sudah digunakan oleh karyawan lain!' });
+    // Cari karyawan berdasarkan email lama
+    const karyawan = await Karyawan.findOne({ email: email_lama });
+
+    if (!karyawan) {
+      return res.status(404).json({ error: 'Karyawan dengan email lama tidak ditemukan!' });
     }
 
-    // Hash password sebelum disimpan
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Update karyawan
-    const updatedKaryawan = await Karyawan.findByIdAndUpdate(
-      id,
-      { email, password: hashedPassword },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedKaryawan) {
-      return res.status(404).json({ error: 'Karyawan tidak ditemukan!' });
+    // Validasi password lama
+    if (karyawan.password !== password_lama) {
+      return res.status(400).json({ error: 'Password lama tidak sesuai!' });
     }
 
-    res.status(200).json({ message: 'Karyawan berhasil diupdate', data: updatedKaryawan });
+    // Periksa apakah email baru sudah digunakan oleh karyawan lain
+    const emailExists = await Karyawan.findOne({ email: email_baru });
+    if (emailExists && emailExists.email !== email_lama) {
+      return res.status(400).json({ error: 'Email baru sudah digunakan oleh karyawan lain!' });
+    }
+
+    // Update email dan password
+    karyawan.email = email_baru;
+    karyawan.password = password_baru;
+
+    // Simpan perubahan
+    const updatedKaryawan = await karyawan.save();
+
+    res.status(200).json({
+      message: 'Email dan password berhasil diperbarui!',
+      data: updatedKaryawan,
+    });
   } catch (error) {
-    console.error('Error saat mengupdate karyawan:', error);
+    console.error('Error saat memperbarui email dan password:', error);
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
@@ -928,17 +934,14 @@ router.post('/addReturGudang', uploadReturGudang, async (req, res) => {
 //update status 
 router.put('/updateStatusRetur/:id', async (req, res) => {
   try {
-    const { id } = req.params; // Ambil ID retur dari parameter URL
-    const { status } = req.body; // Ambil status baru dari body request
+    const { id } = req.params; // ID retur dari parameter URL
+    const { status } = req.body; // Status baru dari body request
 
     // Validasi input
-    if (!status) {
-      return res.status(400).json({ error: 'Status wajib diisi' });
-    }
-
-    // Validasi nilai status (misalnya hanya "approve" atau "rejected")
-    if (status !== 'approve' && status !== 'rejected') {
-      return res.status(400).json({ error: 'Status tidak valid. Hanya diperbolehkan status "approve" atau "rejected".' });
+    if (!status || !['approved', 'rejected'].includes(status)) {
+      return res.status(400).json({
+        error: 'Status tidak valid. Hanya diperbolehkan status "approved" atau "rejected".',
+      });
     }
 
     // Cari data retur berdasarkan ID
@@ -961,7 +964,6 @@ router.put('/updateStatusRetur/:id', async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
-
 //liat retur kepala gudang 
 router.get('/getReturGudang', async (req, res) => {
   try {

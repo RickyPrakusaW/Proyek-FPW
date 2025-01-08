@@ -33,6 +33,7 @@ import KaryawanPage from "./KaryawanPage"
 import List_barang_kariawan from "./Kariawan/List_barang_kariawan";
 import CekStockGudang from "./Kariawan/CekStockGudang";
 import Pembayaran from "./Kariawan/Pembayaran";
+import Print_nota from "./Admin/PrintNota"
 //admin
 import Chatadmin from"./Admin/Chat";
 //kepala gudang 
@@ -114,6 +115,10 @@ const router = createBrowserRouter([
       {
         path: "ReturGudang",
         element: <ReturGudang/>
+      },
+      {
+        path: "printnota",
+        element: <Print_nota/>
       }
     ]
   },

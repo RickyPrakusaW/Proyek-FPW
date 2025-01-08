@@ -36,20 +36,20 @@ function Retur_Gudang_Admin() {
     fetchReturGudang();
   }, []);
 
-  // Fungsi untuk mengubah status menjadi "Approve"
+  // Fungsi untuk mengubah status menjadi "approved"
   const handleApprove = async (idReturGudang) => {
     try {
-      const response = await axios.put(`http://localhost:3000/api/admin/updateStatusRetur/${idReturGudang}`, {
-        status: 'approve',
+      await axios.put(`http://localhost:3000/api/admin/updateStatusRetur/${idReturGudang}`, {
+        status: 'approved', // Konsisten dengan enum di model
       });
 
       // Update status di frontend tanpa refresh
       setReturGudang((prev) =>
         prev.map((retur) =>
-          retur.idReturGudang === idReturGudang ? { ...retur, status: 'approve' } : retur
+          retur.idReturGudang === idReturGudang ? { ...retur, status: 'approved' } : retur
         )
       );
-      alert('Status berhasil diperbarui menjadi Approve!');
+      alert('Status berhasil diperbarui menjadi Approved!');
     } catch (err) {
       alert(err.response?.data?.error || 'Terjadi kesalahan saat memperbarui status');
     }
@@ -89,7 +89,7 @@ function Retur_Gudang_Admin() {
                   <TableCell>{retur.keterangan || 'Tidak ada'}</TableCell>
                   <TableCell>{retur.status}</TableCell>
                   <TableCell>
-                    {retur.status !== 'approve' ? (
+                    {retur.status !== 'approved' ? (
                       <Button
                         variant="contained"
                         color="primary"
