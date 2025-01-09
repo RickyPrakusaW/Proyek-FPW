@@ -189,6 +189,7 @@ const Homekepalagudang = () => {
               )}{" "}
               Karung
             </p>
+            
                 </div>
 
                 <div className={`${cardClasses} p-5 rounded-md text-center`}>
@@ -198,7 +199,14 @@ const Homekepalagudang = () => {
                   </p>
                 </div>
               </div>
-
+ {/* Tombol Chat Kepala Gudang */}
+ <div
+    className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
+    onClick={() => window.open("https://wa.me/6281332075758", "_blank")}
+  >
+    <h3 className="text-xl font-semibold">Chat Admin</h3>
+    <p className="text-base font-medium">Klik untuk membuka WhatsApp</p>
+  </div>
               <div className="grid grid-cols-2 gap-5">
                 <div className={`p-5 rounded-md ${themeClasses}`}>
                   <h3 className="text-xl font-semibold mb-3">Diagram Total Barang Berdasarkan Tanggal</h3>

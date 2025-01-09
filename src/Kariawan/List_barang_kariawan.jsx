@@ -27,7 +27,7 @@ function ListBarangKaryawan() {
 
   const buttonStyles = {
     backgroundColor: isDarkMode ? "#66bb6a" : "#4caf50",
-    '&:hover': {
+    "&:hover": {
       backgroundColor: isDarkMode ? "#388e3c" : "#388e3c",
     },
   };
@@ -95,6 +95,49 @@ function ListBarangKaryawan() {
         padding: "16px",
       }}
     >
+      {/* Tombol Chat dan Grup WhatsApp */}
+      <div style={{ marginBottom: "16px" }}>
+        <div
+          style={{
+            marginBottom: "8px",
+            padding: "16px",
+            backgroundColor: isDarkMode ? "#424242" : "#fff",
+            borderRadius: "8px",
+            cursor: "pointer",
+            textAlign: "center",
+          }}
+          onClick={() => window.open("https://wa.me/6281332075758", "_blank")}
+        >
+          <Typography variant="h6" style={textColor}>
+            Chat Admin
+          </Typography>
+          <Typography variant="body2" style={textColor}>
+            Klik untuk membuka WhatsApp
+          </Typography>
+        </div>
+
+        <div
+          style={{
+            padding: "16px",
+            backgroundColor: isDarkMode ? "#424242" : "#fff",
+            borderRadius: "8px",
+            cursor: "pointer",
+            textAlign: "center",
+          }}
+          onClick={() =>
+            window.open("https://chat.whatsapp.com/HuPk8fAJxvc452QZkOL6Ii", "_blank")
+          }
+        >
+          <Typography variant="h6" style={textColor}>
+            Grup WhatsApp Karyawan
+          </Typography>
+          <Typography variant="body2" style={textColor}>
+            Klik untuk masuk ke grup
+          </Typography>
+        </div>
+      </div>
+
+      {/* List Barang */}
       <Typography
         variant="h4"
         style={{

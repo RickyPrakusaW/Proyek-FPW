@@ -224,6 +224,25 @@ const HomeAdmin = () => {
             
           </div>
         </div>
+        <div className="grid grid-cols-3 gap-5">
+  {/* Tombol Chat Kepala Gudang */}
+  <div
+    className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
+    onClick={() => window.open("https://wa.me/6285172182144", "_blank")}
+  >
+    <h3 className="text-xl font-semibold">Chat Kepala Gudang</h3>
+    <p className="text-base font-medium">Klik untuk membuka WhatsApp</p>
+  </div>
+
+  {/* Tombol Grup WhatsApp */}
+  <div
+    className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
+    onClick={() => window.open("https://chat.whatsapp.com/HuPk8fAJxvc452QZkOL6Ii", "_blank")}
+  >
+    <h3 className="text-xl font-semibold">Grup WhatsApp Kariawan</h3>
+    <p className="text-base font-medium">Klik untuk masuk ke grup</p>
+  </div>
+</div>
 
 
         {/* Bagian Chart */}
@@ -243,6 +262,7 @@ const HomeAdmin = () => {
               <Pie data={customerCityPieChartData} options={{ maintainAspectRatio: false }} />
             </div>
           </div>
+          
         </div>
       </div>
     </div>
