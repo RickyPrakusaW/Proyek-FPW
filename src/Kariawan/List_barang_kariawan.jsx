@@ -11,7 +11,33 @@ import {
   Button,
   CircularProgress,
   Alert,
+  Box,
+  Paper,
+  styled,
 } from "@mui/material";
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import GroupsIcon from '@mui/icons-material/Groups';
+
+// Styled Components
+const WhatsAppButton = styled(Paper)(({ theme, isDarkMode }) => ({
+  padding: '16px',
+  backgroundColor: isDarkMode ? '#424242' : '#ffffff',
+  borderRadius: '12px',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '16px',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 8px 16px rgba(37, 211, 102, 0.2)',
+    backgroundColor: isDarkMode ? '#505050' : '#f8f8f8',
+    '& .whatsapp-icon': {
+      color: '#25D366',
+      transform: 'scale(1.1)',
+    }
+  }
+}));
 
 function ListBarangKaryawan() {
   const navigate = useNavigate();
@@ -36,7 +62,6 @@ function ListBarangKaryawan() {
     color: isDarkMode ? "#fff" : "#000",
   };
 
-  // Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -56,7 +81,6 @@ function ListBarangKaryawan() {
     fetchProducts();
   }, []);
 
-  // Add product to cart
   const addToCart = async (product) => {
     try {
       const response = await fetch("http://localhost:3000/api/admin/addToCart", {
@@ -92,64 +116,84 @@ function ListBarangKaryawan() {
       style={{
         backgroundColor: isDarkMode ? "#303030" : "#f5f5f5",
         minHeight: "100vh",
-        padding: "16px",
+        padding: "24px",
       }}
     >
-      {/* Tombol Chat dan Grup WhatsApp */}
-      <div style={{ marginBottom: "16px" }}>
-        <div
-          style={{
-            marginBottom: "8px",
-            padding: "16px",
-            backgroundColor: isDarkMode ? "#424242" : "#fff",
-            borderRadius: "8px",
-            cursor: "pointer",
-            textAlign: "center",
-          }}
-          onClick={() => window.open("https://wa.me/6281332075758", "_blank")}
-        >
-          <Typography variant="h6" style={textColor}>
-            Chat Admin
-          </Typography>
-          <Typography variant="body2" style={textColor}>
-            Klik untuk membuka WhatsApp
-          </Typography>
-        </div>
+      {/* WhatsApp Buttons Section */}
+      <Grid container spacing={2} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={6}>
+          <WhatsAppButton 
+            isDarkMode={isDarkMode}
+            elevation={1}
+            onClick={() => window.open("https://wa.me/6281332075758", "_blank")}
+            sx={{ height: '100%', marginBottom: { xs: 2, md: 0 } }}
+          >
+            <WhatsAppIcon 
+              className="whatsapp-icon"
+              sx={{ 
+                fontSize: 32,
+                color: isDarkMode ? '#ffffff' : '#128C7E',
+                transition: 'all 0.3s ease'
+              }} 
+            />
+            <Box>
+              <Typography variant="h6" style={textColor}>
+                Chat Admin
+              </Typography>
+              <Typography variant="body2" style={textColor} sx={{ opacity: 0.8 }}>
+                Klik untuk membuka WhatsApp
+              </Typography>
+            </Box>
+          </WhatsAppButton>
+        </Grid>
 
-        <div
-          style={{
-            padding: "16px",
-            backgroundColor: isDarkMode ? "#424242" : "#fff",
-            borderRadius: "8px",
-            cursor: "pointer",
-            textAlign: "center",
-          }}
-          onClick={() =>
-            window.open("https://chat.whatsapp.com/HuPk8fAJxvc452QZkOL6Ii", "_blank")
-          }
-        >
-          <Typography variant="h6" style={textColor}>
-            Grup WhatsApp Karyawan
-          </Typography>
-          <Typography variant="body2" style={textColor}>
-            Klik untuk masuk ke grup
-          </Typography>
-        </div>
-      </div>
+        <Grid item xs={12} md={6}>
+          <WhatsAppButton 
+            isDarkMode={isDarkMode}
+            elevation={1}
+            onClick={() => window.open("https://chat.whatsapp.com/HuPk8fAJxvc452QZkOL6Ii", "_blank")}
+            sx={{ height: '100%' }}
+          >
+            <GroupsIcon 
+              className="whatsapp-icon"
+              sx={{ 
+                fontSize: 32,
+                color: isDarkMode ? '#ffffff' : '#128C7E',
+                transition: 'all 0.3s ease'
+              }} 
+            />
+            <Box>
+              <Typography variant="h6" style={textColor}>
+                Grup WhatsApp Karyawan
+              </Typography>
+              <Typography variant="body2" style={textColor} sx={{ opacity: 0.8 }}>
+                Klik untuk masuk ke grup
+              </Typography>
+            </Box>
+          </WhatsAppButton>
+        </Grid>
+      </Grid>
 
-      {/* List Barang */}
+      {/* List Barang Section */}
       <Typography
         variant="h4"
-        style={{
+        sx={{
           color: isDarkMode ? "#bbdefb" : "#1976d2",
-          marginBottom: "16px",
-          ...textColor,
+          marginBottom: "24px",
+          fontWeight: 600,
         }}
       >
         List Barang
       </Typography>
-      {loading && <CircularProgress color={isDarkMode ? "secondary" : "primary"} />}
-      {error && <Alert severity="error" style={textColor}>{error}</Alert>}
+
+      {loading && (
+        <Box display="flex" justifyContent="center" my={4}>
+          <CircularProgress color={isDarkMode ? "secondary" : "primary"} />
+        </Box>
+      )}
+      
+      {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+      
       {!loading && !error && (
         <Grid container spacing={3}>
           {products.map((product) => (
@@ -158,29 +202,50 @@ function ListBarangKaryawan() {
                 {product.Photo_product ? (
                   <CardMedia
                     component="img"
-                    height="140"
+                    height="200"
                     image={`http://localhost:3000/uploads/product/${product.Photo_product}`}
                     alt={product.Nama_product}
+                    sx={{ objectFit: "cover" }}
                   />
                 ) : (
-                  <div style={{ height: "140px", backgroundColor: "#e0e0e0" }} />
+                  <Box height="200px" bgcolor="#e0e0e0" />
                 )}
                 <CardContent>
-                  <Typography variant="h6" component="div" style={textColor}>
+                  <Typography 
+                    variant="h6" 
+                    component="div" 
+                    style={textColor}
+                    gutterBottom
+                    noWrap
+                  >
                     {product.Nama_product}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" style={textColor}>
-                    Rp. {product.Harga}
+                  <Typography 
+                    variant="body1" 
+                    style={textColor}
+                    sx={{ fontWeight: 600, mb: 1 }}
+                  >
+                    Rp. {product.Harga.toLocaleString('id-ID')}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" style={textColor}>
+                  <Typography 
+                    variant="body2" 
+                    style={textColor}
+                    sx={{ opacity: 0.8 }}
+                  >
                     Stock: {product.Stock_barang}
                   </Typography>
                 </CardContent>
-                <CardActions>
+                <CardActions sx={{ padding: 2 }}>
                   <Button
-                    style={buttonStyles}
+                    fullWidth
                     variant="contained"
                     onClick={() => addToCart(product)}
+                    sx={{
+                      ...buttonStyles,
+                      borderRadius: '8px',
+                      textTransform: 'none',
+                      py: 1
+                    }}
                   >
                     Add to Cart
                   </Button>

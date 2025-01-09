@@ -1,10 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { jsPDF } from "jspdf";
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  Button,
+  Box,
+  IconButton,
+  Tooltip,
+  Container,
+} from "@mui/material";
+import PrintIcon from "@mui/icons-material/Print";
+import ReceiptIcon from "@mui/icons-material/Receipt";
 
 function PrintNota() {
   const [penjualan, setPenjualan] = useState([]);
 
-  // Fungsi untuk mengambil data penjualan dari server
   useEffect(() => {
     const fetchPenjualan = async () => {
       try {
@@ -24,7 +40,6 @@ function PrintNota() {
   }, []);
 
   const handlePrint = (nota) => {
-    // Membuat instance jsPDF
     const doc = new jsPDF();
 
     // Header nota
@@ -55,7 +70,7 @@ function PrintNota() {
 
     // Data tabel
     let yOffset = tableStartY + 10;
-    let grandTotal = 0; // Untuk menghitung total keseluruhan
+    let grandTotal = 0;
 
     if (nota.idCart && Array.isArray(nota.idCart)) {
       nota.idCart.forEach((item, index) => {
@@ -79,51 +94,69 @@ function PrintNota() {
     doc.text("Tanda Terima,", 20, yOffset);
     doc.text("Hormat Kami,", 150, yOffset);
 
-    // Menyimpan PDF dengan nama yang sesuai
     doc.save(`Nota_${nota._id}.pdf`);
   };
 
   return (
-    <div>
-      <h1>Data Penjualan</h1>
-      <table border="1" cellPadding="10" style={{ width: "100%" }}>
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Nama Customer</th>
-            <th>Pembayaran</th>
-            <th>Detail</th>
-            <th>Total Barang</th>
-            <th>Total Harga</th>
-            <th>Tanggal Pembelian</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {penjualan.map((nota, index) => (
-            <tr key={nota.idPenjualan}>
-              <td>{index + 1}</td>
-              <td>{nota.Customer_id.Nama_lengkap}</td>
-              <td>{nota.metodePembayaran}</td>
-              <td>
-                {nota.idCart &&
-                  nota.idCart.map((item) => (
-                    <div key={item.namaBarang}>
-                      {item.namaBarang} - {item.totalProduct} pcs
-                    </div>
-                  ))}
-              </td>
-              <td>{nota.totalBarang}</td>
-              <td>Rp {nota.totalHarga}</td>
-              <td>{nota.tanggalPembelian}</td>
-              <td>
-                <button onClick={() => handlePrint(nota)}>Print Nota</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <ReceiptIcon sx={{ mr: 2, color: 'primary.main' }} />
+        <Typography variant="h4" component="h1">
+          Data Penjualan
+        </Typography>
+      </Box>
+      
+      <TableContainer component={Paper} elevation={3}>
+        <Table sx={{ minWidth: 650 }} aria-label="penjualan table">
+          <TableHead>
+            <TableRow sx={{ backgroundColor: 'primary.main' }}>
+              <TableCell sx={{ color: 'white' }}>No</TableCell>
+              <TableCell sx={{ color: 'white' }}>Nama Customer</TableCell>
+              <TableCell sx={{ color: 'white' }}>Pembayaran</TableCell>
+              <TableCell sx={{ color: 'white' }}>Detail</TableCell>
+              <TableCell sx={{ color: 'white' }}>Total Barang</TableCell>
+              <TableCell sx={{ color: 'white' }}>Total Harga</TableCell>
+              <TableCell sx={{ color: 'white' }}>Tanggal Pembelian</TableCell>
+              <TableCell sx={{ color: 'white' }}>Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {penjualan.map((nota, index) => (
+              <TableRow
+                key={nota.idPenjualan}
+                sx={{ '&:nth-of-type(odd)': { backgroundColor: 'action.hover' } }}
+              >
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{nota.Customer_id.Nama_lengkap}</TableCell>
+                <TableCell>{nota.metodePembayaran}</TableCell>
+                <TableCell>
+                  {nota.idCart &&
+                    nota.idCart.map((item) => (
+                      <Typography key={item.namaBarang} variant="body2" sx={{ mb: 0.5 }}>
+                        {item.namaBarang} - {item.totalProduct} pcs
+                      </Typography>
+                    ))}
+                </TableCell>
+                <TableCell>{nota.totalBarang}</TableCell>
+                <TableCell>Rp {nota.totalHarga.toLocaleString()}</TableCell>
+                <TableCell>{new Date(nota.tanggalPembelian).toLocaleDateString('id-ID')}</TableCell>
+                <TableCell>
+                  <Tooltip title="Print Nota">
+                    <IconButton
+                      color="primary"
+                      onClick={() => handlePrint(nota)}
+                      size="small"
+                    >
+                      <PrintIcon />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
   );
 }
 
