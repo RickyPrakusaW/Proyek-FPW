@@ -14,7 +14,15 @@ import {
 import { useTheme } from "./../ThemeContext";
 
 // Register chart.js components
-ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const Homekepalagudang = () => {
   const navigate = useNavigate();
@@ -43,7 +51,9 @@ const Homekepalagudang = () => {
         }
 
         if (!barangKeluarResponse.ok) {
-          throw new Error(barangKeluarResult.error || "Failed to fetch barang keluar data");
+          throw new Error(
+            barangKeluarResult.error || "Failed to fetch barang keluar data"
+          );
         }
 
         setBarangData(stockResult.data); // Set stock data
@@ -155,8 +165,12 @@ const Homekepalagudang = () => {
     ],
   };
 
-  const themeClasses = isDarkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900";
-  const cardClasses = isDarkMode ? "bg-gray-800 text-white" : "bg-blue-400 text-gray-900";
+  const themeClasses = isDarkMode
+    ? "bg-gray-900 text-white"
+    : "bg-white text-gray-900";
+  const cardClasses = isDarkMode
+    ? "bg-gray-800 text-white"
+    : "bg-blue-400 text-gray-900";
 
   return (
     <div className={`min-h-screen flex flex-col ${themeClasses}`}>
@@ -183,40 +197,51 @@ const Homekepalagudang = () => {
                 >
                   <h3 className="text-xl font-semibold">Total Barang Keluar</h3>
                   <p className="text-2xl font-bold">
-              {barangData.reduce(
-                (total, barang) => total + (barang.total_barang || 0),
-                0
-              )}{" "}
-              Karung
-            </p>
-            
+                    {barangData.reduce(
+                      (total, barang) => total + (barang.total_barang || 0),
+                      0
+                    )}{" "}
+                    Karung
+                  </p>
                 </div>
 
                 <div className={`${cardClasses} p-5 rounded-md text-center`}>
                   <h3 className="text-xl font-semibold">Total Barang</h3>
                   <p className="text-2xl font-bold">
-                    {barangData.reduce((total, barang) => total + (barang.total_barang || 0), 0)} Karung
+                    {barangData.reduce(
+                      (total, barang) => total + (barang.total_barang || 0),
+                      0
+                    )}{" "}
+                    Karung
                   </p>
                 </div>
               </div>
- {/* Tombol Chat Kepala Gudang */}
- <div
-    className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
-    onClick={() => window.open("https://wa.me/6281332075758", "_blank")}
-  >
-    <h3 className="text-xl font-semibold">Chat Admin</h3>
-    <p className="text-base font-medium">Klik untuk membuka WhatsApp</p>
-  </div>
+              {/* Tombol Chat Kepala Gudang */}
+              <div
+                className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
+                onClick={() =>
+                  window.open("https://wa.me/6281332075758", "_blank")
+                }
+              >
+                <h3 className="text-xl font-semibold">Chat Admin</h3>
+                <p className="text-base font-medium">
+                  Klik untuk membuka WhatsApp
+                </p>
+              </div>
               <div className="grid grid-cols-2 gap-5">
                 <div className={`p-5 rounded-md ${themeClasses}`}>
-                  <h3 className="text-xl font-semibold mb-3">Diagram Total Barang Berdasarkan Tanggal</h3>
+                  <h3 className="text-xl font-semibold mb-3">
+                    Diagram Total Barang Berdasarkan Tanggal
+                  </h3>
                   <div className="w-full h-80">
                     <Bar data={barChartData} />
                   </div>
                 </div>
 
                 <div className={`p-5 rounded-md ${themeClasses}`}>
-                  <h3 className="text-xl font-semibold mb-3">Distribusi Total Barang</h3>
+                  <h3 className="text-xl font-semibold mb-3">
+                    Distribusi Total Barang
+                  </h3>
                   <div className="w-full h-80">
                     <Pie data={pieChartData} />
                   </div>
@@ -224,7 +249,9 @@ const Homekepalagudang = () => {
               </div>
 
               <div className="p-5 rounded-md w-full">
-                <h3 className="text-xl font-semibold mb-3">Distribusi Barang Berdasarkan Tipe</h3>
+                <h3 className="text-xl font-semibold mb-3">
+                  Distribusi Barang Berdasarkan Tipe
+                </h3>
                 <div className="w-full h-80">
                   <Pie data={pieChartTypeData} />
                 </div>

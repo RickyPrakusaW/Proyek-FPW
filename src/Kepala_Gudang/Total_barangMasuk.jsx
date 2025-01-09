@@ -1,35 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { useTheme } from "./../ThemeContext";
+import { useNavigate } from "react-router-dom"; // Impor useNavigate
+import { useTheme } from "../ThemeContext";
+import { Grid, Card, Typography, CircularProgress, Box } from "@mui/material";
 
-const Homekepalagudang = () => {
+const Total_barangMasuk = () => {
+  const navigate = useNavigate(); // Gunakan useNavigate
   const { isDarkMode } = useTheme();
-
-  const themeClasses = isDarkMode
-    ? "bg-gray-900 text-white"
-    : "bg-white text-gray-900";
-  const cardClasses = isDarkMode
-    ? "bg-blue-600 text-white p-5 rounded-md text-center cursor-pointer"
-    : "bg-blue-300 text-black p-5 rounded-md text-center cursor-pointer";
-  const sidebarClasses = isDarkMode
-    ? "bg-gray-800 text-white"
-    : "bg-gray-200 text-black";
-
   const [barangData, setBarangData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch data dari backend
-    const fetchStockData = async () => {
+    const fetchBarangData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/admin/getStock"); // Ganti URL dengan endpoint backend Anda
+        const response = await fetch("http://localhost:3000/api/admin/getStock");
         const result = await response.json();
 
         if (!response.ok) {
-          throw new Error(result.error || "Gagal mengambil data");
+          throw new Error(result.error || "Gagal mengambil data barang");
         }
 
-        setBarangData(result.data); // Mengatur data stock dari response
+        setBarangData(result.data); // Set data barang masuk dari backend
       } catch (err) {
         setError(err.message);
       } finally {
@@ -37,67 +28,123 @@ const Homekepalagudang = () => {
       }
     };
 
-    fetchStockData();
+    fetchBarangData();
   }, []);
 
-  // Filter barang untuk menghilangkan yang jumlahnya 0
-  const filteredBarangData = barangData.filter(barang => barang.total_barang > 0);
+  // Gaya untuk kartu berdasarkan tema
+  const cardStyles = {
+    backgroundColor: isDarkMode ? "#1976d2" : "#64b5f6",
+    textAlign: "center",
+    padding: "20px",
+    cursor: "pointer",
+    transition: "background-color 0.3s ease",
+    "&:hover": {
+      backgroundColor: isDarkMode ? "#1565c0" : "#42a5f5",
+    },
+  };
 
   return (
-    <div className={`min-h-screen flex ${themeClasses}`}>
-      {/* Main Content */}
-      <div className="flex-1 p-5 space-y-5">
-        {isLoading ? (
-          <p>Loading data...</p>
-        ) : error ? (
-          <p className="text-red-500">{error}</p>
-        ) : (
-          <>
-            <div className="grid grid-cols-3 gap-5">
-              <div className={cardClasses}>
-                <h3 className="text-xl font-semibold">Total Barang Masuk</h3>
-                <p className="text-2xl font-bold">{filteredBarangData.length} Item</p>
-              </div>
-              <div className={cardClasses}>
-                <h3 className="text-xl font-semibold">Total Barang Keluar</h3>
-                <p className="text-2xl font-bold">0</p>
-              </div>
-              <div className={cardClasses}>
-                <h3 className="text-xl font-semibold">Total Barang</h3>
-                <p className="text-2xl font-bold">
-                  {filteredBarangData.reduce(
-                    (total, barang) => total + (barang.total_barang || 0),
-                    0
-                  )}{" "}
-                  Item
-                </p>
-              </div>
-            </div>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: isDarkMode ? "#121212" : "#fff",
+        color: isDarkMode ? "#fff" : "#000",
+        p: 3,
+        transition: "background-color 0.3s ease, color 0.3s ease",
+      }}
+    >
+      {/* Main Content Section */}
+      <Box sx={{ flex: 1, p: 3 }}>
+        {/* Cards Section */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          {/* Kartu Total Barang */}
+          <Grid item xs={12} sm={4}>
+            <Card
+              sx={cardStyles}
+              onClick={() => navigate("/kepalaGudang/totalBarang")} // Navigasi ke Total Barang
+            >
+              <Typography variant="h6" fontWeight="bold">
+                Total Barang
+              </Typography>
+              <Typography variant="h4" fontWeight="bold">
+                {barangData.length} Item
+              </Typography>
+            </Card>
+          </Grid>
 
-            <div className="grid grid-cols-3 gap-5">
-              {filteredBarangData.map((barang) => (
-                <div
-                  key={barang._id} // Pastikan Anda menggunakan `_id` dari MongoDB
-                  className={`p-5 rounded-md text-center ${sidebarClasses}`}
+          {/* Kartu Total Barang Keluar */}
+          <Grid item xs={12} sm={4}>
+            <Card
+              sx={cardStyles}
+              onClick={() => navigate("/kepalaGudang/totalBarangKeluar")} // Navigasi ke Total Barang Keluar
+            >
+              <Typography variant="h6" fontWeight="bold">
+                Total Barang Keluar
+              </Typography>
+              <Typography variant="h4" fontWeight="bold">
+                {barangData.reduce(
+                  (total, barang) => total + (barang.total_barang || 0),
+                  0
+                )}{" "}
+                Karung
+              </Typography>
+            </Card>
+          </Grid>
+
+          {/* Kartu Total Barang Masuk */}
+          <Grid item xs={12} sm={4}>
+            <Card
+              sx={cardStyles}
+              onClick={() => navigate("/kepalaGudang/totalBarangMasuk")} // Navigasi ke Total Barang Masuk
+            >
+              <Typography variant="h6" fontWeight="bold">
+                Total Barang Masuk
+              </Typography>
+              <Typography variant="h4" fontWeight="bold">
+                {barangData.reduce(
+                  (total, barang) => total + (barang.total_barang || 0),
+                  0
+                )}{" "}
+                Karung
+              </Typography>
+            </Card>
+          </Grid>
+        </Grid>
+
+        {/* Barang Cards Section */}
+        {isLoading ? (
+          <Box sx={{ textAlign: "center", mt: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Typography color="error">{error}</Typography>
+        ) : (
+          <Grid container spacing={3} sx={{ mt: 4 }}>
+            {barangData.map((barang, index) => (
+              <Grid item xs={12} sm={4} key={barang._id || index}>
+                <Card
+                  sx={{
+                    backgroundColor: isDarkMode ? "#424242" : "#f5f5f5",
+                    p: 3,
+                    textAlign: "center",
+                    transition: "background-color 0.3s ease",
+                  }}
                 >
-                  <img
-                    src={barang.photo_url || "https://via.placeholder.com/100"}
-                    alt={barang.nama}
-                    className="w-20 h-20 mx-auto rounded-md mb-3"
-                  />
-                  <h4 className="text-lg font-bold">{barang.nama}</h4>
-                  <p className="text-sm">ID: {barang.id_stock}</p>
-                  <p className="text-sm">Tipe: {barang.tipe_barang}</p>
-                  <p className="text-sm">Jumlah: {barang.total_barang}</p>
-                  <p className="text-sm">Tanggal Masuk: {barang.tanggal_masuk}</p>
-                </div>
-              ))}
-            </div>
-          </>
+                  <Typography variant="h6" fontWeight="bold">
+                    {barang.nama}
+                  </Typography>
+                  <Typography variant="body2">ID: {barang.id_stock}</Typography>
+                  <Typography variant="body2">Tipe: {barang.tipe_barang}</Typography>
+                  <Typography variant="body2">Jumlah: {barang.total_barang}</Typography>
+                  <Typography variant="body2">Tanggal Masuk: {barang.tanggal_masuk}</Typography>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
-export default Homekepalagudang;
+export default Total_barangMasuk;
