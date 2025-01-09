@@ -10,12 +10,12 @@ const PenjualanSchema = new Schema({
   nomorInvoice: {
     type: String,
     required: true,
-    unique: true, // Pastikan setiap nomorInvoice unik
+    unique: true, // Ensure unique invoice numbers
   },
   idCart: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'Cart', // Koleksi yang direferensikan
+      ref: 'Cart', // Reference to Cart collection
     },
   ],
   namaBarang: {
@@ -32,11 +32,11 @@ const PenjualanSchema = new Schema({
   },
   tanggalPembelian: {
     type: Date,
-    default: Date.now,
+    default: Date.now, // Use Date.now directly for the default value
   },
   Customer_id: {
     type: Schema.Types.ObjectId,
-    ref: 'Customer', // Koleksi yang direferensikan
+    ref: 'Customer', // Reference to Customer collection
     required: true,
   },
   status: {
@@ -45,4 +45,5 @@ const PenjualanSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model('Penjualan', PenjualanSchema);
+// Use safeguard to prevent overwriting the model
+module.exports = mongoose.models.Penjualan || mongoose.model('Penjualan', PenjualanSchema);

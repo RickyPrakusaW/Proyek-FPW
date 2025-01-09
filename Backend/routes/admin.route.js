@@ -527,7 +527,6 @@ router.get('/products/:folder/:imageName', (req, res) => {
 // Route untuk menambahkan retur barang
 router.post("/addRetur", uploadRetur, async (req, res) => {
   try {
-    // Log file and body data for debugging
     console.log("File diterima:", req.file);
     console.log("Data body:", req.body);
 
@@ -545,7 +544,6 @@ router.post("/addRetur", uploadRetur, async (req, res) => {
       return res.status(400).json({ error: "Semua field wajib diisi!" });
     }
 
-    // Validate numeric and date fields
     if (isNaN(Jumlah_barang) || Jumlah_barang <= 0) {
       return res.status(400).json({ error: "Jumlah barang harus berupa angka positif." });
     }
@@ -554,7 +552,22 @@ router.post("/addRetur", uploadRetur, async (req, res) => {
       return res.status(400).json({ error: "Tanggal tidak valid." });
     }
 
-    // Create a new ReturAdmin entry
+    // Mengurangi stok barang di koleksi produk
+    const product = await Product.findOne({ Id_product: Id_barang });
+    if (!product) {
+      return res.status(404).json({ error: "Barang dengan ID tersebut tidak ditemukan." });
+    }
+
+    if (product.Stock_barang < Jumlah_barang) {
+      return res
+        .status(400)
+        .json({ error: "Stok barang tidak mencukupi untuk pengurangan retur." });
+    }
+
+    product.Stock_barang -= parseInt(Jumlah_barang);
+    await product.save();
+
+    // Buat entri baru di ReturAdmin
     const newRetur = new ReturAdmin({
       Id_retur_admin: newId,
       Id_barang,
@@ -565,18 +578,15 @@ router.post("/addRetur", uploadRetur, async (req, res) => {
       Status: Status || "Barang rusak",
     });
 
-    // Save the new entry to the database
     const savedRetur = await newRetur.save();
 
-    // Respond with success message
     res.status(201).json({
-      message: "Retur barang berhasil ditambahkan",
+      message: "Retur barang berhasil ditambahkan dan stok diperbarui.",
       data: savedRetur,
     });
   } catch (error) {
     console.error("Error saat menambahkan retur barang:", error);
 
-    // Improved error response for debugging
     res.status(500).json({
       error: "Terjadi kesalahan pada server",
       details: error.message,
@@ -592,54 +602,58 @@ router.get('/getRetur', async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
-
 router.put("/updateRetur/:id", async (req, res) => {
   try {
-    const { id } = req.params; // ID retur dari parameter URL
+    const { id } = req.params; // ID yang diterima dari URL
+    console.log("ID diterima: ", id); // Log ID yang diterima dari frontend
     const { Status } = req.body; // Status baru dari body request
 
-    // Validasi input
+    // Validasi status baru
     if (!Status) {
-      return res.status(400).json({ error: "Status wajib diisi!" });
+      return res.status(400).json({ error: "Status baru harus disediakan." });
     }
 
-    // Validasi nilai status
-    const validStatuses = [
-      "Barang diretur ke supplier",
-      "Barang dikembalikan dari supplier",
-      "Barang rusak",
-    ];
-    if (!validStatuses.includes(Status)) {
-      return res.status(400).json({ error: "Status tidak valid!" });
+    // Temukan retur berdasarkan Id_retur_admin
+    const retur = await ReturAdmin.findOne({ Id_retur_admin: id.toString() }); // Mengonversi ID menjadi string
+    if (!retur) {
+      return res.status(404).json({ error: "Retur barang tidak ditemukan." });
     }
 
-    // Cari retur berdasarkan ID dan update status
-    const updatedRetur = await ReturAdmin.findOneAndUpdate(
-      { Id_retur_admin: id }, // Filter by Id_retur_admin
-      { $set: { Status } },   // Update the status
-      { new: true }           // Return the updated document
-    );
-
-    if (!updatedRetur) {
-      return res.status(404).json({ error: "Data retur tidak ditemukan!" });
+    // Jika status tidak berubah, tidak perlu memperbarui
+    if (retur.Status === Status) {
+      return res.status(400).json({ error: "Status sudah sesuai." });
     }
 
-    // Kirim respon sukses
+    // Jika status diubah menjadi "Barang dikembalikan dari supplier"
+    if (Status === "Barang dikembalikan dari supplier") {
+      const product = await Product.findOne({ Id_product: retur.Id_barang });
+      if (!product) {
+        return res.status(404).json({
+          error: "Barang terkait retur tidak ditemukan di koleksi produk.",
+        });
+      }
+
+      // Tambahkan kembali stok barang dengan jumlah barang retur
+      product.Stock_barang += parseInt(retur.Jumlah_barang);
+      await product.save();
+    }
+
+    // Update status retur
+    retur.Status = Status;
+    const updatedRetur = await retur.save();
+
     res.status(200).json({
-      message: "Status retur berhasil diperbarui",
+      message: "Status retur berhasil diperbarui.",
       data: updatedRetur,
     });
   } catch (error) {
     console.error("Error saat memperbarui status retur:", error);
-
-    // Respon kesalahan
     res.status(500).json({
       error: "Terjadi kesalahan pada server",
       details: error.message,
     });
   }
 });
-
 
 //kepala gudang
 router.post('/addStock', uploadStock, async (req, res) => {
@@ -906,6 +920,11 @@ router.post('/addReturGudang', uploadReturGudang, async (req, res) => {
       return res.status(404).json({ error: 'Barang dengan ID tersebut tidak ditemukan' });
     }
 
+    // Validasi apakah jumlah barang yang diretur tidak lebih dari jumlah stok
+    if (jumlahBarang > stock.total_barang) {
+      return res.status(400).json({ error: 'Jumlah barang retur melebihi jumlah stok yang tersedia' });
+    }
+
     // Buat ID unik untuk retur
     const idReturGudang = `${id_barang}-${Date.now()}`;
 
@@ -919,11 +938,15 @@ router.post('/addReturGudang', uploadReturGudang, async (req, res) => {
       tanggal,
     });
 
-    await retur.save();
+    // Kurangi jumlah barang di stok
+    stock.total_barang -= jumlahBarang; // Kurangi jumlah stok dengan jumlah retur
+    await stock.save(); // Simpan perubahan stok
+
+    await retur.save(); // Simpan retur ke database
 
     // Kirim respon sukses
     res.status(201).json({
-      message: 'Barang retur berhasil ditambahkan',
+      message: 'Barang retur berhasil ditambahkan dan stok diperbarui',
       data: retur,
     });
   } catch (error) {
@@ -931,6 +954,7 @@ router.post('/addReturGudang', uploadReturGudang, async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+
 //update status 
 router.put('/updateStatusRetur/:id', async (req, res) => {
   try {
@@ -1169,6 +1193,7 @@ router.get('/getCustomers', async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
+//p
 router.post('/addPenjualan', async (req, res) => {
   const { customerId, cartId, status, metodePembayaran } = req.body;
 

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useTheme } from "../ThemeContext";
 import axios from "axios";
 import {
@@ -19,7 +18,6 @@ import {
 } from "@mui/material";
 
 const ReturAdmin = () => {
-  const navigate = useNavigate();
   const { isDarkMode } = useTheme();
   const [barangReturs, setBarangReturs] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,7 +33,7 @@ const ReturAdmin = () => {
   const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
     : "bg-white text-gray-900";
-  const textColor = isDarkMode ? "text-white" : "text-black"; // Define text color based on theme
+  const textColor = isDarkMode ? "text-white" : "text-black";
 
   useEffect(() => {
     fetchReturs();
@@ -69,7 +67,6 @@ const ReturAdmin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const formData = new FormData();
     formData.append("Id_barang", newRetur.Id_barang);
     formData.append("Nama_barang", newRetur.Nama_barang);
@@ -127,22 +124,21 @@ const ReturAdmin = () => {
             fullWidth
             sx={{
               maxWidth: 300,
-              backgroundColor: isDarkMode ? "#2c2c2c" : "white", // Dark background in dark mode
+              backgroundColor: isDarkMode ? "#2c2c2c" : "white",
               "& .MuiInputBase-root": {
-                color: isDarkMode ? "white" : "black", // White text in dark mode, black text in light mode
+                color: isDarkMode ? "white" : "black",
               },
               "& .MuiOutlinedInput-notchedOutline": {
-                borderColor: isDarkMode ? "#555" : "#ccc", // Darker border in dark mode
+                borderColor: isDarkMode ? "#555" : "#ccc",
               },
               "& .MuiInputLabel-root": {
-                color: isDarkMode ? "#ccc" : "#000", // Lighter label in dark mode
+                color: isDarkMode ? "#ccc" : "#000",
               },
               "&:hover .MuiOutlinedInput-notchedOutline": {
-                borderColor: isDarkMode ? "#fff" : "#000", // Highlight border on hover
+                borderColor: isDarkMode ? "#fff" : "#000",
               },
             }}
           />
-
           <Button
             variant="contained"
             color="success"
@@ -153,7 +149,7 @@ const ReturAdmin = () => {
         </div>
 
         <TableContainer component={Paper} sx={{ maxHeight: "400px" }}>
-          <Table stickyHeader aria-label="retur barang table">
+          <Table stickyHeader>
             <TableHead>
               <TableRow>
                 <TableCell className={textColor}>No</TableCell>
@@ -202,19 +198,6 @@ const ReturAdmin = () => {
                                 "Barang diretur ke supplier"
                               )
                             }
-                            sx={{
-                              paddingX: 3,
-                              paddingY: 1.5,
-                              fontWeight: "bold",
-                              borderRadius: 2,
-                              textTransform: "capitalize",
-                              border: "2px solid", // Adds a custom border width
-                              borderColor: "primary.main", // Border color matching the primary theme
-                              "&:hover": {
-                                backgroundColor: "primary.main", // Hover effect with primary color
-                                color: "white", // Text color changes on hover
-                              },
-                            }}
                           >
                             Retur ke Supplier
                           </Button>
@@ -229,19 +212,6 @@ const ReturAdmin = () => {
                                 "Barang dikembalikan dari supplier"
                               )
                             }
-                            sx={{
-                              paddingX: 3,
-                              paddingY: 1.5,
-                              fontWeight: "bold",
-                              borderRadius: 2,
-                              textTransform: "capitalize",
-                              border: "2px solid", // Adds a custom border width
-                              borderColor: "secondary.main", // Border color matching the secondary theme
-                              "&:hover": {
-                                backgroundColor: "secondary.main", // Hover effect with secondary color
-                                color: "white", // Text color changes on hover
-                              },
-                            }}
                           >
                             Kembali dari Supplier
                           </Button>
@@ -259,97 +229,6 @@ const ReturAdmin = () => {
             </TableBody>
           </Table>
         </TableContainer>
-
-        <Dialog open={showModal} onClose={() => setShowModal(false)}>
-          <DialogTitle className="text-black">Tambah Retur</DialogTitle>
-          <DialogContent>
-            <form onSubmit={handleSubmit}>
-              <TextField
-                label="ID Barang"
-                variant="outlined"
-                name="Id_barang"
-                value={newRetur.Id_barang}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-              />
-              <TextField
-                label="Nama Barang"
-                variant="outlined"
-                name="Nama_barang"
-                value={newRetur.Nama_barang}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-              />
-              <TextField
-                label="Jumlah Barang"
-                variant="outlined"
-                name="Jumlah_barang"
-                value={newRetur.Jumlah_barang}
-                onChange={handleChange}
-                type="number"
-                fullWidth
-                margin="normal"
-              />
-              <TextField
-                label="Tanggal"
-                variant="outlined"
-                name="Tanggal"
-                value={newRetur.Tanggal}
-                onChange={handleChange}
-                type="date"
-                fullWidth
-                margin="normal"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-              <input
-                type="file"
-                onChange={handleFileChange}
-                className="mt-3 w-full"
-              />
-            </form>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => setShowModal(false)}
-              color="secondary"
-              variant="contained"
-              sx={{
-                marginRight: 2,
-                paddingX: 3,
-                paddingY: 1.5,
-                fontWeight: "bold",
-                borderRadius: 2,
-                textTransform: "capitalize",
-                "&:hover": {
-                  backgroundColor: "#f44336", // Hover effect with a custom color (red)
-                },
-              }}
-            >
-              Batal
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              color="success"
-              variant="contained"
-              sx={{
-                paddingX: 3,
-                paddingY: 1.5,
-                fontWeight: "bold",
-                borderRadius: 2,
-                textTransform: "capitalize",
-                "&:hover": {
-                  backgroundColor: "#4caf50", // Hover effect with a custom color (green)
-                },
-              }}
-            >
-              Simpan
-            </Button>
-          </DialogActions>
-        </Dialog>
       </div>
     </div>
   );

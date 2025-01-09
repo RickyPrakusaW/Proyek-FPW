@@ -14,6 +14,7 @@ import {
   Box,
   Paper,
   styled,
+  TextField,
 } from "@mui/material";
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import GroupsIcon from '@mui/icons-material/Groups';
@@ -45,6 +46,7 @@ function ListBarangKaryawan() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(""); // state for search query
 
   const cardStyles = {
     backgroundColor: isDarkMode ? "#424242" : "#fff",
@@ -111,6 +113,13 @@ function ListBarangKaryawan() {
     }
   };
 
+  // Filter products based on search query
+  const filteredProducts = products.filter((product) =>
+    (product.Id_product && product.Id_product.toString().toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (product.Nama_product && product.Nama_product.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+  
+
   return (
     <div
       style={{
@@ -174,6 +183,23 @@ function ListBarangKaryawan() {
         </Grid>
       </Grid>
 
+      {/* Search Bar */}
+      <Box mb={3}>
+        <TextField
+          label="Search by ID or Name"
+          variant="outlined"
+          fullWidth
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{
+            backgroundColor: isDarkMode ? "#424242" : "#fff",
+            "& .MuiInputBase-root": {
+              color: isDarkMode ? "#fff" : "#000",
+            },
+          }}
+        />
+      </Box>
+
       {/* List Barang Section */}
       <Typography
         variant="h4"
@@ -196,7 +222,7 @@ function ListBarangKaryawan() {
       
       {!loading && !error && (
         <Grid container spacing={3}>
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={product._id}>
               <Card style={cardStyles}>
                 {product.Photo_product ? (
@@ -211,6 +237,15 @@ function ListBarangKaryawan() {
                   <Box height="200px" bgcolor="#e0e0e0" />
                 )}
                 <CardContent>
+                <Typography 
+                    variant="h6" 
+                    component="div" 
+                    style={textColor}
+                    gutterBottom
+                    noWrap
+                  >
+                    {product.Id_product}
+                  </Typography>
                   <Typography 
                     variant="h6" 
                     component="div" 

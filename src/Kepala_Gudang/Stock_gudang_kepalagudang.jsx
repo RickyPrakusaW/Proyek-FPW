@@ -87,7 +87,7 @@ const StockGudang = () => {
               className="w-full h-48 object-cover rounded-md mb-4"
             />
             {/* ID Stock */}
-            <h2 className={cardTitleClasses}>{stock.id_stock}</h2>
+            <h2 className={cardTitleClasses}>{stock.id_barang}</h2>
             {/* Nama Barang */}
             <h2 className={cardTitleClasses}>{stock.nama_barang}</h2>
             {/* Stock Barang */}

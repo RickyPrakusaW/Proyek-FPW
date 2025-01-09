@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const StockSchema = new mongoose.Schema({
   id_barang: {
-    type: String, // Gunakan String untuk ID barang
+    type: String,
     required: true,
     unique: true
   },
@@ -11,7 +11,7 @@ const StockSchema = new mongoose.Schema({
     required: true
   },
   total_barang: {
-    type: Number, // Total stok barang
+    type: Number, 
     required: true
   },
   tipe_barang: {

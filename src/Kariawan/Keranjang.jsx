@@ -116,7 +116,7 @@ function Keranjang() {
                 <TableCell style={{ color: textColor }}>ID Barang</TableCell>
                 <TableCell style={{ color: textColor }}>Nama Barang</TableCell>
                 <TableCell style={{ color: textColor }}>Jumlah</TableCell>
-                <TableCell style={{ color: textColor }}>Foto</TableCell>
+                
                 <TableCell style={{ color: textColor }}>Harga</TableCell>
                 <TableCell style={{ color: textColor }}>Total</TableCell>
                 <TableCell style={{ color: textColor }}>Aksi</TableCell>
@@ -126,7 +126,7 @@ function Keranjang() {
               {cartItems.map((item, index) => (
                 <TableRow key={item._id}>
                   <TableCell style={{ color: textColor }}>{index + 1}</TableCell>
-                  <TableCell style={{ color: textColor }}>{item.Id_product}</TableCell>
+                  <TableCell style={{ color: textColor }}>{item.idCart}</TableCell>
                   <TableCell style={{ color: textColor }}>{item.namaBarang}</TableCell>
                   <TableCell>
                     <Button
@@ -147,17 +147,7 @@ function Keranjang() {
                       +
                     </Button>
                   </TableCell>
-                  <TableCell>
-                    {item.photo ? (
-                      <img
-                        src={item.photo}
-                        alt={item.namaBarang}
-                        style={{ width: 48, height: 48, objectFit: "cover" }}
-                      />
-                    ) : (
-                      <div style={{ width: 48, height: 48, backgroundColor: "#ccc" }}></div>
-                    )}
-                  </TableCell>
+                 
                   <TableCell style={{ color: textColor }}>Rp. {item.harga}</TableCell>
                   <TableCell style={{ color: textColor }}>Rp. {item.totalBelanja}</TableCell>
                   <TableCell>

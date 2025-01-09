@@ -165,6 +165,12 @@ const Homekepalagudang = () => {
     ],
   };
 
+  // Calculate total barang keluar
+  const totalBarangKeluar = barangKeluarData.reduce(
+    (total, barang) => total + (barang.Total_barang || 0),
+    0
+  );
+
   const themeClasses = isDarkMode
     ? "bg-gray-900 text-white"
     : "bg-white text-gray-900";
@@ -196,13 +202,7 @@ const Homekepalagudang = () => {
                   onClick={() => navigate("/kepalaGudang/totalBarangKeluar")}
                 >
                   <h3 className="text-xl font-semibold">Total Barang Keluar</h3>
-                  <p className="text-2xl font-bold">
-                    {barangData.reduce(
-                      (total, barang) => total + (barang.total_barang || 0),
-                      0
-                    )}{" "}
-                    Karung
-                  </p>
+                  <p className="text-2xl font-bold">{totalBarangKeluar} Karung</p>
                 </div>
 
                 <div className={`${cardClasses} p-5 rounded-md text-center`}>
@@ -216,6 +216,7 @@ const Homekepalagudang = () => {
                   </p>
                 </div>
               </div>
+
               {/* Tombol Chat Kepala Gudang */}
               <div
                 className={`${cardClasses} p-5 rounded-md text-center cursor-pointer`}
@@ -228,6 +229,7 @@ const Homekepalagudang = () => {
                   Klik untuk membuka WhatsApp
                 </p>
               </div>
+
               <div className="grid grid-cols-2 gap-5">
                 <div className={`p-5 rounded-md ${themeClasses}`}>
                   <h3 className="text-xl font-semibold mb-3">

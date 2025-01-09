@@ -7,9 +7,11 @@ const Total_barangMasuk = () => {
   const navigate = useNavigate(); // Gunakan useNavigate
   const { isDarkMode } = useTheme();
   const [barangData, setBarangData] = useState([]);
+  const [barangKeluarData, setBarangKeluarData] = useState([]); // State untuk barang keluar
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Fetch data barang masuk
   useEffect(() => {
     const fetchBarangData = async () => {
       try {
@@ -23,12 +25,32 @@ const Total_barangMasuk = () => {
         setBarangData(result.data); // Set data barang masuk dari backend
       } catch (err) {
         setError(err.message);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchBarangData();
+  }, []);
+
+  // Fetch data barang keluar
+  useEffect(() => {
+    const fetchBarangKeluarData = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/admin/barangKeluar");
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || "Gagal mengambil data barang keluar");
+        }
+
+        setBarangKeluarData(result.data); // Set data barang keluar
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false); // Selesai memuat data
+      }
+    };
+
+    fetchBarangKeluarData();
   }, []);
 
   // Gaya untuk kartu berdasarkan tema
@@ -82,8 +104,8 @@ const Total_barangMasuk = () => {
                 Total Barang Keluar
               </Typography>
               <Typography variant="h4" fontWeight="bold">
-                {barangData.reduce(
-                  (total, barang) => total + (barang.total_barang || 0),
+                {barangKeluarData.reduce(
+                  (total, barang) => total + (barang.Total_barang || 0),
                   0
                 )}{" "}
                 Karung
@@ -133,9 +155,9 @@ const Total_barangMasuk = () => {
                   <Typography variant="h6" fontWeight="bold">
                     {barang.nama}
                   </Typography>
-                  <Typography variant="body2">ID: {barang.id_stock}</Typography>
+                  <Typography variant="body2">ID: {barang.id_barang}</Typography>
                   <Typography variant="body2">Tipe: {barang.tipe_barang}</Typography>
-                  <Typography variant="body2">Jumlah: {barang.total_barang}</Typography>
+                  <Typography variant="body2">Jumlah: {barang.total_barang} karung</Typography>
                   <Typography variant="body2">Tanggal Masuk: {barang.tanggal_masuk}</Typography>
                 </Card>
               </Grid>

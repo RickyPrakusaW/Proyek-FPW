@@ -14,7 +14,7 @@ const Total_barangKeluar = () => {
     const fetchBarangData = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/api/admin/getStock"
+          "http://localhost:3000/api/admin/barangKeluar"
         ); // Gunakan endpoint yang sama
         const result = await response.json();
 
@@ -62,16 +62,16 @@ const Total_barangKeluar = () => {
           {/* Kartu Total Barang */}
           <Grid item xs={12} sm={4}>
             <Card
-              sx={cardStyles}
-              onClick={() => navigate("/kepalaGudang/totalBarang")} // Navigasi ke Total Barang
-            >
-              <Typography variant="h6" fontWeight="bold">
-                Total Barang
-              </Typography>
-              <Typography variant="h4" fontWeight="bold">
-                {barangData.length} Item
-              </Typography>
-            </Card>
+                          sx={cardStyles}
+                          onClick={() => navigate("/kepalaGudang/totalBarang")} // Navigasi ke Total Barang
+                        >
+                          <Typography variant="h6" fontWeight="bold">
+                            Total Barang
+                          </Typography>
+                          <Typography variant="h4" fontWeight="bold">
+                            {barangData.length} Item
+                          </Typography>
+                        </Card>
           </Grid>
 
           {/* Kartu Total Barang Keluar */}
@@ -85,7 +85,7 @@ const Total_barangKeluar = () => {
               </Typography>
               <Typography variant="h4" fontWeight="bold">
                 {barangData.reduce(
-                  (total, barang) => total + (barang.total_barang || 0),
+                  (total, barang) => total + (barang.Total_barang || 0),
                   0
                 )}{" "}
                 Karung
@@ -136,19 +136,19 @@ const Total_barangKeluar = () => {
                     {barang.nama_barang}
                   </Typography>
                   <Typography variant="body2">
-                    ID: {barang.id_barang_keluar}
+                    ID: {barang.id_barang}
                   </Typography>
                   <Typography variant="body2">
-                    Tipe: {barang.tipe_barang}
+                    Tipe: {barang.Tipe_barang}
                   </Typography>
                   <Typography variant="body2">
-                    Jumlah Keluar: {barang.jumlah_keluar} Karung
+                    Jumlah Keluar: {barang.Total_barang} Karung
                   </Typography>
                   <Typography variant="body2">
-                    Tanggal Keluar: {barang.tanggal_keluar}
+                    Tanggal Keluar: {barang.Tanggal_keluar}
                   </Typography>
                   <Typography variant="body2">
-                    Status: {barang.status}
+                    Status: {barang.Status}
                   </Typography>
                 </Card>
               </Grid>

@@ -54,7 +54,7 @@ function CekStockGudang() {
                   <CardContent>
                     {/* Display ID Barang first */}
                     <Typography variant="body2" color="textSecondary">
-                      ID Barang: {stock.id_stock}
+                      ID Barang: {stock.id_barang}
                     </Typography>
 
                     <Typography variant="h6">{stock.nama_barang}</Typography>
