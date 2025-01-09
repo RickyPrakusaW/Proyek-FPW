@@ -1193,37 +1193,29 @@ router.get('/getCustomers', async (req, res) => {
     res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
-//p
+//penjualan 
 router.post('/addPenjualan', async (req, res) => {
-  const { customerId, cartId, status, metodePembayaran } = req.body;
+  const { customer, cartItems, metodePembayaran } = req.body;
 
   // Validasi input
-  if (!customerId || !Array.isArray(cartId) || typeof status !== 'boolean' || !metodePembayaran) {
+  if (!customer || !Array.isArray(cartItems)) {
     return res.status(400).json({
-      error: 'Data pelanggan, keranjang, status, dan metode pembayaran wajib diisi dengan format yang benar.',
-    });
-  }
-
-  // Validasi metode pembayaran
-  if (!['cash', 'transfer'].includes(metodePembayaran)) {
-    return res.status(400).json({
-      error: 'Metode pembayaran harus berupa "cash" atau "transfer".',
+      error: 'Data pelanggan dan keranjang wajib diisi dengan format yang benar.',
     });
   }
 
   try {
-    // Ambil data pelanggan
-    const customer = await Customer.findById(customerId).select('Nama_lengkap No_telepone');
-    if (!customer) {
-      return res.status(404).json({ error: 'Pelanggan tidak ditemukan.' });
+    // Pastikan customer baru dibuat tanpa duplikat ID
+    let customerRecord = await Customer.findOne({ No_telepone: customer.No_telepone });
+    if (!customerRecord) {
+      customerRecord = await Customer.create(customer); // Buat customer baru jika belum ada
     }
 
-    // Ambil data keranjang menggunakan cartId
-    const carts = await Cart.find({ _id: { $in: cartId } }).select('namaBarang totalProduct harga');
-    if (carts.length !== cartId.length) {
+    // Ambil data keranjang berdasarkan ID yang dikirimkan
+    const carts = await Cart.find({ _id: { $in: cartItems.map(item => item._id) } });
+    if (carts.length !== cartItems.length) {
       return res.status(404).json({
         error: 'Beberapa item dalam keranjang tidak ditemukan.',
-        missingItems: cartId.filter(id => !carts.some(cart => cart._id.equals(id))),
       });
     }
 
@@ -1231,70 +1223,86 @@ router.post('/addPenjualan', async (req, res) => {
     const totalBarang = carts.reduce((sum, cart) => sum + cart.totalProduct, 0);
     const totalHarga = carts.reduce((sum, cart) => sum + cart.harga * cart.totalProduct, 0);
 
-    // Perbarui stok barang berdasarkan keranjang
+    // Kurangi stok produk
     for (const cart of carts) {
-      const product = await Product.findOne({ Nama_product: cart.namaBarang });
-      if (!product) {
-        return res.status(404).json({ error: `Produk ${cart.namaBarang} tidak ditemukan.` });
-      }
-
-      if (product.Stock_barang < cart.totalProduct) {
+      const product = await Product.findOne({ _id: cart.idBarang });
+      if (!product || product.Stock_barang < cart.totalProduct) {
         return res.status(400).json({
-          error: `Stok barang untuk ${cart.namaBarang} tidak mencukupi.`,
-          availableStock: product.Stock_barang,
+          error: `Stok tidak mencukupi untuk ${cart.namaBarang}.`,
         });
       }
-
-      // Kurangi stok barang
       product.Stock_barang -= cart.totalProduct;
       await product.save();
     }
 
-    // Buat nomor invoice unik
-    const nomorInvoice = `INV-${Date.now()}`;
+    // Generate unique invoice number
+    const nomorInvoice = `INV-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
 
-    // Format tanggal menggunakan moment.js
-    const formattedDate = moment().format('DD/MM/YYYY, HH:mm:ss');
-
-    // Data penjualan yang akan disimpan
+    // Simpan data penjualan
     const penjualanData = {
       idPenjualan: `PJ${Date.now()}`,
-      nomorInvoice, // Tambahkan nomor invoice
-      idCart: carts.map(cart => cart._id),
+      nomorInvoice,
+      idCart: cartItems.map(item => item._id),
       namaBarang: carts.map(cart => cart.namaBarang).join(', '),
       totalBarang,
       totalHarga,
-      tanggalPembelian: formattedDate, // Gunakan format tanggal yang diperbaiki
-      Customer_id: customer._id,
-      status,
-      metodePembayaran, // Tambahkan metode pembayaran
+      tanggalPembelian: new Date(),
+      Customer_id: customerRecord._id, // Menggunakan ID customer yang ada di database
+      status: false,
+      metodePembayaran: metodePembayaran || 'belum bayar',
     };
 
-    // Simpan data penjualan ke database
     const penjualanRecord = await Penjualan.create(penjualanData);
 
-    // Populate data penjualan dengan informasi lengkap
+    // Populate data penjualan untuk respons
     const populatedPenjualan = await Penjualan.findById(penjualanRecord._id)
-      .populate('Customer_id', 'Nama_lengkap No_telepone') // Populate customer info
-      .populate('idCart', 'namaBarang totalProduct harga'); // Populate cart items
+      .populate('Customer_id', 'Nama_lengkap No_telepone')
+      .populate('idCart', 'namaBarang totalProduct harga');
 
-    // Respons sukses
     res.status(201).json({
-      message: 'Penjualan berhasil disimpan dan stok barang diperbarui.',
+      message: 'Penjualan berhasil disimpan.',
       data: populatedPenjualan,
     });
   } catch (error) {
     console.error('Error saat menyimpan penjualan:', error);
+    res.status(500).json({
+      error: 'Terjadi kesalahan pada server.',
+      details: error.message,
+    });
+  }
+});
+//update 
+router.put('/updateMetodePembayaran/:idPenjualan', async (req, res) => {
+  const { idPenjualan } = req.params;
+  const { metodePembayaran } = req.body;
+  
+  if (!metodePembayaran) {
+    return res.status(400).json({
+      error: 'Metode pembayaran wajib diisi.',
+    });
+  }
 
-    // Penanganan error spesifik untuk validasi MongoDB
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({
-        error: 'Data penjualan tidak valid.',
-        details: error.errors,
+  try {
+    const penjualanRecord = await Penjualan.findOne({ idPenjualan });
+    if (!penjualanRecord) {
+      return res.status(404).json({
+        error: 'Penjualan tidak ditemukan.',
       });
     }
 
-    // Penanganan error default
+    penjualanRecord.metodePembayaran = metodePembayaran;
+    await penjualanRecord.save();
+
+    const populatedPenjualan = await Penjualan.findById(penjualanRecord._id)
+      .populate('Customer_id', 'Nama_lengkap No_telepone')
+      .populate('idCart', 'namaBarang totalProduct harga');
+
+    res.status(200).json({
+      message: 'Metode pembayaran berhasil diperbarui.',
+      data: populatedPenjualan,
+    });
+  } catch (error) {
+    console.error('Error saat memperbarui metode pembayaran:', error);
     res.status(500).json({
       error: 'Terjadi kesalahan pada server.',
       details: error.message,

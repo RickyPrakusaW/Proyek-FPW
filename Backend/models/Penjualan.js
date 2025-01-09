@@ -43,6 +43,12 @@ const PenjualanSchema = new Schema({
     type: Boolean,
     required: true,
   },
+  metodePembayaran: {
+    type: String,
+    enum: ['belum bayar', 'cash', 'transfer'], // Allowed values
+    default: 'belum bayar', // Default value
+    required: true,
+  },
 });
 
 // Use safeguard to prevent overwriting the model

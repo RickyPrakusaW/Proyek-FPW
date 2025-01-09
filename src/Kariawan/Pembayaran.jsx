@@ -1,28 +1,22 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Grid,
-  Box
-} from "@mui/material";
-// import BcaLogo from "./bca-logo.png"; // Pastikan Anda memiliki file gambar lokal di folder proyek Anda
+import { Card, CardContent, Typography, Button, Grid, Box } from "@mui/material";
+import axios from "axios"; // Pastikan Anda memiliki axios terinstal
 
 function Pembayaran() {
   const location = useLocation();
   const navigate = useNavigate();
 
   // Ambil data dari state navigasi
-  const { totalBelanja, formData, cartItems } = location.state || {
+  const { totalBelanja, formData, cartItems, idPenjualan } = location.state || {
     totalBelanja: 0,
     formData: {},
     cartItems: [],
+    idPenjualan: "", // Pastikan ID Penjualan ada
   };
 
   // State untuk metode pembayaran
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState(""); // Menyimpan metode pembayaran yang dipilih
 
   // Fungsi untuk mengirim data pembayaran ke backend
   const handlePayment = async () => {
@@ -30,15 +24,25 @@ function Pembayaran() {
       alert("Pilih metode pembayaran terlebih dahulu!");
       return;
     }
-
+  
+    console.log("ID Penjualan:", idPenjualan);
+    console.log("Metode Pembayaran:", paymentMethod);
+  
     try {
-      alert("Pembayaran berhasil!");
-      navigate("/karyawan"); // Redirect ke halaman utama karyawan
+      // Kirim PUT request untuk update metode pembayaran
+      const response = await axios.put(
+        `http://localhost:3000/api/admin/updateMetodePembayaran/${idPenjualan}`,
+        { metodePembayaran: paymentMethod }
+      );
+  
+      alert("Pembayaran berhasil! Metode pembayaran telah diperbarui.");
+      navigate("/karyawan");
     } catch (error) {
       console.error("Error selama pembayaran:", error);
-      alert(error.message);
+      alert("Terjadi kesalahan saat memperbarui metode pembayaran: " + error.message);
     }
   };
+  
 
   return (
     <Grid container justifyContent="center" alignItems="center" style={{ minHeight: "100vh" }}>
@@ -48,6 +52,7 @@ function Pembayaran() {
             Pembayaran
           </Typography>
 
+          {/* Pilihan metode pembayaran */}
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
             <Button
               variant={paymentMethod === "transfer" ? "contained" : "outlined"}
@@ -76,10 +81,12 @@ function Pembayaran() {
             </Button>
           </div>
 
+          {/* Menampilkan total tagihan */}
           <div style={{ marginTop: "20px", textAlign: "center" }}>
             <Typography variant="h6">Total Tagihan: Rp. {totalBelanja}</Typography>
           </div>
 
+          {/* Data pelanggan */}
           <Box mt={3}>
             <Typography variant="subtitle1">Data Pelanggan:</Typography>
             <Typography>Nama: {formData.Nama_lengkap}</Typography>
@@ -88,6 +95,7 @@ function Pembayaran() {
             <Typography>Kode Pos: {formData.Kodepos}</Typography>
           </Box>
 
+          {/* Tombol kembali */}
           <div style={{ marginTop: "20px" }}>
             <Button
               variant="contained"
@@ -98,6 +106,8 @@ function Pembayaran() {
               Kembali
             </Button>
           </div>
+
+          {/* Tombol bayar */}
           <div style={{ marginTop: "10px" }}>
             <Button
               variant="contained"

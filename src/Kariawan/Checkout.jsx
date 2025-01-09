@@ -4,15 +4,6 @@ import { useNavigate } from "react-router-dom";
 function Checkout() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    Nama_lengkap: "",
-    No_telepone: "",
-    Alamat: "",
-    Kota: "",
-    Negara: "",
-    Kodepos: "",
-  });
-
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -41,25 +32,77 @@ function Checkout() {
     0
   );
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const validateForm = () => {
-    const { Nama_lengkap, No_telepone, Alamat, Kota, Negara, Kodepos } = formData;
+  const handleCheckout = async () => {
+    const Nama_lengkap = document.getElementById("Nama_lengkap").value;
+    const No_telepone = document.getElementById("No_telepone").value;
+    const Alamat = document.getElementById("Alamat").value;
+    const Kota = document.getElementById("Kota").value;
+    const Negara = document.getElementById("Negara").value;
+    const Kodepos = document.getElementById("Kodepos").value;
+  
     if (!Nama_lengkap || !No_telepone || !Alamat || !Kota || !Negara || !Kodepos) {
       alert("Semua data pelanggan harus diisi.");
-      return false;
+      return;
     }
-    return true;
+  
+    const customerData = {
+      Nama_lengkap,
+      No_telepone,
+      Alamat,
+      Kota,
+      Negara,
+      Kodepos,
+    };
+  
+    try {
+      // Kirim data customer ke endpoint `/addCustomer`
+      const customerResponse = await fetch("http://localhost:3000/api/admin/addCustomer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(customerData),
+      });
+  
+      const customerResult = await customerResponse.json();
+  
+      if (!customerResponse.ok) {
+        alert(customerResult.error || "Gagal menambahkan customer.");
+        return;
+      }
+  
+      // Ambil ID Customer dari respons
+      const { data: newCustomer } = customerResult;
+  
+      // Kirim data penjualan ke endpoint `/addPenjualan`
+      const penjualanData = {
+        customer: newCustomer, // Data customer dari respons
+        cartItems: cartItems,
+        totalBelanja,
+      };
+  
+      const penjualanResponse = await fetch("http://localhost:3000/api/admin/addPenjualan", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(penjualanData),
+      });
+  
+      const penjualanResult = await penjualanResponse.json();
+  
+      if (penjualanResponse.ok) {
+        alert(penjualanResult.message);
+        navigate("/karyawan/pembayaran");
+      } else {
+        alert(penjualanResult.error);
+      }
+    } catch (error) {
+      alert("Terjadi kesalahan saat mengirim data ke server.");
+      console.error(error);
+    }
   };
-
-  const handleCheckout = () => {
-    if (!validateForm()) return;
-
-    navigate("/karyawan/pembayaran", { state: { totalBelanja, formData, cartItems } });
-  };
+  
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -75,21 +118,60 @@ function Checkout() {
               <div className="md:col-span-2">
                 <h2 className="mb-4 text-xl font-semibold text-black">Informasi Data Pelanggan</h2>
                 <form className="space-y-4">
-                  {Object.keys(formData).map((key) => (
-                    <div key={key}>
-                      <label className="block text-black">
-                        {key.replace("_", " ")}
-                      </label>
-                      <input
-                        type="text"
-                        name={key}
-                        value={formData[key]}
-                        onChange={handleChange}
-                        placeholder={key.replace("_", " ")}
-                        className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 text-black"
-                      />
-                    </div>
-                  ))}
+                  <div>
+                    <label className="block text-black">Nama Lengkap</label>
+                    <input
+                      id="Nama_lengkap"
+                      type="text"
+                      placeholder="Nama Lengkap"
+                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 text-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-black">No Telepone</label>
+                    <input
+                      id="No_telepone"
+                      type="text"
+                      placeholder="No Telepone"
+                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 text-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-black">Alamat</label>
+                    <input
+                      id="Alamat"
+                      type="text"
+                      placeholder="Alamat"
+                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 text-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-black">Kota</label>
+                    <input
+                      id="Kota"
+                      type="text"
+                      placeholder="Kota"
+                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 text-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-black">Negara</label>
+                    <input
+                      id="Negara"
+                      type="text"
+                      placeholder="Negara"
+                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 text-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-black">Kodepos</label>
+                    <input
+                      id="Kodepos"
+                      type="text"
+                      placeholder="Kodepos"
+                      className="w-full px-4 py-2 border rounded-md focus:ring focus:ring-blue-300 text-black"
+                    />
+                  </div>
                 </form>
               </div>
 
