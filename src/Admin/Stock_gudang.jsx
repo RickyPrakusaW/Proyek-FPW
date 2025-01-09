@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useTheme } from "../ThemeContext"; 
+import { useTheme } from "../ThemeContext";
 import axios from "axios";
+import { SearchIcon } from "lucide-react";
 
 const StockGudang = () => {
   const { isDarkMode } = useTheme();
@@ -14,9 +15,10 @@ const StockGudang = () => {
     ? "bg-gray-800 text-white shadow-lg"
     : "bg-white text-gray-900 shadow-md";
   const inputClasses = isDarkMode
-    ? "p-2 rounded-md border border-gray-700 focus:outline-none bg-gray-700 text-white"
-    : "p-2 rounded-md border border-gray-300 focus:outline-none bg-white text-gray-900";
+    ? "p-4 pl-12 text-lg rounded-md border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white w-full sm:w-96 md:w-[480px] lg:w-[640px] transition-all duration-300"
+    : "p-4 pl-12 text-lg rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 w-full sm:w-96 md:w-[480px] lg:w-[640px] transition-all duration-300";
   const textClasses = isDarkMode ? "text-white" : "text-gray-900";
+  const searchIconClasses = isDarkMode ? "text-gray-400" : "text-gray-500";
 
   useEffect(() => {
     const fetchStockData = async () => {
@@ -40,16 +42,21 @@ const StockGudang = () => {
 
   return (
     <div className={`min-h-screen flex flex-col ${themeClasses}`}>
-      {/* Header */}
-      <div className="flex justify-between items-center p-5">
-        <h1 className={`text-2xl font-bold ${textClasses}`}>Stock Di Gudang</h1>
-        <input
-          type="text"
-          placeholder="Search"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          className={inputClasses}
-        />
+      {/* Header with larger search bar */}
+      <div className="flex flex-col sm:flex-row justify-between items-center p-6 gap-6">
+        <h1 className={`text-3xl font-bold ${textClasses}`}>Stock Di Gudang</h1>
+        <div className="relative w-full sm:w-auto">
+          <SearchIcon 
+            className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 ${searchIconClasses}`}
+          />
+          <input
+            type="text"
+            placeholder="Search product..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className={inputClasses}
+          />
+        </div>
       </div>
 
       {/* Cards Container */}
@@ -57,19 +64,16 @@ const StockGudang = () => {
         {filteredStocks.map((stock, index) => (
           <div
             key={index}
-            className={`rounded-lg overflow-hidden flex flex-col items-center p-5 ${cardClasses}`}
+            className={`rounded-lg overflow-hidden flex flex-col items-center p-5 ${cardClasses} hover:shadow-xl transition-shadow duration-300`}
           >
-            {/* Image */}
             <img
               src={stock.photo_url}
               alt={stock.nama_barang}
               className="w-full h-48 object-cover rounded-md mb-4"
             />
-            {/* Nama Barang */}
             <h2 className={`text-lg font-bold mb-2 ${textClasses}`}>
               {stock.nama_barang}
             </h2>
-            {/* Stock Barang */}
             <p className={`text-sm ${textClasses}`}>
               Jumlah: <span className="font-semibold">{stock.total_barang}</span>
             </p>

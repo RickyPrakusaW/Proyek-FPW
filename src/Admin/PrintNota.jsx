@@ -14,12 +14,16 @@ import {
   IconButton,
   Tooltip,
   Container,
+  TextField,
 } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import ReceiptIcon from "@mui/icons-material/Receipt";
+import { useTheme } from "../ThemeContext"; // Asumsikan Anda memiliki hook useTheme
 
 function PrintNota() {
   const [penjualan, setPenjualan] = useState([]);
+  const [searchQuery, setSearchQuery] = useState(""); // State untuk menyimpan query pencarian
+  const { isDarkMode } = useTheme(); // Ambil nilai isDarkMode dari context
 
   useEffect(() => {
     const fetchPenjualan = async () => {
@@ -38,6 +42,11 @@ function PrintNota() {
 
     fetchPenjualan();
   }, []);
+
+  // Fungsi untuk memfilter data berdasarkan nama customer
+  const filteredPenjualan = penjualan.filter((nota) =>
+    nota.Customer_id?.Nama_lengkap?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handlePrint = (nota) => {
     const doc = new jsPDF();
@@ -105,7 +114,38 @@ function PrintNota() {
           Data Penjualan
         </Typography>
       </Box>
-      
+
+      {/* Search Bar */}
+      <Box sx={{ mb: 3 }}>
+        <TextField
+          fullWidth
+          label="Cari berdasarkan nama customer"
+          variant="outlined"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{
+            backgroundColor: isDarkMode ? "white" : "inherit", // Latar belakang putih saat dark mode
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: isDarkMode ? "black" : "inherit", // Border hitam saat dark mode
+              },
+              '&:hover fieldset': {
+                borderColor: isDarkMode ? "black" : "inherit", // Border hitam saat hover di dark mode
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: isDarkMode ? "black" : "inherit", // Border hitam saat fokus di dark mode
+              },
+            },
+            '& .MuiInputLabel-root': {
+              color: isDarkMode ? "black" : "inherit", // Label hitam saat dark mode
+            },
+            '& .MuiInputBase-input': {
+              color: isDarkMode ? "black" : "inherit", // Teks input hitam saat dark mode
+            },
+          }}
+        />
+      </Box>
+
       <TableContainer component={Paper} elevation={3}>
         <Table sx={{ minWidth: 650 }} aria-label="penjualan table">
           <TableHead>
@@ -121,7 +161,7 @@ function PrintNota() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {penjualan.map((nota, index) => (
+            {filteredPenjualan.map((nota, index) => (
               <TableRow
                 key={nota.idPenjualan}
                 sx={{ '&:nth-of-type(odd)': { backgroundColor: 'action.hover' } }}

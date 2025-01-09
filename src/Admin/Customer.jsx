@@ -12,6 +12,8 @@ import {
   Typography,
   CircularProgress,
   Paper,
+  TextField,
+  Box,
 } from "@mui/material";
 import { useTheme } from "../ThemeContext"; // Assuming useTheme hook is available
 
@@ -19,6 +21,7 @@ function Customer() {
   const [customers, setCustomers] = useState([]); // State untuk menyimpan data customer
   const [loading, setLoading] = useState(true); // State untuk loading status
   const [error, setError] = useState(null); // State untuk error handling
+  const [searchQuery, setSearchQuery] = useState(""); // State untuk menyimpan query pencarian
   const { isDarkMode } = useTheme(); // Get isDarkMode from context
 
   useEffect(() => {
@@ -48,6 +51,16 @@ function Customer() {
     XLSX.writeFile(workbook, "Data_Pelanggan.xlsx"); // Unduh file Excel
   };
 
+  // Fungsi untuk memfilter data berdasarkan query pencarian
+  const filteredCustomers = customers.filter((customer) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      customer.Nama_lengkap?.toLowerCase().includes(query) || // Cari berdasarkan nama
+      customer.Kota?.toLowerCase().includes(query) || // Cari berdasarkan kota
+      customer.Negara?.toLowerCase().includes(query) // Cari berdasarkan negara
+    );
+  });
+
   if (loading) return <CircularProgress className="mx-auto mt-5" />;
 
   if (error)
@@ -67,6 +80,39 @@ function Customer() {
       >
         Daftar Data Pelanggan
       </Typography>
+
+      {/* Search Bar */}
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          fullWidth
+          label="Cari berdasarkan nama, kota, atau negara"
+          variant="outlined"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{
+            backgroundColor: isDarkMode ? "#121212" : "inherit",
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: isDarkMode ? "white" : "inherit",
+              },
+              "&:hover fieldset": {
+                borderColor: isDarkMode ? "white" : "inherit",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: isDarkMode ? "white" : "inherit",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              color: isDarkMode ? "white" : "inherit",
+            },
+            "& .MuiInputBase-input": {
+              color: isDarkMode ? "white" : "inherit",
+            },
+          }}
+        />
+      </Box>
+
+      {/* Tombol Ekspor ke Excel */}
       <Button
         onClick={exportToExcel}
         variant="contained"
@@ -80,9 +126,14 @@ function Customer() {
       >
         Ekspor ke Excel
       </Button>
-      {customers.length === 0 ? (
-        <Typography align="center" sx={{ color: "black" }}>
-          Tidak ada pelanggan yang tersedia.
+
+      {/* Tabel Data Pelanggan */}
+      {filteredCustomers.length === 0 ? (
+        <Typography
+          align="center"
+          sx={{ color: isDarkMode ? "white" : "black" }}
+        >
+          Tidak ada pelanggan yang ditemukan.
         </Typography>
       ) : (
         <TableContainer
@@ -102,7 +153,7 @@ function Customer() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {customers.map((customer) => (
+              {filteredCustomers.map((customer) => (
                 <TableRow key={customer.Customer_id}>
                   <TableCell sx={{ color: "black" }}>
                     {customer.Customer_id}

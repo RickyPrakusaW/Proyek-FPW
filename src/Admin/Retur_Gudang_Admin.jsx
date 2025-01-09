@@ -13,12 +13,14 @@ import {
   CircularProgress,
   Alert,
   Box,
+  TextField,
 } from '@mui/material';
 
 function Retur_Gudang_Admin() {
   const [returGudang, setReturGudang] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(''); // State untuk menyimpan query pencarian
 
   // Fetch data retur gudang dari API
   useEffect(() => {
@@ -55,6 +57,11 @@ function Retur_Gudang_Admin() {
     }
   };
 
+  // Fungsi untuk memfilter data berdasarkan nama barang
+  const filteredReturGudang = returGudang.filter((retur) =>
+    retur.namaBarang?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (loading) return <CircularProgress style={{ display: 'block', margin: '20px auto' }} />;
   if (error) return <Alert severity="error" style={{ margin: '20px auto', width: 'fit-content' }}>{error}</Alert>;
 
@@ -63,7 +70,32 @@ function Retur_Gudang_Admin() {
       <Typography variant="h4" align="center" gutterBottom color='black'>
         Daftar Retur Gudang
       </Typography>
-      {returGudang.length === 0 ? (
+
+      {/* Search Bar */}
+      <Box sx={{ mb: 3 }}>
+        <TextField
+          fullWidth
+          label="Cari berdasarkan nama barang"
+          variant="outlined"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: 'primary.main', // Warna border saat tidak aktif
+              },
+              '&:hover fieldset': {
+                borderColor: 'primary.dark', // Warna border saat hover
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: 'primary.main', // Warna border saat fokus
+              },
+            },
+          }}
+        />
+      </Box>
+
+      {filteredReturGudang.length === 0 ? (
         <Typography variant="body1" align="center" color="textSecondary">
           Tidak ada data retur ditemukan
         </Typography>
@@ -81,7 +113,7 @@ function Retur_Gudang_Admin() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {returGudang.map((retur) => (
+              {filteredReturGudang.map((retur) => (
                 <TableRow key={retur.idReturGudang}>
                   <TableCell>{retur.idReturGudang}</TableCell>
                   <TableCell>{retur.namaBarang || 'N/A'}</TableCell>

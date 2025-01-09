@@ -14,12 +14,14 @@ import {
   Avatar,
   Alert,
   Box,
+  TextField,
 } from "@mui/material";
 
 function TotalBarangKeluar() {
   const [barangKeluar, setBarangKeluar] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(""); // State untuk menyimpan query pencarian
 
   // Fetch data barang keluar
   useEffect(() => {
@@ -59,6 +61,11 @@ function TotalBarangKeluar() {
     }
   };
 
+  // Fungsi untuk memfilter data berdasarkan nama barang
+  const filteredBarangKeluar = barangKeluar.filter((barang) =>
+    barang.Nama_barang?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   // Jika masih loading
   if (loading) return <CircularProgress style={{ display: 'block', margin: '20px auto' }} />;
 
@@ -70,7 +77,32 @@ function TotalBarangKeluar() {
       <Typography variant="h4" align="center" gutterBottom color="black">
         Daftar Barang Keluar
       </Typography>
-      {barangKeluar.length === 0 ? (
+
+      {/* Search Bar */}
+      <Box sx={{ mb: 3 }}>
+        <TextField
+          fullWidth
+          label="Cari berdasarkan nama barang"
+          variant="outlined"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: 'primary.main', // Warna border saat tidak aktif
+              },
+              '&:hover fieldset': {
+                borderColor: 'primary.dark', // Warna border saat hover
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: 'primary.main', // Warna border saat fokus
+              },
+            },
+          }}
+        />
+      </Box>
+
+      {filteredBarangKeluar.length === 0 ? (
         <Typography variant="body1" align="center" color="textSecondary">
           Tidak ada data barang keluar
         </Typography>
@@ -87,7 +119,7 @@ function TotalBarangKeluar() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {barangKeluar.map((barang) => (
+              {filteredBarangKeluar.map((barang) => (
                 <TableRow key={barang.Id_barang_keluar}>
                   <TableCell>{barang.Nama_barang}</TableCell>
                   <TableCell>{barang.Jumlah}</TableCell>

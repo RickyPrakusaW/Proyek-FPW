@@ -13,12 +13,14 @@ import {
   TableRow,
   Typography,
   Box,
+  TextField,
 } from "@mui/material";
 
-function Penjualan() {
-  const [penjualan, setPenjualan] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+function Penjualan({ isDarkMode }) {
+  const [penjualan, setPenjualan] = useState([]); // Data penjualan dari API
+  const [loading, setLoading] = useState(true); // State untuk loading
+  const [error, setError] = useState(null); // State untuk error
+  const [searchQuery, setSearchQuery] = useState(""); // State untuk menyimpan query pencarian
 
   useEffect(() => {
     const fetchPenjualan = async () => {
@@ -26,7 +28,7 @@ function Penjualan() {
         const response = await axios.get(
           "http://localhost:3000/api/admin/getPenjualan"
         );
-        setPenjualan(response.data.data);
+        setPenjualan(response.data.data); // Set data penjualan
         setLoading(false);
       } catch (error) {
         console.error("Error saat mengambil data penjualan:", error);
@@ -38,6 +40,7 @@ function Penjualan() {
     fetchPenjualan();
   }, []);
 
+  // Fungsi untuk menghitung total harga
   const calculateTotalHarga = (idCart, totalHarga) => {
     if (!Array.isArray(idCart) || idCart.length === 0) {
       return totalHarga || 0;
@@ -48,6 +51,7 @@ function Penjualan() {
     );
   };
 
+  // Fungsi untuk menghitung total pemasukan
   const calculateTotalPemasukan = () => {
     return penjualan.reduce(
       (total, item) =>
@@ -56,6 +60,7 @@ function Penjualan() {
     );
   };
 
+  // Fungsi untuk ekspor data ke Excel
   const exportToExcel = () => {
     const dataForExcel = penjualan.map((item) => ({
       "ID Penjualan": item.idPenjualan,
@@ -72,6 +77,13 @@ function Penjualan() {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data Penjualan");
     XLSX.writeFile(workbook, "Data_Penjualan.xlsx");
   };
+
+  // Fungsi untuk memfilter data berdasarkan nama customer
+  const filteredPenjualan = penjualan.filter((item) =>
+    item.Customer_id?.Nama_lengkap?.toLowerCase().includes(
+      searchQuery.toLowerCase()
+    )
+  );
 
   if (loading) {
     return (
@@ -99,6 +111,40 @@ function Penjualan() {
       <Typography variant="h4" gutterBottom>
         Data Penjualan
       </Typography>
+
+      {/* Search Bar */}
+      <TextField
+        fullWidth
+        label="Cari berdasarkan nama customer"
+        variant="outlined"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        sx={{
+          mb: 2,
+          backgroundColor: isDarkMode ? "white" : "inherit", // Latar belakang putih saat dark mode
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: isDarkMode ? "black" : "inherit", // Border hitam saat dark mode
+            },
+            "&:hover fieldset": {
+              borderColor: isDarkMode ? "black" : "inherit", // Border hitam saat hover di dark mode
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: isDarkMode ? "black" : "inherit", // Border hitam saat fokus di dark mode
+            },
+            // Warna teks input
+            "& input": {
+              color: isDarkMode ? "black" : "inherit", // Teks hitam saat dark mode
+            },
+          },
+          // Warna label
+          "& .MuiInputLabel-root": {
+            color: isDarkMode ? "black" : "inherit", // Label hitam saat dark mode
+          },
+        }}
+      />
+
+      {/* Tombol Ekspor ke Excel */}
       <Button
         variant="contained"
         color="primary"
@@ -107,7 +153,9 @@ function Penjualan() {
       >
         Ekspor ke Excel
       </Button>
-      {penjualan.length === 0 ? (
+
+      {/* Tabel Data Penjualan */}
+      {filteredPenjualan.length === 0 ? (
         <Typography variant="body1">Tidak ada data penjualan.</Typography>
       ) : (
         <TableContainer component={Paper}>
@@ -124,7 +172,7 @@ function Penjualan() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {penjualan.map((item) => (
+              {filteredPenjualan.map((item) => (
                 <TableRow key={item._id}>
                   <TableCell>{item.idPenjualan}</TableCell>
                   <TableCell>
@@ -152,6 +200,8 @@ function Penjualan() {
           </Table>
         </TableContainer>
       )}
+
+      {/* Total Pemasukan */}
       <Typography variant="h6" sx={{ mt: 3 }}>
         Total Pemasukan: Rp{" "}
         {calculateTotalPemasukan().toLocaleString("id-ID", {
