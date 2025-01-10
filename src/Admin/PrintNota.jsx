@@ -50,6 +50,11 @@ function PrintNota() {
 
   const handlePrint = (nota) => {
     const doc = new jsPDF();
+    
+    // Menambahkan logo dari folder assets
+    const logoUrl = "../assets/logo.jpg"; // Path relatif ke logo
+
+    doc.addImage(logoUrl, 'JPEG', 10, 10, 30, 30); // Menambahkan logo ke PDF
 
     // Header nota
     doc.setFontSize(16);
