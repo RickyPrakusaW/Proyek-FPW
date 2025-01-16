@@ -34,6 +34,7 @@ import List_barang_kariawan from "./Kariawan/List_barang_kariawan";
 import CekStockGudang from "./Kariawan/CekStockGudang";
 import Pembayaran from "./Kariawan/Pembayaran";
 import Print_nota from "./Admin/PrintNota"
+import store from "../redux/store"
 //admin
 import Chatadmin from"./Admin/Chat";
 //kepala gudang 
@@ -42,6 +43,7 @@ import { ThemeProvider } from "./ThemeContext"; // Import ThemeProvider
 import "./index.css"; // Untuk memuat Tailwind CSS
 import Keranjang from "./Kariawan/Keranjang";
 import Checkout from "./Kariawan/Checkout";
+import { Provider } from "react-redux";
 
 const router = createBrowserRouter([
   {
@@ -195,8 +197,10 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <ThemeProvider>
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </Provider>
   </React.StrictMode>
 );

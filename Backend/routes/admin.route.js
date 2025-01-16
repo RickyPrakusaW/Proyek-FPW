@@ -1251,6 +1251,7 @@ router.post('/addPenjualan', async (req, res) => {
       status: false,
       metodePembayaran: metodePembayaran || 'belum bayar',
     };
+    const idPenjualan = penjualanData.idPenjualan
 
     const penjualanRecord = await Penjualan.create(penjualanData);
 
@@ -1261,7 +1262,7 @@ router.post('/addPenjualan', async (req, res) => {
 
     res.status(201).json({
       message: 'Penjualan berhasil disimpan.',
-      data: populatedPenjualan,
+      data: populatedPenjualan, idPenjualan
     });
   } catch (error) {
     console.error('Error saat menyimpan penjualan:', error);
@@ -1273,6 +1274,7 @@ router.post('/addPenjualan', async (req, res) => {
 });
 //update 
 router.put('/updatePenjualan/:idPenjualan', async (req, res) => {
+  console.log("hello bangg")
   const { idPenjualan } = req.params;
   const { metodePembayaran } = req.body;
 

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, Typography, Button, Grid, Box } from "@mui/material";
+import { useSelector, useDispatch } from 'react-redux';
 import axios from "axios";
 
 function Pembayaran() {
   const location = useLocation();
   const navigate = useNavigate();
-
-  const { idPenjualan } = location.state || { idPenjualan: "" };
+  const dispatch = useDispatch();
+  const idPenjualan = useSelector((state) => state.idPenjualan.idPenjualan);
+  
 
   // State untuk data penjualan
   const [penjualanData, setPenjualanData] = useState(null);
@@ -17,7 +19,7 @@ function Pembayaran() {
   useEffect(() => {
     const fetchPenjualanData = async () => {
       try {
-        
+        console.log("ini adalah id penjualan: " + idPenjualan)
         const response = await axios.get(`http://localhost:3000/api/admin/getPenjualan/${idPenjualan}`);
         
         setPenjualanData(response.data);
@@ -40,6 +42,7 @@ function Pembayaran() {
     try {
       // Kirim PUT request untuk update metode pembayaran
       console.log('sebelum')
+      console.log(idPenjualan)
       const response = await axios.put(
         `http://localhost:3000/api/admin/updatePenjualan/${idPenjualan}`,
         { metodePembayaran: paymentMethod }

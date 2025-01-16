@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
+import { setIdPenjualan } from "../../redux/idPenjualanSlice";
 
 function Checkout() {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -92,6 +94,7 @@ function Checkout() {
       const penjualanResult = await penjualanResponse.json();
   
       if (penjualanResponse.ok) {
+        dispatch(setIdPenjualan(penjualanResult.idPenjualan))
         alert(penjualanResult.message);
         navigate("/karyawan/pembayaran");
       } else {
