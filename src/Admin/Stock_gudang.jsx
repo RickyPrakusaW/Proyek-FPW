@@ -72,6 +72,9 @@ const StockGudang = () => {
               className="w-full h-48 object-cover rounded-md mb-4"
             />
             <h2 className={`text-lg font-bold mb-2 ${textClasses}`}>
+              {stock.id_barang}
+            </h2>
+            <h2 className={`text-lg font-bold mb-2 ${textClasses}`}>
               {stock.nama_barang}
             </h2>
             <p className={`text-sm ${textClasses}`}>

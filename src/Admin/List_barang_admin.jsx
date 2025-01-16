@@ -124,6 +124,9 @@ const ListBarangAdmin = () => {
                   alt={product.Nama_product}
                 />
                 <CardContent>
+                <Typography variant="body1">
+                    Id Barang: Rp {product.Id_product}
+                  </Typography>
                   <Typography variant="h6" fontWeight="bold" gutterBottom>
                     {product.Nama_product}
                   </Typography>
@@ -183,6 +186,7 @@ const ListBarangAdmin = () => {
               <Typography variant="h5" fontWeight="bold" gutterBottom>
                 {selectedProduct.Nama_product}
               </Typography>
+              
               <CardMedia
                 component="img"
                 height="300"
@@ -190,6 +194,9 @@ const ListBarangAdmin = () => {
                 alt={selectedProduct.Nama_product}
                 sx={{ borderRadius: 2, marginBottom: 2 }}
               />
+              <Typography variant="body1">
+                heleh: Rp {selectedProduct.Harga}
+              </Typography>
               <Typography variant="body1">
                 Harga: Rp {selectedProduct.Harga}
               </Typography>
