@@ -3,12 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import logo from "./assets/logo.jpg";
+import GoogleIcon from './assets/google_icon.png'
 
 const Login = () => {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const handleLoginGoogle = async () => {
+    //
+    const googleLogin = await fetch('http://localhost:3000/api/auth/google/request', {method: 'post'});
+    const data = await googleLogin.json();
+    window.location.href = data.url
+  }
 
   const handleLogin = async (data) => {
     const { username, password } = data;
@@ -78,6 +86,42 @@ const Login = () => {
             >
               {isLoading ? "Loading..." : "Login"}
             </button>
+            <button
+          type="button"
+          onClick={() => handleLoginGoogle()}
+          style={{
+            marginTop: '10px',
+            width: '100%',
+            padding: '0.8rem',
+            backgroundColor: '#DB4437',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            transition: '0.3s',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onMouseOver={(e) => {
+            e.target.style.backgroundColor = '#80251d';
+            e.target.querySelector('img').style.filter = 'brightness(0.59)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.backgroundColor = '#DB4437';
+            e.target.querySelector('img').style.filter = 'brightness(1)';
+          }}
+        >
+          <img
+            src={GoogleIcon}
+            alt="Google Icon"
+            style={{ width: '20px', height: '20px', marginRight: '10px', transition: '0.3s' }}
+          />
+          Login with Google
+        </button>
           </form>
         </div>
         <div className="w-1/2 pl-8">
