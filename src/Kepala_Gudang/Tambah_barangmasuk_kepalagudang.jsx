@@ -184,7 +184,7 @@ const TambahBarangMasukKepalaGudang = () => {
           </div>
 
           <div className="flex justify-end space-x-4 mt-6">
-            <button type="button" className={buttonBackClasses}>
+            <button type="button" className={buttonBackClasses} navigate >
               Kembali
             </button>
             <button type="submit" className={buttonSaveClasses}>

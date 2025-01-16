@@ -1,22 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, Typography, Button, Grid, Box } from "@mui/material";
-import axios from "axios"; // Pastikan Anda memiliki axios terinstal
+import axios from "axios";
 
 function Pembayaran() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Ambil data dari state navigasi
-  const { totalBelanja, formData, cartItems, idPenjualan } = location.state || {
-    totalBelanja: 0,
-    formData: {},
-    cartItems: [],
-    idPenjualan: "", // Pastikan ID Penjualan ada
-  };
+  const { idPenjualan } = location.state || { idPenjualan: "" };
 
-  // State untuk metode pembayaran
+  // State untuk data penjualan
+  const [penjualanData, setPenjualanData] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(""); // Menyimpan metode pembayaran yang dipilih
+
+  // Fetch data penjualan
+  useEffect(() => {
+    const fetchPenjualanData = async () => {
+      try {
+        
+        const response = await axios.get(`http://localhost:3000/api/admin/getPenjualan/${idPenjualan}`);
+        
+        setPenjualanData(response.data);
+      } catch (error) {
+        console.error("Error fetching penjualan data:", error);
+        alert("Gagal memuat data penjualan.");
+      }
+    };
+
+    fetchPenjualanData();
+  }, [idPenjualan]);
 
   // Fungsi untuk mengirim data pembayaran ke backend
   const handlePayment = async () => {
@@ -24,17 +36,16 @@ function Pembayaran() {
       alert("Pilih metode pembayaran terlebih dahulu!");
       return;
     }
-  
-    console.log("ID Penjualan:", idPenjualan);
-    console.log("Metode Pembayaran:", paymentMethod);
-  
+
     try {
       // Kirim PUT request untuk update metode pembayaran
+      console.log('sebelum')
       const response = await axios.put(
-        `http://localhost:3000/api/admin/updateMetodePembayaran/${idPenjualan}`,
+        `http://localhost:3000/api/admin/updatePenjualan/${idPenjualan}`,
         { metodePembayaran: paymentMethod }
       );
-  
+      console.log('sesudah')
+
       alert("Pembayaran berhasil! Metode pembayaran telah diperbarui.");
       navigate("/karyawan");
     } catch (error) {
@@ -42,7 +53,10 @@ function Pembayaran() {
       alert("Terjadi kesalahan saat memperbarui metode pembayaran: " + error.message);
     }
   };
-  
+
+  if (!penjualanData) {
+    return <Typography>Memuat data...</Typography>;
+  }
 
   return (
     <Grid container justifyContent="center" alignItems="center" style={{ minHeight: "100vh" }}>
@@ -61,7 +75,7 @@ function Pembayaran() {
               style={{ flex: 1, marginRight: "10px", display: "flex", alignItems: "center" }}
             >
               <img
-                src={"https://w7.pngwing.com/pngs/561/1/png-transparent-bank-central-asia-logo-bca-finance-business-bank-blue-cdr-text.png"}
+                src="https://w7.pngwing.com/pngs/561/1/png-transparent-bank-central-asia-logo-bca-finance-business-bank-blue-cdr-text.png"
                 alt="BCA Logo"
                 style={{ width: "30px", height: "30px", marginRight: "10px" }}
               />
@@ -83,38 +97,31 @@ function Pembayaran() {
 
           {/* Menampilkan total tagihan */}
           <div style={{ marginTop: "20px", textAlign: "center" }}>
-            <Typography variant="h6">Total Tagihan: Rp. {totalBelanja}</Typography>
+            <Typography variant="h6">Total Tagihan: Rp. {penjualanData.totalHarga}</Typography>
           </div>
 
           {/* Data pelanggan */}
           <Box mt={3}>
             <Typography variant="subtitle1">Data Pelanggan:</Typography>
-            <Typography>Nama: {formData.Nama_lengkap}</Typography>
-            <Typography>No Telepon: {formData.No_telepone}</Typography>
-            <Typography>Alamat: {formData.Alamat}, {formData.Kota}, {formData.Negara}</Typography>
-            <Typography>Kode Pos: {formData.Kodepos}</Typography>
+            {penjualanData.Customer_id && (
+              <>
+                <Typography>Nama: {penjualanData.Customer_id.Nama_lengkap}</Typography>
+                <Typography>No Telepon: {penjualanData.Customer_id.No_telepone}</Typography>
+                <Typography>Alamat: {penjualanData.Customer_id.Alamat}</Typography>
+              </>
+            )}
           </Box>
 
           {/* Tombol kembali */}
           <div style={{ marginTop: "20px" }}>
-            <Button
-              variant="contained"
-              color="secondary"
-              fullWidth
-              onClick={() => navigate(-1)}
-            >
+            <Button variant="contained" color="secondary" fullWidth onClick={() => navigate(-1)}>
               Kembali
             </Button>
           </div>
 
           {/* Tombol bayar */}
           <div style={{ marginTop: "10px" }}>
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              onClick={handlePayment}
-            >
+            <Button variant="contained" color="primary" fullWidth onClick={handlePayment}>
               Bayar
             </Button>
           </div>

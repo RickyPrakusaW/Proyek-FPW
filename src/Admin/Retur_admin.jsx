@@ -230,6 +230,67 @@ const ReturAdmin = () => {
           </Table>
         </TableContainer>
       </div>
+
+      {/* Modal Dialog */}
+      <Dialog open={showModal} onClose={() => setShowModal(false)}>
+        <DialogTitle>Tambah Retur Barang</DialogTitle>
+        <DialogContent>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="ID Barang"
+              variant="outlined"
+              name="Id_barang"
+              value={newRetur.Id_barang}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              fullWidth
+              label="Nama Barang"
+              variant="outlined"
+              name="Nama_barang"
+              value={newRetur.Nama_barang}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              fullWidth
+              label="Jumlah Barang"
+              variant="outlined"
+              name="Jumlah_barang"
+              value={newRetur.Jumlah_barang}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              fullWidth
+              label="Tanggal"
+              variant="outlined"
+              name="Tanggal"
+              type="date"
+              value={newRetur.Tanggal}
+              onChange={handleChange}
+              InputLabelProps={{ shrink: true }}
+              sx={{ mb: 2 }}
+            />
+            <input
+              type="file"
+              name="Photo_product"
+              onChange={handleFileChange}
+              style={{ display: "block", marginBottom: "16px" }}
+            />
+            <DialogActions>
+              <Button onClick={() => setShowModal(false)} color="primary">
+                Cancel
+              </Button>
+              <Button type="submit" color="primary">
+                Submit
+              </Button>
+            </DialogActions>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

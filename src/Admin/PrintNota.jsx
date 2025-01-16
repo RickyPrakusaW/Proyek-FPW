@@ -47,15 +47,14 @@ function PrintNota() {
   const filteredPenjualan = penjualan.filter((nota) =>
     nota.Customer_id?.Nama_lengkap?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
   const handlePrint = (nota) => {
     const doc = new jsPDF();
     
-    // Menambahkan logo dari folder assets
-    const logoUrl = "../assets/logo.jpg"; // Path relatif ke logo
-
+    // Pastikan logo berada di folder public dan akses dengan path relatif
+    const logoUrl = "/logo.jpg";  // Path relatif ke logo di folder public
+  
     doc.addImage(logoUrl, 'JPEG', 10, 10, 30, 30); // Menambahkan logo ke PDF
-
+  
     // Header nota
     doc.setFontSize(16);
     doc.text("TOKO SEMOGA JADI JAYA", 105, 20, { align: "center" });
@@ -63,7 +62,7 @@ function PrintNota() {
     doc.text("Menjual Tas dan Koper", 105, 27, { align: "center" });
     doc.text("Alamat: Dupak Grosir Surabaya Blok A2 No. 5", 105, 34, { align: "center" });
     doc.text("Telepon: 08510059521", 105, 41, { align: "center" });
-
+  
     // Info Nota
     doc.setFontSize(10);
     doc.text(`Nama Customer: ${nota.Customer_id.Nama_lengkap}`, 20, 50);
@@ -71,7 +70,7 @@ function PrintNota() {
     doc.text(`Tanggal Pembelian: ${nota.tanggalPembelian}`, 20, 64);
     doc.text(`Total Barang: ${nota.totalBarang}`, 20, 71);
     doc.text(`Total Harga: Rp ${nota.totalHarga}`, 20, 78);
-
+  
     // Header tabel
     const tableStartY = 85;
     doc.setFontSize(10);
@@ -81,16 +80,16 @@ function PrintNota() {
     doc.text("Jumlah", 150, tableStartY);
     doc.text("Total", 180, tableStartY);
     doc.line(20, tableStartY + 2, 190, tableStartY + 2);
-
+  
     // Data tabel
     let yOffset = tableStartY + 10;
     let grandTotal = 0;
-
+  
     if (nota.idCart && Array.isArray(nota.idCart)) {
       nota.idCart.forEach((item, index) => {
         const itemTotal = item.harga * item.totalProduct;
         grandTotal += itemTotal;
-
+  
         doc.text(`${index + 1}`, 20, yOffset);
         doc.text(item.namaBarang, 40, yOffset);
         doc.text(`Rp ${item.harga}`, 120, yOffset);
@@ -99,18 +98,18 @@ function PrintNota() {
         yOffset += 10;
       });
     }
-
+  
     // Footer
     yOffset += 20;
     doc.text(`Grand Total: Rp ${grandTotal}`, 20, yOffset);
-
+  
     yOffset += 20;
     doc.text("Tanda Terima,", 20, yOffset);
     doc.text("Hormat Kami,", 150, yOffset);
-
+  
     doc.save(`Nota_${nota._id}.pdf`);
   };
-
+  
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>

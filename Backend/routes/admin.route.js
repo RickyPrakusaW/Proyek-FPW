@@ -1272,44 +1272,46 @@ router.post('/addPenjualan', async (req, res) => {
   }
 });
 //update 
-router.put('/updateMetodePembayaran/:idPenjualan', async (req, res) => {
+router.put('/updatePenjualan/:idPenjualan', async (req, res) => {
   const { idPenjualan } = req.params;
   const { metodePembayaran } = req.body;
-  
+
+  console.log("Menerima request untuk idPenjualan:", idPenjualan);
+  console.log("Metode pembayaran yang dikirim:", metodePembayaran);
+
+  // Validasi metodePembayaran
   if (!metodePembayaran) {
-    return res.status(400).json({
-      error: 'Metode pembayaran wajib diisi.',
-    });
+    return res.status(400).json({ error: 'Metode pembayaran wajib diisi.' });
+  }
+
+  // Pastikan metodePembayaran valid (sesuai enum)
+  const allowedMethods = ['belum bayar', 'cash', 'transfer'];
+  if (!allowedMethods.includes(metodePembayaran)) {
+    return res.status(400).json({ error: 'Metode pembayaran tidak valid.' });
   }
 
   try {
+    console.log("hallo bang")
+    // Cari penjualan berdasarkan idPenjualan
     const penjualanRecord = await Penjualan.findOne({ idPenjualan });
+    console.log("Data penjualan yang ditemukan:", penjualanRecord);
+
     if (!penjualanRecord) {
-      return res.status(404).json({
-        error: 'Penjualan tidak ditemukan.',
-      });
+      return res.status(404).json({ error: 'Penjualan tidak ditemukan.' });
     }
 
+    // Update metodePembayaran
     penjualanRecord.metodePembayaran = metodePembayaran;
     await penjualanRecord.save();
 
-    const populatedPenjualan = await Penjualan.findById(penjualanRecord._id)
-      .populate('Customer_id', 'Nama_lengkap No_telepone')
-      .populate('idCart', 'namaBarang totalProduct harga');
+    console.log("Metode pembayaran berhasil diperbarui:", penjualanRecord);
 
-    res.status(200).json({
-      message: 'Metode pembayaran berhasil diperbarui.',
-      data: populatedPenjualan,
-    });
+    res.status(200).json({ message: 'Metode pembayaran berhasil diperbarui.' });
   } catch (error) {
-    console.error('Error saat memperbarui metode pembayaran:', error);
-    res.status(500).json({
-      error: 'Terjadi kesalahan pada server.',
-      details: error.message,
-    });
+    console.error('Error selama update metode pembayaran:', error);
+    res.status(500).json({ error: 'Terjadi kesalahan pada server.' });
   }
 });
-
 
 router.get('/getPenjualan', async (req, res) => {
   try {
@@ -1334,7 +1336,30 @@ router.get('/getPenjualan', async (req, res) => {
     });
   }
 });
+router.get('/getPenjualan/:idPenjualan', async (req, res) => {
+  const { idPenjualan } = req.params;
 
+  try {
+    const penjualanData = await Penjualan.findOne({ idPenjualan })
+      .populate('Customer_id') // Populate data customer
+      .populate('idCart');     // Populate data cart
+
+    if (!penjualanData) {
+      return res.status(404).json({ message: 'Data penjualan tidak ditemukan' });
+    }
+
+    res.status(200).json({
+      message: 'Data penjualan berhasil diambil',
+      data: penjualanData,
+    });
+  } catch (error) {
+    console.error('Error saat mengambil data penjualan:', error);
+    res.status(500).json({
+      error: 'Terjadi kesalahan pada server',
+      details: error.message,
+    });
+  }
+});
 
 //chat
 const sendMessage = async (chatId, senderId, senderRole, message) => {
