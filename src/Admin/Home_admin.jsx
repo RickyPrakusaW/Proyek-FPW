@@ -65,6 +65,7 @@ const HomeAdmin = () => {
   };
 
   useEffect(() => {
+
     // Ambil data produk
     axios
       .get("http://localhost:3000/api/admin/products")
@@ -114,33 +115,34 @@ const HomeAdmin = () => {
 
     // Ambil dan proses data penjualan per bulan
     axios
-      .get("http://localhost:3000/api/admin/getPenjualan")
-      .then((response) => {
-        const penjualanData = response.data.data;
+    .get("http://localhost:3000/api/admin/getPenjualan")
+    .then((response) => {
+      const penjualanData = response.data.data;
 
-        // Hitung total pemasukan keseluruhan
-        const total = penjualanData.reduce((sum, penjualan) => sum + penjualan.totalHarga, 0);
-        setTotalIncome(total);
+      // Hitung total pemasukan keseluruhan
+      const total = penjualanData.reduce((sum, penjualan) => sum + penjualan.totalHarga, 0);
+      setTotalIncome(total);
 
-        // Inisialisasi array untuk menyimpan total per bulan (12 bulan)
-        const monthlyTotals = Array(12).fill(0);
+      // Kelompokkan dan jumlahkan penjualan per bulan
+      const monthlyTotals = Array(12).fill(0); // Inisialisasi array untuk menyimpan total per bulan (12 bulan)
+      penjualanData.forEach((penjualan) => {
+        const tanggal = new Date(penjualan.tanggalPembelian);
+        const month = tanggal.getMonth(); // 0-11
+        monthlyTotals[month] += penjualan.totalHarga;
+      });
 
-        // Kelompokkan dan jumlahkan penjualan per bulan
-        penjualanData.forEach(penjualan => {
-          const date = new Date(penjualan.tanggal);
-          const month = date.getMonth(); // 0-11
-          monthlyTotals[month] += penjualan.totalHarga;
-        });
+      // Siapkan label bulan dalam bahasa Indonesia
+      const monthLabels = Array(12)
+        .fill()
+        .map((_, index) => getIndonesianMonth(index));
 
-        // Siapkan data untuk chart
-        const monthLabels = Array(12).fill().map((_, index) => getIndonesianMonth(index));
-        
-        setMonthlySalesData({
-          labels: monthLabels,
-          data: monthlyTotals,
-        });
-      })
-      .catch((error) => console.error("Error mengambil data penjualan:", error));
+      // Update state untuk chart
+      setMonthlySalesData({
+        labels: monthLabels, // Nama bulan
+        data: monthlyTotals, // Total penjualan per bulan
+      });
+    })
+    .catch((error) => console.error("Error mengambil data penjualan:", error));
   }, []);
 
   const openModal = (content) => {
@@ -181,14 +183,14 @@ const HomeAdmin = () => {
     datasets: [
       {
         label: "Total Penjualan per Bulan",
-        data: monthlySalesData.data,
+        data: monthlySalesData.data, // Data array total penjualan bulanan
         backgroundColor: [
           '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
           '#FF99CC', '#66B2FF', '#FFE5CC', '#99E6E6', '#CC99FF', '#FFB366'
         ],
-        borderColor: isDarkMode ? 
-          Array(12).fill('rgba(255, 255, 255, 0.2)') : 
-          Array(12).fill('rgba(0, 0, 0, 0.2)'),
+        borderColor: isDarkMode
+          ? Array(12).fill('rgba(255, 255, 255, 0.2)')
+          : Array(12).fill('rgba(0, 0, 0, 0.2)'),
         borderWidth: 1,
       },
     ],
