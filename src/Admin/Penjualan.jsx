@@ -202,12 +202,12 @@ function Penjualan({ isDarkMode }) {
       )}
 
       {/* Total Pemasukan */}
-      <Typography variant="h6" sx={{ mt: 3 }}>
+      {/* <Typography variant="h6" sx={{ mt: 3 }}>
         Total Pemasukan: Rp{" "}
         {calculateTotalPemasukan().toLocaleString("id-ID", {
           minimumFractionDigits: 0,
         })}
-      </Typography>
+      </Typography> */}
     </Box>
   );
 }
