@@ -69,7 +69,9 @@ function PrintNota() {
     doc.text(`Metode Pembayaran: ${nota.metodePembayaran}`, 20, 57);
     doc.text(`Tanggal Pembelian: ${nota.tanggalPembelian}`, 20, 64);
     doc.text(`Total Barang: ${nota.totalBarang}`, 20, 71);
-    doc.text(`Total Harga: Rp ${nota.totalHarga}`, 20, 78);
+    const formattedTotalHarga = nota.totalHarga.toLocaleString('id-ID');
+    console.log(formattedTotalHarga)
+    doc.text(`Total Harga: Rp ${formattedTotalHarga}`, 20, 78);
   
     // Header tabel
     const tableStartY = 85;
@@ -92,9 +94,9 @@ function PrintNota() {
   
         doc.text(`${index + 1}`, 20, yOffset);
         doc.text(item.namaBarang, 40, yOffset);
-        doc.text(`Rp ${item.harga}`, 120, yOffset);
+        doc.text(`Rp ${item.harga.toLocaleString('id-ID')}`, 120, yOffset);
         doc.text(`${item.totalProduct}`, 150, yOffset);
-        doc.text(`Rp ${itemTotal}`, 180, yOffset);
+        doc.text(`Rp ${itemTotal.toLocaleString('id-ID')}`, 180, yOffset);
         yOffset += 10;
       });
     }
