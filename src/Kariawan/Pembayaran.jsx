@@ -98,13 +98,13 @@ function Pembayaran() {
             </Button>
           </div>
 
-          {/* Menampilkan total tagihan */}
+          {/* Menampilkan total tagihan
           <div style={{ marginTop: "20px", textAlign: "center" }}>
             <Typography variant="h6">Total Tagihan: Rp. {penjualanData.totalHarga}</Typography>
-          </div>
+          </div> */}
 
           {/* Data pelanggan */}
-          <Box mt={3}>
+          {/* <Box mt={3}>
             <Typography variant="subtitle1">Data Pelanggan:</Typography>
             {penjualanData.Customer_id && (
               <>
@@ -113,7 +113,7 @@ function Pembayaran() {
                 <Typography>Alamat: {penjualanData.Customer_id.Alamat}</Typography>
               </>
             )}
-          </Box>
+          </Box> */}
 
           {/* Tombol kembali */}
           <div style={{ marginTop: "20px" }}>

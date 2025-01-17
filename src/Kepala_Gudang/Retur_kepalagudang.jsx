@@ -153,9 +153,7 @@ const ReturAdmin = () => {
                 <TableCell align="center" sx={{ color: textColor }}>
                   Tanggal
                 </TableCell>
-                <TableCell align="center" sx={{ color: textColor }}>
-                  Foto Barang
-                </TableCell>
+                
                 <TableCell align="center" sx={{ color: textColor }}>
                   Status
                 </TableCell>
@@ -182,14 +180,7 @@ const ReturAdmin = () => {
                   <TableCell align="center" sx={{ color: textColor }}>
                     {new Date(retur.tanggal).toLocaleDateString()}
                   </TableCell>
-                  <TableCell align="center">
-                    <Avatar
-                      variant="square"
-                      src={`http://localhost:3000/api/admin/uploads/stock/${retur.photoBarang}`}
-                      alt="Barang"
-                      sx={{ width: 56, height: 56, mx: "auto" }}
-                    />
-                  </TableCell>
+                
                   <TableCell align="center" sx={{ color: textColor }}>
                     {retur.status === "approved" ? (
                       <Tooltip title="Approved">

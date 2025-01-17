@@ -125,7 +125,7 @@ const ListBarangAdmin = () => {
                 />
                 <CardContent>
                 <Typography variant="body1">
-                    Id Barang: Rp {product.Id_product}
+                    Id Barang: {product.Id_product}
                   </Typography>
                   <Typography variant="h6" fontWeight="bold" gutterBottom>
                     {product.Nama_product}
@@ -195,7 +195,7 @@ const ListBarangAdmin = () => {
                 sx={{ borderRadius: 2, marginBottom: 2 }}
               />
               <Typography variant="body1">
-                heleh: Rp {selectedProduct.Harga}
+                ID Barang:   {selectedProduct.Id_product}
               </Typography>
               <Typography variant="body1">
                 Harga: Rp {selectedProduct.Harga}
